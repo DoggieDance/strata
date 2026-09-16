@@ -1,0 +1,97 @@
+name: STRATA ETL
+
+# Deterministic data pipeline. No model in the loop, no subscription usage.
+# Runs with every machine switched off.
+#
+# NOTE: scheduled workflows auto-disable after 60 days of repository inactivity.
+# The keepalive step below exists solely to prevent that.
+
+on:
+  schedule:
+    - cron: "17 7 1 * *"        # 1st of the month, 07:17 UTC
+  workflow_dispatch:
+    inputs:
+      states:
+        description: "State FIPS codes, comma separated (default: 51 = Virginia)"
+        default: "51"
+      vintages:
+        description: "ACS 5-year vintages, comma separated"
+        default: "2020"
+      force:
+        description: "Rebuild even if the manifest is current"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strata-etl
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r etl/requirements.txt
+
+      # Fails loudly rather than silently producing a stale build.
+      - name: Preflight — can this runner reach Census?
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
+            "https://www2.census.gov/programs-surveys/acs/summary_file/")
+          echo "census.gov -> $code"
+          test "$code" = "200" || { echo "::error::Census unreachable from runner"; exit 1; }
+
+      - name: Check release calendar
+        id: check
+        run: python -m etl.check_releases --out release_state.json
+
+      - name: Build cube
+        if: steps.check.outputs.changed == 'true' || inputs.force
+        run: |
+          python -m etl.build_cube \
+            --states "${{ inputs.states || '51' }}" \
+            --vintages "${{ inputs.vintages || '2020' }}" \
+            --out build/
+
+      - name: Build tiles
+        if: steps.check.outputs.changed == 'true' || inputs.force
+        run: python -m etl.build_tiles --states "${{ inputs.states || '51' }}" --out build/
+
+      - name: Test
+        if: steps.check.outputs.changed == 'true' || inputs.force
+        run: python -m pytest tests/ -q
+
+      - name: Upload to R2
+        if: steps.check.outputs.changed == 'true' || inputs.force
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          aws s3 sync build/ "s3://$R2_BUCKET/" \
+            --endpoint-url "$R2_ENDPOINT" --no-progress
+          # Vintages accumulate. Never --delete.
+
+      # The manifest is the contract between the ETL and the app.
+      - name: Commit manifest and keepalive
+        run: |
+          git config user.name  "strata-etl"
+          git config user.email "noreply@github.com"
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
+          git add -A app/manifest.json release_state.json .keepalive 2>/dev/null || true
+          git diff --cached --quiet && echo "nothing to commit" && exit 0
+          git commit -m "etl: refresh manifest [skip ci]"
+          git pull --rebase --autostash
+          git push

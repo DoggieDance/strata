@@ -1,0 +1,11 @@
+build/
+data/
+*.pmtiles
+*.parquet
+*.zip
+*.dat
+__pycache__/
+.venv/
+node_modules/
+.DS_Store
+.env

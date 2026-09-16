@@ -1,0 +1,26 @@
+indicator,rank,neighborhood,pct_change
+income,1,Roxborough Park,139.46
+income,2,Old Kensington,129.13
+income,3,East Kensington,123.99
+income,4,Northern Liberties,93.33
+income,5,Brewerytown,86.09
+rent,1,Sharswood,91.82
+rent,2,Old Kensington,74.90
+rent,3,Navy Yard,52.22
+rent,4,Roxborough Park,51.07
+rent,5,Packer Park,51.00
+home_value,1,East Kensington,116.69
+home_value,2,Old Kensington,110.98
+home_value,3,Nicetown,95.09
+home_value,4,Point Breeze,94.27
+home_value,5,Sharswood,82.30
+bachelors_plus,1,Mcguire,1968.87
+bachelors_plus,2,Ludlow,438.95
+bachelors_plus,3,Sharswood,376.63
+bachelors_plus,4,Port Richmond,348.85
+bachelors_plus,5,West Poplar,334.99
+nh_white,1,Glenwood,1053.46
+nh_white,2,Haverford North,694.46
+nh_white,3,West Parkside,453.77
+nh_white,4,Mill Creek,344.73
+nh_white,5,Brewerytown,315.08

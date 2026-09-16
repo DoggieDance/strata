@@ -1,0 +1,10 @@
+{
+  "series": "R-CPI-U-RS",
+  "source": "https://www.bls.gov/cpi/research-series/home.htm",
+  "retrieved": null,
+  "note": "Populate from BLS at Phase 01. Factors are data, never constants in code. The Philadelphia study used 1.187 for 2010 to 2020 dollars; that value is a fixture to check against, not the source of truth.",
+  "annual": {},
+  "fixtures": {
+    "2010_to_2020_study_value": 1.187
+  }
+}

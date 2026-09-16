@@ -1,0 +1,82 @@
+{
+  "registry_version": 1,
+  "note": "Seed measures from the Philadelphia study (GEOG 376, 2025). Per-vintage sources are mandatory: table definitions drift between decennial-anchored redesigns.",
+  "measures": [
+    {
+      "id": "agg_household_income",
+      "label": "Aggregate household income",
+      "kind": "aggregate",
+      "dollars": true,
+      "denominator": "households",
+      "sources": {
+        "2006-2010": { "dataset": "acs5", "table": "B19025", "cells": ["001"] },
+        "2016-2020": { "dataset": "acs5", "table": "B19025", "cells": ["001"] }
+      },
+      "derives": "mean_household_income"
+    },
+    {
+      "id": "agg_gross_rent",
+      "label": "Aggregate gross rent",
+      "kind": "aggregate",
+      "dollars": true,
+      "denominator": "renter_households",
+      "sources": {
+        "2006-2010": { "dataset": "acs5", "table": "B25065", "cells": ["001"] },
+        "2016-2020": { "dataset": "acs5", "table": "B25065", "cells": ["001"] }
+      },
+      "derives": "mean_gross_rent"
+    },
+    {
+      "id": "agg_home_value",
+      "label": "Aggregate home value",
+      "kind": "derived",
+      "dollars": true,
+      "denominator": "owner_households",
+      "method": "bin_midpoint_sum",
+      "sources": {
+        "2006-2010": {
+          "dataset": "acs5", "table": "B25075", "cells": ["002:025"],
+          "top_bin": { "collapse_from": "024", "midpoint": 1250000 }
+        },
+        "2016-2020": {
+          "dataset": "acs5", "table": "B25075", "cells": ["002:027"],
+          "top_bin": { "collapse_from": "025", "midpoint": 1250000,
+                       "note": "2020 publishes bins above $2M; collapsed to match the 2010 structure." }
+        }
+      },
+      "derives": "mean_home_value",
+      "caution": "Bin structure differs between vintages. The collapsed top-bin midpoint is a documented modeling choice, not a measurement."
+    },
+    {
+      "id": "pct_bachelors_plus",
+      "label": "Bachelor's degree or higher, age 25+",
+      "kind": "percent",
+      "denominator": "pop_25_plus",
+      "sources": {
+        "2006-2010": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"] },
+        "2016-2020": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"] }
+      },
+      "caution": "Subject table. Separate Summary File and separate API endpoint from detailed tables."
+    },
+    {
+      "id": "pct_nh_white",
+      "label": "Non-Hispanic white share of population",
+      "kind": "ratio",
+      "numerator_source": { "table": "B03002", "cells": ["003"] },
+      "denominator_source": { "table": "B03002", "cells": ["001"] },
+      "sources": {
+        "2006-2010": { "dataset": "acs5", "table": "B03002" },
+        "2016-2020": { "dataset": "acs5", "table": "B03002" }
+      },
+      "caution": "Near-zero baselines produce percent changes in the hundreds or thousands that mean nothing. This is the reason the index standardizes rather than ranking raw percent change."
+    }
+  ],
+  "denominators": {
+    "households":        { "table": "B25003", "cells": ["001"] },
+    "owner_households":  { "table": "B25003", "cells": ["002"] },
+    "renter_households": { "table": "B25003", "cells": ["003"] },
+    "total_population":  { "table": "B01003", "cells": ["001"] },
+    "pop_25_plus":       { "dataset": "acs5/subject", "table": "S1501", "cells": ["C01_006"] }
+  },
+  "jam_values": [-666666666, -999999999, -888888888, -222222222, -333333333, -555555555]
+}
