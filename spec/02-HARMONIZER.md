@@ -13,6 +13,50 @@ correctly flagged the assumption: values are uniformly distributed within a
 tract. They are not. A tract that is half industrial park and half dense
 apartments gives the industrial half credit for people who do not live there.
 
+## First task: obtaining 2006–2010
+
+**Resolve this before any crosswalk work.** Nothing below matters until the
+2010 side of the comparison can be loaded.
+
+The 2006–2010 5-year vintage predates the table-based Summary File. It is
+published only in the old **sequence-based** format:
+
+```
+https://www2.census.gov/programs-surveys/acs/summary_file/2010/
+  data/5_year_by_state/ …                 per-state archives
+  data/5_year_seq_by_state/ …             per-state, per-sequence files
+  data/2010_5yr_SummaryFileTemplates.zip  column headers per sequence
+  documentation/5_year/user_tools/Sequence_Number_and_Table_Number_Lookup.txt
+```
+
+A table is not a file there. Its cells are spread across a numbered sequence
+file (e.g. B25075 is sequence 99, B25063 and B25065 are sequence 98), with
+estimates and MOEs in separate `e`/`m` files. Rows are keyed by `LOGRECNO`,
+joined to GEOID through a separate geography file, and tract and block-group
+rows live in a separate archive (`Virginia_Tracts_Block_Groups_Only.zip`
+vs `Virginia_All_Geographies_Not_Tracts_Block_Groups.zip`). There is no 2010 table-based prototype;
+`summary_file/2010/` has only `data/` and `documentation/`.
+
+The task is to decide and document:
+
+1. **Source.** Sequence-based Summary File, or another keyless static source,
+   with the reason. The Census API is not a build source (spec 01).
+2. **Loader.** A 2006–2010 reader that produces the same per-table frame the
+   2016–2020 loader does (GEOID index, `E###` / `M###` columns), so `clean.py`
+   stays vintage-agnostic.
+3. **Subject tables.** S1501 is not in the 2010 Summary File either. The
+   2006–2010 `pct_bachelors_plus` needs its own detailed-table recipe.
+   **B15003 does not exist in the 2010 lookup file**; the recipe must use
+   B15002 (sex by educational attainment, population 25+, sequence 40), summing
+   the bachelor's-and-above cells for both sexes. `pop_25_plus` likewise
+   becomes `B15002_001`.
+4. **Registry.** A `2006-2010` entry in `registry/summary_files.json`.
+   Already verified from the 2010 lookup file: B25075 bins (registry v3),
+   B25063_002 "With cash rent:", B25065's cash-rent universe.
+
+Gate for this task: 20 Virginia 2006–2010 tract values match data.census.gov,
+and the jam guard passes, exactly as for Phase 01.
+
 ## The decision: population weighting
 
 Apportion using **2020 decennial census block population** as the weight rather

@@ -57,8 +57,9 @@ quietly false.
   `Content-Range` — in Chrome, Safari and Firefox. Not 200.
 - CORS preflight on the data origin admits the `Range` header.
 - A PMTiles tile loads from a cold browser in each of those three.
-- The Actions workflow can reach `www2.census.gov` from a runner. (It cannot be
-  reached from a Cowork session, so this is genuinely untested until it runs.)
+- The build machine can reach `www2.census.gov` (preflight before every build).
+  Verified 2026-09-16: 200. It cannot be reached from a Cowork session.
+- The Phase 03 watchdog workflow can reach whatever it checks from a runner.
 
 ## Visual regression
 

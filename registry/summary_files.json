@@ -1,0 +1,21 @@
+{
+  "note": "Where each vintage's table-based Summary File lives. Per-vintage, never one global layout: the table-based format only became official with the 2021 release; 2016-2020 exists only as a Census prototype in that format.",
+  "vintages": {
+    "2016-2020": {
+      "endyear": 2020,
+      "status": "prototype",
+      "data_base": "https://www2.census.gov/programs-surveys/acs/summary_file/2020/prototype/5YRData/",
+      "table_file": "acsdt5y2020-{table}.dat",
+      "geos": "https://www2.census.gov/programs-surveys/acs/summary_file/2020/prototype/Geos20205YR.csv",
+      "table_shells": "https://www2.census.gov/programs-surveys/acs/summary_file/2020/prototype/ACS2020_Table_Shells.csv",
+      "tract_geography": "2020",
+      "dollars": "2020 inflation-adjusted dollars",
+      "has_subject_tables": false,
+      "caveats": [
+        "The spec's table-based-SF/ path does not exist for 2020 (404). The prototype/ directory is the only table-based release of this vintage.",
+        "No ETag is served by www2.census.gov for these files; the fetcher falls back to Last-Modified + Content-Length validators.",
+        "Tract rows use 2020 tract definitions (all 2,147 VA rows match the 2020 Gazetteer). Geos20205YR.csv lists 2,198 VA tracts; the rest are absent from the data tables."
+      ]
+    }
+  }
+}

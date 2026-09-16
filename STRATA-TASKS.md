@@ -26,7 +26,7 @@ suggestions.
 | Version | Reserved for | Status |
 |---|---|---|
 | v0.1 | Phase 00 — spec files committed | in progress |
-| v0.2 | Phase 01 — Virginia data spine | reserved |
+| v0.2 | Phase 01 — Virginia data spine | in progress — cube rebuilt from registry v3 2026-09-16; gate pending manual spot-check |
 | v0.3 | Phase 02 — harmonizer | reserved |
 
 Rule: reserve here first. A build that discovers its version is taken halts.

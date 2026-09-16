@@ -1,6 +1,8 @@
 # ETL
 
-Runs on GitHub Actions, or locally. **It cannot run from a Cowork session** —
+Runs on the local build machine only. There is no CI pipeline; the old Actions
+file is parked at `etl.workflow.yml.draft` and the Phase 03 workflow will be a
+watchdog. **It cannot run from a Cowork session** —
 `census.gov` is blocked by that session's egress policy. This is documented in
 `spec/01-DATA-SPINE.md` and is not a bug to route around.
 
@@ -20,9 +22,15 @@ Runs on GitHub Actions, or locally. **It cannot run from a Cowork session** —
 ## Local run
 
 ```bash
-pip install -r etl/requirements.txt
-python -m etl.build_cube --states 51 --vintages 2020 --out build/
+python3 -m venv .venv            # never global pip
+.venv/bin/pip install -r etl/requirements.txt
+.venv/bin/python -m etl.fetch_summary_file --vintage 2016-2020
+.venv/bin/python -m etl.build_cube --states 51 --vintages 2016-2020 --out build/
+.venv/bin/python -m pytest tests/ -q
 ```
+
+If `python3 -m venv` fails for lack of ensurepip, use `--without-pip` and
+bootstrap pip inside the venv with `get-pip.py`.
 
 ## Secrets
 

@@ -1,3 +1,13 @@
+# DRAFT — NOT ACTIVE. Moved out of .github/workflows/ on 2026-09-16.
+#
+# The laptop is the build machine; this file is kept for reference only.
+# The real workflow is written at Phase 03 as a watchdog (release-calendar and
+# staleness checks), not as a build pipeline. Known defects if revived as-is:
+#   - calls etl.check_releases and etl.build_tiles, which do not exist
+#   - passes --vintages 2020 (now an alias for 2016-2020)
+#   - ends in `git pull --rebase --autostash && git push`, which the git
+#     discipline in STRATA-TASKS.md forbids (fast-forward only, no auto-push)
+#
 name: STRATA ETL
 
 # Deterministic data pipeline. No model in the loop, no subscription usage.

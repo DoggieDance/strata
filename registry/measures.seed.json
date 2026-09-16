@@ -1,5 +1,5 @@
 {
-  "registry_version": 1,
+  "registry_version": 3,
   "note": "Seed measures from the Philadelphia study (GEOG 376, 2025). Per-vintage sources are mandatory: table definitions drift between decennial-anchored redesigns.",
   "measures": [
     {
@@ -19,12 +19,17 @@
       "label": "Aggregate gross rent",
       "kind": "aggregate",
       "dollars": true,
-      "denominator": "renter_households",
+      "denominator": "cash_rent_renter_households",
       "sources": {
         "2006-2010": { "dataset": "acs5", "table": "B25065", "cells": ["001"] },
         "2016-2020": { "dataset": "acs5", "table": "B25065", "cells": ["001"] }
       },
-      "derives": "mean_gross_rent"
+      "universe": "Renter-occupied housing units paying cash rent (both vintages, per the table shells).",
+      "derives": "mean_gross_rent",
+      "legacy_derives": [
+        { "id": "mean_gross_rent_philly_study", "denominator": "renter_households", "legacy": true,
+          "note": "The Philadelphia study's definition (GEOG 376, 2025): B25065 divided by all renter-occupied units (B25003_003), which includes no-cash-rent units outside B25065's universe. Biased low wherever no-cash-rent units are common. Kept only so the Phase 04 replication can reproduce the study and measure the difference; not for new indices." }
+      ]
     },
     {
       "id": "agg_home_value",
@@ -36,16 +41,78 @@
       "sources": {
         "2006-2010": {
           "dataset": "acs5", "table": "B25075", "cells": ["002:025"],
-          "top_bin": { "collapse_from": "024", "midpoint": 1250000 }
+          "top_bin": { "collapse_from": "025", "collapse_at_lower_bound": 1000000, "midpoint": 1250000,
+                       "note": "Top published bin is \"$1,000,000 or more\" (025). Registry v2 said collapse_from 024, which would have valued the $750,000-$999,999 bin at $1.25M; corrected in v3 from the label text." },
+          "bins_source": "Labels read from the 2006-2010 Sequence_Number_and_Table_Number_Lookup.txt (summary_file/2010/documentation/5_year/user_tools/)",
+          "bins_columns": ["cell", "lower", "upper", "midpoint_used"],
+          "bins": [
+            ["002", 0, 9999, 5000],
+            ["003", 10000, 14999, 12500],
+            ["004", 15000, 19999, 17500],
+            ["005", 20000, 24999, 22500],
+            ["006", 25000, 29999, 27500],
+            ["007", 30000, 34999, 32500],
+            ["008", 35000, 39999, 37500],
+            ["009", 40000, 49999, 45000],
+            ["010", 50000, 59999, 55000],
+            ["011", 60000, 69999, 65000],
+            ["012", 70000, 79999, 75000],
+            ["013", 80000, 89999, 85000],
+            ["014", 90000, 99999, 95000],
+            ["015", 100000, 124999, 112500],
+            ["016", 125000, 149999, 137500],
+            ["017", 150000, 174999, 162500],
+            ["018", 175000, 199999, 187500],
+            ["019", 200000, 249999, 225000],
+            ["020", 250000, 299999, 275000],
+            ["021", 300000, 399999, 350000],
+            ["022", 400000, 499999, 450000],
+            ["023", 500000, 749999, 625000],
+            ["024", 750000, 999999, 875000],
+            ["025", 1000000, null, 1250000]
+          ]
         },
         "2016-2020": {
           "dataset": "acs5", "table": "B25075", "cells": ["002:027"],
-          "top_bin": { "collapse_from": "025", "midpoint": 1250000,
-                       "note": "2020 publishes bins above $2M; collapsed to match the 2010 structure." }
+          "top_bin": { "collapse_from": "025", "collapse_at_lower_bound": 1000000, "midpoint": 1250000,
+                       "note": "Publishes three bins at or above $1M (025 $1,000,000-$1,499,999, 026 $1,500,000-$1,999,999, 027 $2,000,000 or more). All three are collapsed to the same $1.25M so both vintages treat homes worth $1M+ identically. This understates tracts with many $1.5M+ homes." },
+          "bins_source": "Labels read from ACS2020_Table_Shells.csv (summary_file/2020/prototype/)",
+          "bins_columns": ["cell", "lower", "upper", "midpoint_used"],
+          "bins": [
+            ["002", 0, 9999, 5000],
+            ["003", 10000, 14999, 12500],
+            ["004", 15000, 19999, 17500],
+            ["005", 20000, 24999, 22500],
+            ["006", 25000, 29999, 27500],
+            ["007", 30000, 34999, 32500],
+            ["008", 35000, 39999, 37500],
+            ["009", 40000, 49999, 45000],
+            ["010", 50000, 59999, 55000],
+            ["011", 60000, 69999, 65000],
+            ["012", 70000, 79999, 75000],
+            ["013", 80000, 89999, 85000],
+            ["014", 90000, 99999, 95000],
+            ["015", 100000, 124999, 112500],
+            ["016", 125000, 149999, 137500],
+            ["017", 150000, 174999, 162500],
+            ["018", 175000, 199999, 187500],
+            ["019", 200000, 249999, 225000],
+            ["020", 250000, 299999, 275000],
+            ["021", 300000, 399999, 350000],
+            ["022", 400000, 499999, 450000],
+            ["023", 500000, 749999, 625000],
+            ["024", 750000, 999999, 875000],
+            ["025", 1000000, 1499999, 1250000],
+            ["026", 1500000, 1999999, 1250000],
+            ["027", 2000000, null, 1250000]
+          ]
         }
       },
       "derives": "mean_home_value",
-      "caution": "Bin structure differs between vintages. The collapsed top-bin midpoint is a documented modeling choice, not a measurement."
+      "bin_rule": "Collapse point is set from label text, not by cell number: every bin whose lower bound is at least $1,000,000 (the lower bound of 2006-2010's open-ended top bin) gets the top midpoint. Other bins use (lower + upper + 1) / 2; 'Less than $10,000' is 0-9,999, midpoint 5,000. The build re-parses the vintage's labels and fails if they disagree with the bins recorded here.",
+      "top_midpoint_provenance": "The $1,250,000 top-bin midpoint comes from the source Philadelphia study (GEOG 376, JMU, 2025), not from Census. Census publishes no midpoint for an open-ended bin; this is a modeling choice, not a derived value.",
+      "top_midpoint_alternative": "Revisit later: Pareto interpolation (fit a Pareto tail to the upper bins and take the open bin's mean) is the rigorous alternative, as used for Census medians in open-ended intervals.",
+      "caution": "Bin structure differs between vintages. The top midpoint is an assumption, not a measurement."
     },
     {
       "id": "pct_bachelors_plus",
@@ -54,7 +121,11 @@
       "denominator": "pop_25_plus",
       "sources": {
         "2006-2010": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"] },
-        "2016-2020": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"] }
+        "2016-2020": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"],
+                       "summary_file_substitute": {
+                         "dataset": "acs5", "table": "B15003",
+                         "numerator_cells": ["022:025"], "denominator_cells": ["001"],
+                         "note": "Subject tables are not in the Summary File. Recomputed from B15003 (bachelor's + master's + professional + doctorate over population 25+), the definition S1501_C02_015 publishes. Estimates should agree with S1501. The numerator MOE is the root-sum-square of the component MOEs and the percent MOE uses the proportion formula, the Census-documented method for derived estimates (ACS Handbook, 'Calculating Measures of Error for Derived Estimates'). Census computes S1501's published MOE directly, so the two MOEs can differ slightly." } }
       },
       "caution": "Subject table. Separate Summary File and separate API endpoint from detailed tables."
     },
@@ -75,8 +146,15 @@
     "households":        { "table": "B25003", "cells": ["001"] },
     "owner_households":  { "table": "B25003", "cells": ["002"] },
     "renter_households": { "table": "B25003", "cells": ["003"] },
+    "cash_rent_renter_households": { "table": "B25063", "cells": ["002"],
+                           "note": "'With cash rent:' in both 2006-2010 and 2016-2020. This is B25065's universe. B25070_001 was rejected: its total includes a 'Not computed' line (no cash rent or zero income)." },
     "total_population":  { "table": "B01003", "cells": ["001"] },
-    "pop_25_plus":       { "dataset": "acs5/subject", "table": "S1501", "cells": ["C01_006"] }
+    "pop_25_plus":       { "dataset": "acs5/subject", "table": "S1501", "cells": ["C01_006"],
+                           "summary_file_substitute": {
+                             "2016-2020": { "dataset": "acs5", "table": "B15003", "cells": ["001"],
+                                            "note": "Same universe (population 25 years and over) as S1501_C01_006." } } }
   },
-  "jam_values": [-666666666, -999999999, -888888888, -222222222, -333333333, -555555555]
+  "jam_values": [-666666666, -999999999, -888888888, -222222222, -333333333],
+  "controlled_moe_value": -555555555,
+  "jam_note": "jam_values are missing data and become null. controlled_moe_value appears only in MOE fields: the estimate is controlled to an independent total, has no sampling error, and becomes an MOE of 0. In an estimate field it is an error."
 }

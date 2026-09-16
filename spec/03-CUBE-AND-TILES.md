@@ -12,8 +12,19 @@ One wide Parquet file per state per vintage per geography level.
 acs/{vintage}/{level}/{state_fips}.parquet
 ```
 
-- Rows: `GEOID`, sorted, so row groups align to counties.
-- Columns: one `{measure}_e` and one `{measure}_m` per measure. Float32.
+- Rows: `GEOID`, sorted, so row groups align to counties. **One row per
+  geography the vintage's geography file lists** (for 2016–2020 Virginia,
+  `Geos20205YR.csv`: 2,198 tracts). Tables do not all carry every row (B25065
+  has 2,147, B19025 2,196). A tract missing from a table gets nulls for that
+  table's measures; it is never dropped. The row set is identical across every
+  measure in a file.
+- Columns: one `{measure}_e` and one `{measure}_m` per measure. Float32, except
+  **dollar aggregates, which are Float64.** Tract aggregates reach 1e9–1e10
+  dollars, where Float32 cannot hold the published integer exactly (spacing is
+  32 at 3e8 and 1,024 at 1e10), and the Phase 01 gate requires exact matches.
+  Means, percents and counts stay Float32; counts are checked against Float32's
+  exact-integer range (2^24) at build time. Missing values are Parquet nulls,
+  never NaN.
 - Row group size ~8,000 rows. Compression zstd.
 
 Parquet is columnar, so an index naming five measures fetches ten columns, not
@@ -23,7 +34,7 @@ the whole file. Read with **hyparquet** (~10 KB) using HTTP range requests.
 
 | Scope | Rows | Est. compressed |
 |---|---|---|
-| Virginia, tracts, one vintage | ~2,200 | ~0.4 MB |
+| Virginia, tracts, one vintage | 2,198 | ~0.4 MB — **measured 0.27 MB** (Phase 01, 26 value columns) |
 | National, tracts, one vintage | ~85,000 | ~15–25 MB |
 | National, block groups | ~240,000 | ~45–70 MB |
 
@@ -63,8 +74,14 @@ the default path.
 | App shell | GitHub Pages | 1 GB site, 100 GB/mo | < 1 MB | ample |
 | Cube + tiles | Cloudflare R2 | 10 GB, **zero egress** | ~150–300 MB | ample |
 | Read ops | Cloudflare R2 | 10 M class-B/mo | ~30 per session | ample |
-| ETL compute | GitHub Actions | unmetered on public repos | ~15 min/mo | ample |
-| Job duration | GitHub Actions | 6 h per job | ~25 min national | watch |
+| ETL compute | Local build machine | — | minutes per state | n/a |
+| Watchdog | GitHub Actions | unmetered on public repos | seconds/mo | ample |
+
+**The build runs on the laptop, not in CI.** It downloads from census.gov,
+computes, and pushes finished artifacts out. The Actions workflow, written at
+this phase, is a **watchdog**: it checks the release calendar and whether what
+is deployed is stale, and reports. It does not build or push data. The earlier
+pipeline draft is parked at `etl/etl.workflow.yml.draft` for reference.
 
 **Data goes to R2, not GitHub Pages, deliberately.** Pages has a documented
 history of mangling byte-range requests for `.pmtiles` archives and a hard

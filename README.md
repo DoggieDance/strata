@@ -27,7 +27,7 @@ which did this once, by hand, for one city.
 ```
 spec/        design documents — read these first, in order
 registry/    measure definitions (which ACS variables, how derived)
-etl/         build pipeline — runs on GitHub Actions, never in a chat session
+etl/         build pipeline — runs on the local build machine, never in a chat session
 app/         the single-file web app
 tests/       golden fixtures and property tests
 tasks/       scheduled-task specifications
