@@ -19,6 +19,8 @@ watchdog. **It cannot run from a Cowork session** —
 | `build_cube` | Writes per-state Parquet, sorted by GEOID, 8k row groups, zstd. |
 | `build_tiles` | CB shapefiles to a GEOID-only PMTiles archive. |
 | `write_manifest` | The contract the app reads. Nothing reaches past it. |
+| `zcta` | Assigns each ZCTA to the state holding most of its land (2020 relationship file). |
+| `build_geometry` | Cartographic Boundary polygons per level → GeoJSON (GEOID only) + a names file. |
 | `spotcheck` | Validation only: fills a gate fixture from data.census.gov's published tables. |
 
 ## Local run
@@ -26,9 +28,10 @@ watchdog. **It cannot run from a Cowork session** —
 ```bash
 python3 -m venv .venv            # never global pip
 .venv/bin/pip install -r etl/requirements.txt
-.venv/bin/python -m etl.fetch_summary_file --vintage 2016-2020
-.venv/bin/python -m etl.fetch_summary_file --vintage 2006-2010
-.venv/bin/python -m etl.build_cube --states 51 --vintages 2016-2020,2006-2010 --out build/
+.venv/bin/python -m etl.fetch_summary_file --vintage 2016-2020 --levels tract,county,place,zcta
+.venv/bin/python -m etl.fetch_summary_file --vintage 2006-2010 --levels tract,county,place
+.venv/bin/python -m etl.build_cube --states 51 --vintages 2016-2020,2006-2010 --levels tract,county,place,zcta --out build/
+.venv/bin/python -m etl.build_geometry --vintages 2016-2020,2006-2010 --levels tract,county,place,zcta
 .venv/bin/python -m pytest tests/ -q
 ```
 

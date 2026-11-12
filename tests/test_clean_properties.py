@@ -183,3 +183,9 @@ def test_scope_lock(states, vintages, level):
 
 def test_2006_2010_in_phase_02_scope():
     check_scope(["51"], ["2006-2010", "2016-2020"], "tract")
+
+
+def test_2006_2010_has_no_zcta():
+    from etl.common import LevelUnavailable, level_cfg
+    with pytest.raises(LevelUnavailable):
+        level_cfg("2006-2010", "zcta")

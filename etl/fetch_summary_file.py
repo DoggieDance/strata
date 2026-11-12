@@ -26,7 +26,9 @@ import requests
 
 from etl.common import (
     ROOT,
+    LevelUnavailable,
     check_scope,
+    level_cfg,
     load_measures,
     load_summary_files,
     raw_dir,
@@ -133,12 +135,12 @@ def fetch(url: str, dest: Path, session: requests.Session) -> str:
     return "downloaded"
 
 
-def raw_files(vintage: str, state: str = "51") -> list[tuple[str, Path]]:
-    """(url, local path) for everything a vintage's build reads, in fetch order.
-    For sequence vintages the lookup file must already be cached to resolve
-    sequences; sequence_targets() handles that ordering."""
+def raw_files(vintage: str, state: str = "51", level: str = "tract") -> list[tuple[str, Path]]:
+    """(url, local path) for everything one (vintage, level) build reads, in fetch order.
+    For sequence vintages the lookup file comes first: it resolves the sequences."""
+    level_cfg(vintage, level)  # raises for a level Census did not publish
     if vintage_format(vintage) == "sequence":
-        return sequence_targets(vintage, state)
+        return sequence_targets(vintage, state, level)
     cfg = load_summary_files()["vintages"][vintage]
     targets = [
         (cfg["data_base"] + cfg["table_file"].format(table=t.lower()), table_path(vintage, t))
@@ -147,6 +149,9 @@ def raw_files(vintage: str, state: str = "51") -> list[tuple[str, Path]]:
     for key in ("geos", "table_shells"):
         url = cfg[key]
         targets.append((url, raw_dir(vintage) / url.rsplit("/", 1)[1]))
+    if level == "zcta":
+        from etl.zcta import relationship_target
+        targets.append(relationship_target())
     return targets
 
 
@@ -154,13 +159,19 @@ def lookup_target(vintage: str) -> tuple[str, Path]:
     return sequence_file.cfg(vintage)["lookup"], sequence_file.lookup_path(vintage)
 
 
-def sequence_targets(vintage: str, state: str) -> list[tuple[str, Path]]:
+def sequence_targets(vintage: str, state: str, level: str = "tract") -> list[tuple[str, Path]]:
+    archive = sequence_file.archive_of(vintage, level)
+    geo_archive = sequence_file.cfg(vintage)["geos_archive"]
     seqs = sorted({sequence_file.layout(vintage, t).sequence for t in required_tables(vintage)})
-    names = [sequence_file.sequence_name(vintage, state, q) for q in seqs]
-    names.append(sequence_file.geos_name(vintage, state))
-    return [lookup_target(vintage)] + [
-        (sequence_file.data_url(vintage, state, n), raw_dir(vintage) / n) for n in names
-    ]
+    out = [lookup_target(vintage)]
+    for q in seqs:
+        n = sequence_file.sequence_name(vintage, state, q)
+        out.append((sequence_file.data_url(vintage, state, n, archive),
+                    sequence_file.local_path(vintage, n, archive)))
+    g = sequence_file.geos_name(vintage, state)
+    out.append((sequence_file.data_url(vintage, state, g, geo_archive),
+                sequence_file.local_path(vintage, g, geo_archive)))
+    return out
 
 
 def verify_lookup(vintage: str) -> None:
@@ -174,9 +185,12 @@ def verify_lookup(vintage: str) -> None:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--vintage", default="2016-2020")
+    ap.add_argument("--levels", default="tract", help="comma list: tract,county,place,zcta")
     args = ap.parse_args(argv)
     vintage = resolve_vintage(args.vintage)
-    check_scope(["51"], [vintage], "tract")
+    levels = [x.strip() for x in args.levels.split(",")]
+    for level in levels:
+        check_scope(["51"], [vintage], level)
 
     with requests.Session() as s:
         s.headers["User-Agent"] = "strata-etl (static ACS build)"
@@ -184,12 +198,19 @@ def main(argv=None) -> int:
             url, dest = lookup_target(vintage)
             print(f"{fetch(url, dest, s):10s} {dest.relative_to(ROOT)}")
             verify_lookup(vintage)
-        targets = raw_files(vintage)
-        if vintage_format(vintage) == "sequence":
-            targets = targets[1:]  # the lookup, fetched above
-        for url, dest in targets:
-            status = fetch(url, dest, s)
-            print(f"{status:10s} {dest.relative_to(ROOT)}")
+        seen = set()
+        for level in levels:
+            try:
+                targets = raw_files(vintage, "51", level)
+            except LevelUnavailable as e:
+                print(f"skipped    {e}")
+                continue
+            for url, dest in targets:
+                fetched_above = vintage_format(vintage) == "sequence" and url == lookup_target(vintage)[0]
+                if dest in seen or fetched_above:
+                    continue
+                seen.add(dest)
+                print(f"{fetch(url, dest, s):10s} {dest.relative_to(ROOT)}")
     return 0
 
 

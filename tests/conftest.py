@@ -5,10 +5,11 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build"
 VINTAGES = ["2016-2020", "2006-2010"]
+LEVELS = ["tract", "county", "place", "zcta"]
 
 
-def cube_path(vintage):
-    return BUILD / "acs" / vintage / "tract" / "51.parquet"
+def cube_path(vintage, level="tract"):
+    return BUILD / "acs" / vintage / level / "51.parquet"
 
 
 CUBE = cube_path("2016-2020")
@@ -18,8 +19,8 @@ def built_artifacts():
     return sorted(BUILD.rglob("*.parquet")) if BUILD.exists() else []
 
 
-def open_cube(vintage):
-    path = cube_path(vintage)
+def open_cube(vintage, level="tract"):
+    path = cube_path(vintage, level)
     if not path.exists():
         pytest.skip(f"{path.relative_to(ROOT)} not built")
     import pyarrow.parquet as pq
@@ -27,11 +28,28 @@ def open_cube(vintage):
     return pq.ParquetFile(path)
 
 
-@pytest.fixture(scope="session", params=VINTAGES)
-def vintage(request):
+def built_combos():
+    """(vintage, level) for every cube on disk, plus tract cubes even if absent (they skip)."""
+    out = [(v, "tract") for v in VINTAGES]
+    out += [(v, lv) for v in VINTAGES for lv in LEVELS[1:] if cube_path(v, lv).exists()]
+    return out
+
+
+@pytest.fixture(scope="session", params=built_combos(), ids=lambda c: f"{c[0]}-{c[1]}")
+def combo(request):
     return request.param
 
 
 @pytest.fixture(scope="session")
-def cube(vintage):
-    return open_cube(vintage)
+def vintage(combo):
+    return combo[0]
+
+
+@pytest.fixture(scope="session")
+def level(combo):
+    return combo[1]
+
+
+@pytest.fixture(scope="session")
+def cube(vintage, level):
+    return open_cube(vintage, level)

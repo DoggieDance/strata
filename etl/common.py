@@ -13,7 +13,10 @@ RAW_DIR = ROOT / "data" / "raw" / "acs"
 # 2026-11-12; Phase 02's first task adds the 2006-2010 vintage, Virginia only.
 PHASE_STATES = frozenset({"51"})
 PHASE_VINTAGES = frozenset({"2006-2010", "2016-2020"})
-PHASE_LEVELS = frozenset({"tract"})
+# Levels the owner asked for 2026-11-12: Census-published counties/cities,
+# places and ZCTAs, alongside tracts. Values are Census's own estimates for
+# those geographies, not sums of tracts.
+PHASE_LEVELS = frozenset({"tract", "county", "place", "zcta"})
 VINTAGE_ALIASES = {"2010": "2006-2010", "2020": "2016-2020"}
 
 SUMLEVEL_PREFIX = {"tract": "1400000US"}
@@ -59,7 +62,7 @@ def check_scope(states, vintages, level) -> None:
     if bad:
         raise ScopeError(
             f"Outside the current phase scope (Virginia; {', '.join(sorted(PHASE_VINTAGES))}; "
-            "tract): " + ", ".join(bad)
+            f"{', '.join(sorted(PHASE_LEVELS))}): " + ", ".join(bad)
         )
 
 
@@ -92,3 +95,18 @@ def table_path(vintage: str, table: str) -> Path:
 def vintage_format(vintage: str) -> str:
     """'table' (table-based Summary File) or 'sequence' (2006-2010 style)."""
     return load_summary_files()["vintages"][vintage].get("format", "table")
+
+
+def level_cfg(vintage: str, level: str) -> dict:
+    """Summary-level settings for one vintage. Raises if Census did not publish it."""
+    v = load_summary_files()["vintages"][vintage]
+    if level in v.get("unavailable_levels", {}):
+        raise LevelUnavailable(f"{vintage} {level}: {v['unavailable_levels'][level]}")
+    try:
+        return v["levels"][level]
+    except KeyError:
+        raise ValueError(f"{vintage}: no {level!r} level in the registry") from None
+
+
+class LevelUnavailable(ValueError):
+    """Census did not publish this level for this vintage."""

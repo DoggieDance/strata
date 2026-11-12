@@ -156,3 +156,8 @@ td button.show {
   .panel { border-right: 0; border-top: 1px solid var(--rule); padding: 4px 16px 16px; }
   th:nth-child(4), td:nth-child(4) { display: none; }
 }
+
+/* Unavailable combinations (e.g. ZIP codes for 2006-10). Disabled controls are
+   exempt from contrast minimums; the title and option text say why. */
+.seg-row input:disabled + span { opacity: .45; cursor: not-allowed; text-decoration: line-through; }
+.seg-row label:has(input:disabled) { cursor: not-allowed; }

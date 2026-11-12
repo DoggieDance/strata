@@ -7,6 +7,7 @@ names it, e.g. B19025_001E):
 - va_tract_spotcheck_2006-2010.csv  2006-2010, Phase 02 first-task gate
 - va_tract_nulls_2006-2010.csv      2006-2010 missing-value cases ('.' and blank)
 - va_tract_education_2006-2010.csv  2006-2010 B15002 recomputation vs published S1501
+- va_{county,place,zcta}_spotcheck_{vintage}.csv  the same check for each published level
 
 The random ones are filled once by `python -m etl.spotcheck --vintage …`
 (seed 51) from data.census.gov's published tables, an independent path from
@@ -57,47 +58,59 @@ COLUMN = {
     },
 }
 
+# (vintage, level, fixture)
 FILES = [
-    ("2016-2020", "va_tract_spotcheck.csv"),
-    ("2006-2010", "va_tract_spotcheck_2006-2010.csv"),
-    ("2006-2010", "va_tract_nulls_2006-2010.csv"),
-    ("2006-2010", "va_tract_education_2006-2010.csv"),
+    ("2016-2020", "tract", "va_tract_spotcheck.csv"),
+    ("2006-2010", "tract", "va_tract_spotcheck_2006-2010.csv"),
+    ("2006-2010", "tract", "va_tract_nulls_2006-2010.csv"),
+    ("2006-2010", "tract", "va_tract_education_2006-2010.csv"),
+    ("2016-2020", "county", "va_county_spotcheck_2016-2020.csv"),
+    ("2016-2020", "place", "va_place_spotcheck_2016-2020.csv"),
+    ("2016-2020", "zcta", "va_zcta_spotcheck_2016-2020.csv"),
+    ("2006-2010", "county", "va_county_spotcheck_2006-2010.csv"),
+    ("2006-2010", "place", "va_place_spotcheck_2006-2010.csv"),
 ]
+RANDOM = {name for _, _, name in FILES if "nulls" not in name and "education" not in name}
 
-NULL = ("", "-", "N", "(X)", "*****", "**", "null")
+NULL = ("", "-", "N", "(X)", "**", "null")
 
 
 def cases():
     out = []
-    for vintage, name in FILES:
+    for vintage, level, name in FILES:
         path = FIXTURES / name
         if not path.exists():
-            out.append(pytest.param(vintage, name, None, id=f"{name}-missing"))
+            out.append(pytest.param(vintage, level, name, None, id=f"{name}-missing"))
             continue
         with open(path, newline="") as f:
             for row in csv.DictReader(f):
-                out.append(pytest.param(vintage, name, row,
-                                        id=f"{vintage}-{row['GEOID']}-{row['variable']}"))
+                out.append(pytest.param(vintage, level, name, row,
+                                        id=f"{vintage}-{level}-{row['GEOID']}-{row['variable']}"))
     return out
 
 
-@pytest.mark.parametrize("vintage,name,row", cases())
-def test_spotcheck(vintage, name, row):
+@pytest.mark.parametrize("vintage,level,name,row", cases())
+def test_spotcheck(vintage, level, name, row):
     if row is None:
         pytest.skip(f"tests/fixtures/{name} not filled in yet")
-    cube = open_cube(vintage)
+    cube = open_cube(vintage, level)
     col, tol = COLUMN[vintage][row["variable"]]
     t = cube.read(columns=["GEOID", col]).to_pydict()
     got = t[col][t["GEOID"].index(row["GEOID"])]
     want = row["value"].strip()
-    if want in NULL:
+    if want == "*****":
+        # Controlled estimate: published MOE -555555555, which the cube stores as 0.
+        assert row["variable"].endswith("M") and got == 0
+    elif want in NULL:
         assert got is None or math.isnan(got)
     else:
         assert got is not None and abs(got - float(want.replace(",", ""))) <= tol
 
 
 def test_random_fixtures_have_twenty_rows():
-    for vintage, name in FILES[:2]:
+    for vintage, level, name in FILES:
+        if name not in RANDOM:
+            continue
         path = FIXTURES / name
         if path.exists():
             with open(path, newline="") as f:

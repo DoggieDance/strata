@@ -18,7 +18,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from etl.common import load_summary_files, raw_dir
+from etl.common import level_cfg, load_summary_files, raw_dir
 
 
 @dataclass(frozen=True)
@@ -56,8 +56,18 @@ def sequence_name(vintage: str, state: str, sequence: int) -> str:
     return cfg(vintage)["sequence_file"].format(sequence=sequence, **state_cfg(vintage, state))
 
 
-def data_url(vintage: str, state: str, name: str) -> str:
-    return cfg(vintage)["data_base"].format(**state_cfg(vintage, state)) + name
+def archive_of(vintage: str, level: str) -> str:
+    return level_cfg(vintage, level)["archive"]
+
+
+def data_url(vintage: str, state: str, name: str, archive: str = "tracts") -> str:
+    """Tract and non-tract rows ship in separate archives with identically named files."""
+    base = cfg(vintage)["data_base"].format(**state_cfg(vintage, state))
+    return base + cfg(vintage)["archives"][archive]["dir"] + name
+
+
+def local_path(vintage: str, name: str, archive: str = "tracts"):
+    return raw_dir(vintage) / (cfg(vintage)["archives"][archive]["local"] + name)
 
 
 @lru_cache(maxsize=None)
@@ -99,26 +109,33 @@ def labels(vintage: str) -> dict[str, str]:
 
 
 @lru_cache(maxsize=None)
-def tracts(vintage: str, state: str) -> pd.DataFrame:
-    """Tract rows of the geography file: LOGRECNO, GEOID, NAME.
+def geos(vintage: str, state: str, level: str = "tract") -> pd.DataFrame:
+    """One level's rows of the geography file: LOGRECNO, GEOID, NAME.
 
-    The GEOID column is checked against STATE+COUNTY+TRACT rather than trusted.
+    The file's own GEOID column is checked against the GEOID built from its parts.
     """
     c = cfg(vintage)
     col = c["geos_columns"]
+    lc = level_cfg(vintage, level)
+    short = {"140": "14000US", "050": "05000US", "160": "16000US"}[lc["sumlevel"]]
     rows = []
-    with open(raw_dir(vintage) / geos_name(vintage, state), encoding="latin-1", newline="") as f:
+    path = local_path(vintage, geos_name(vintage, state), c["geos_archive"])
+    with open(path, encoding="latin-1", newline="") as f:
         for r in csv.reader(f):
-            if r[col["SUMLEVEL"]] != "140" or r[col["STATE"]] != state:
+            if r[col["SUMLEVEL"]] != lc["sumlevel"] or r[3] != "00" or r[col["STATE"]] != state:
                 continue
-            geoid = r[col["STATE"]] + r[col["COUNTY"]] + r[col["TRACT"]]
-            if r[col["GEOID"]] != "14000US" + geoid:
-                raise ValueError(f"geography file: {r[col['GEOID']]} != 14000US{geoid}")
+            geoid = "".join(r[col[k]] for k in lc["geoid"])
+            if r[col["GEOID"]] != short + geoid:
+                raise ValueError(f"geography file: {r[col['GEOID']]} != {short}{geoid}")
             rows.append((r[col["LOGRECNO"]], geoid, r[col["NAME"]]))
     df = pd.DataFrame(rows, columns=["LOGRECNO", "GEOID", "NAME"])
     if df.empty or not df.GEOID.is_unique or not df.LOGRECNO.is_unique:
-        raise ValueError(f"geography file: tract rows for {state} are empty or not unique")
+        raise ValueError(f"geography file: {level} rows for {state} are empty or not unique")
     return df
+
+
+def tracts(vintage: str, state: str) -> pd.DataFrame:
+    return geos(vintage, state, "tract")
 
 
 def _read_part(zf: zipfile.ZipFile, name: str, lay: TableLayout, logrecnos: set):
@@ -136,19 +153,19 @@ def _read_part(zf: zipfile.ZipFile, name: str, lay: TableLayout, logrecnos: set)
     return out
 
 
-def load_table(vintage: str, table: str, state: str) -> pd.DataFrame:
-    """Raw tract frame for one table: index GEOID, columns E001.. then M001..,
+def load_table(vintage: str, table: str, state: str, level: str = "tract") -> pd.DataFrame:
+    """Raw frame for one table and level: index GEOID, columns E001.. then M001..,
     still as strings with the vintage's missing tokens. clean.load_table
     converts and applies the jam guard."""
     lay = layout(vintage, table)
-    geo = tracts(vintage, state)
+    geo = geos(vintage, state, level)
     logs = set(geo.LOGRECNO)
     header = cfg(vintage)["sequence_header_fields"]
     if lay.start <= header:
         raise ValueError(f"{table}: start position {lay.start} falls inside the header fields")
     name = sequence_name(vintage, state, lay.sequence)
     stem = name.removesuffix(".zip")
-    with zipfile.ZipFile(raw_dir(vintage) / name) as zf:
+    with zipfile.ZipFile(local_path(vintage, name, archive_of(vintage, level))) as zf:
         est = _read_part(zf, f"e{stem}.txt", lay, logs)
         moe = _read_part(zf, f"m{stem}.txt", lay, logs)
     if set(est) != set(moe):

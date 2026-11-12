@@ -28,18 +28,18 @@ import pandas as pd
 
 from etl.common import (
     JAM_FLOOR,
-    SUMLEVEL_PREFIX,
     check_scope,
     controlled_moe_value,
     expand_cells,
     jam_values,
+    level_cfg,
     load_measures,
     load_summary_files,
     raw_dir,
     table_path,
     vintage_format,
 )
-from etl import sequence_file
+from etl import sequence_file, zcta
 
 
 class JamValueError(ValueError):
@@ -74,12 +74,12 @@ def strip_jams(df: pd.DataFrame, jams=None, controlled=None) -> pd.DataFrame:
 
 def load_table(vintage: str, table: str, state: str, level: str = "tract") -> pd.DataFrame:
     """One table, one state, one level. Index = GEOID; columns E001, M001, ..."""
+    lc = level_cfg(vintage, level)
     if vintage_format(vintage) == "sequence":
-        if level != "tract":
-            raise ValueError("sequence-file reader handles tracts only")
-        df = sequence_file.to_numeric(sequence_file.load_table(vintage, table, state), vintage)
-        return strip_jams(df)
-    prefix = SUMLEVEL_PREFIX[level] + state
+        df = sequence_file.load_table(vintage, table, state, level)
+        return strip_jams(sequence_file.to_numeric(df, vintage))
+    # ZCTA rows are national (no state in the GEO_ID); the universe picks the state's.
+    prefix = lc["prefix"] + ("" if level == "zcta" else state)
     path = table_path(vintage, table)
     with open(path, encoding="latin-1") as f:
         header = f.readline().rstrip("\r\n").split("|")
@@ -90,37 +90,57 @@ def load_table(vintage: str, table: str, state: str, level: str = "tract") -> pd
     tag = table.upper() + "_"
     df.columns = [c.removeprefix(tag) for c in df.columns]
     df = df.apply(pd.to_numeric, errors="raise")
-    df.index = df.index.str.removeprefix(SUMLEVEL_PREFIX[level])
+    df.index = df.index.str.removeprefix(lc["prefix"])
     df.index.name = "GEOID"
     if not df.index.is_unique:
         raise ValueError(f"{path.name}: duplicate GEOIDs")
     return strip_jams(df)
 
 
-def _state_tracts(vintage: str, state: str) -> pd.DataFrame:
+GEOID_LENGTH = {"tract": 11, "county": 5, "place": 7, "zcta": 5}
+
+
+@lru_cache(maxsize=None)
+def _state_geos(vintage: str, state: str, level: str) -> pd.DataFrame:
+    """Rows of the vintage's geography file for one state and level: GEOID, NAME."""
+    lc = level_cfg(vintage, level)
     if vintage_format(vintage) == "sequence":
-        return sequence_file.tracts(vintage, state)
+        return sequence_file.geos(vintage, state, level)
     cfg = load_summary_files()["vintages"][vintage]
     path = raw_dir(vintage) / cfg["geos"].rsplit("/", 1)[1]
-    geos = pd.read_csv(path, dtype=str, encoding="latin-1",
-                       usecols=["SUMLEVEL", "STATE", "COUNTY", "TRACT", "NAME"])
-    sel = geos[(geos.SUMLEVEL == "140") & (geos.STATE == state)]
-    # This file writes the short "14000US" prefix, the data files "1400000US";
-    # build the GEOID from its parts rather than trust either.
-    return sel.assign(GEOID=sel.STATE + sel.COUNTY + sel.TRACT)
+    geos = pd.read_csv(path, dtype=str, encoding="latin-1", usecols=[
+        "SUMLEVEL", "COMPONENT", "STATE", "COUNTY", "PLACE", "TRACT", "ZCTA5", "NAME"])
+    sel = geos[(geos.SUMLEVEL == lc["sumlevel"]) & (geos.COMPONENT == "00")]
+    if level == "zcta":
+        sel = sel[sel.ZCTA5.isin(zcta.for_state(state))]
+    else:
+        sel = sel[sel.STATE == state]
+    # This file writes short prefixes ("14000US"), the data files long ones
+    # ("1400000US"); build the GEOID from its parts rather than trust either.
+    geoid = sel[lc["geoid"]].astype(str).agg("".join, axis=1)
+    return pd.DataFrame({"GEOID": geoid.values, "NAME": sel.NAME.values})
 
 
-def tract_universe(vintage: str, state: str) -> pd.Index:
-    """Every tract the vintage's geography file lists for the state."""
-    idx = pd.Index(sorted(_state_tracts(vintage, state).GEOID), name="GEOID")
-    if not idx.is_unique or not (idx.str.len() == 11).all():
-        raise ValueError("geography file: tract GEOIDs are not unique 11-character codes")
+def geo_universe(vintage: str, state: str, level: str = "tract") -> pd.Index:
+    """Every geography of this level the vintage's geography file lists for the state."""
+    idx = pd.Index(sorted(_state_geos(vintage, state, level).GEOID), name="GEOID")
+    n = GEOID_LENGTH[level]
+    if idx.empty or not idx.is_unique or not (idx.str.len() == n).all():
+        raise ValueError(f"geography file: {level} GEOIDs are not unique {n}-character codes")
     return idx
 
 
-def tract_names(vintage: str, state: str) -> pd.Series:
-    sel = _state_tracts(vintage, state)
+def geo_names(vintage: str, state: str, level: str = "tract") -> pd.Series:
+    sel = _state_geos(vintage, state, level)
     return pd.Series(sel.NAME.values, index=sel.GEOID)
+
+
+def tract_universe(vintage: str, state: str) -> pd.Index:
+    return geo_universe(vintage, state, "tract")
+
+
+def tract_names(vintage: str, state: str) -> pd.Series:
+    return geo_names(vintage, state, "tract")
 
 
 # --------------------------------------------------------------------------
@@ -240,7 +260,7 @@ def build_measures(vintage: str, state: str, level: str = "tract"):
     """Return (frame, notes). frame: index GEOID, columns {id}_e / {id}_m."""
     check_scope([state], [vintage], level)
     reg = load_measures()
-    universe = tract_universe(vintage, state)
+    universe = geo_universe(vintage, state, level)
 
     tables: dict[str, pd.DataFrame] = {}
 

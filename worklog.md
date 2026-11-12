@@ -258,3 +258,28 @@ Owner request: make the preview accessible without losing the palette.
   both themes, map and table views. Scripted keyboard-only run: skip link →
   search → Show on map → canvas focus + inspector → arrow-key vintage change.
   Not done: a human screen-reader pass.
+
+## 2026-11-12 (later) — published county, place and ZCTA levels (v0.2.1)
+
+Owner asked for counties and cities, with ZIP codes as an option.
+- Census publishes all three directly in the same Summary File, so the cubes
+  hold Census's own estimates and margins, not sums of tracts. A test confirms
+  that controlled counts (population, households) sum exactly from tracts to
+  counties. Dollar aggregates differ by up to 0.17%: separate estimates.
+- Registry: per-vintage `levels` (sumlevel, GEO_ID prefix, GEOID parts); 2010
+  non-tract rows come from the second archive (`all_geographies/` locally);
+  `zcta_state` rule (largest land share, 2020 relationship file).
+- 2006–2010 has **no ZCTA rows** anywhere in the Summary File (checked state
+  and national geo files). `LevelUnavailable` is raised; fetch/build/geometry skip it.
+- Cubes: VA 2016–20 county 133, place 672, zcta 883; 2006–10 county 134
+  (Bedford city), place 591. Every row has a polygon.
+- Spot-check: 20 per new (vintage, level) = 100 values, all match.
+  **Bug found and fixed:** data.census.gov answers 204 when throttling, even
+  twice running, so 4 fixture values were wrongly recorded as "not published".
+  The cube was right every time. Now 5 × 204 over ~2 min are required. The
+  committed tract fixtures had no such blanks. `*****` (controlled MOE) now
+  checks for 0.
+- Preview: Geography selector; unavailable combinations disabled with a reason;
+  stale-hover race on level switch fixed; ZIP names fixed. axe: 0 violations.
+- Tests: 276 passed.
+- Ledger v0.2.1 entered after the build; the rule says before. Noted there.

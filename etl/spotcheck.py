@@ -9,6 +9,7 @@ Validation only. The app never calls this, and nothing here touches the cube.
     python -m etl.spotcheck --vintage 2016-2020   # Phase 01 gate
     python -m etl.spotcheck --vintage 2006-2010   # Phase 02 first-task gate
     python -m etl.spotcheck --vintage 2006-2010 --dry-run
+    python -m etl.spotcheck --vintage 2016-2020 --level county   # also place, zcta
 
 Published values come back as text. A suppressed value is published as a jam
 value with a symbol in the annotation column (e.g. -666666666 with "-"); the
@@ -50,12 +51,18 @@ VINTAGES = {
 }
 
 
-def fixture_path(vintage):
-    return ROOT / "tests" / "fixtures" / VINTAGES[vintage]["fixture"]
+# data.census.gov GEO_ID prefix per level.
+GEO_PREFIX = {"tract": "1400000US", "county": "0500000US", "place": "1600000US", "zcta": "8600000US"}
 
 
-def cube_path(vintage):
-    return ROOT / "build" / "acs" / vintage / "tract" / "51.parquet"
+def fixture_path(vintage, level="tract"):
+    if level == "tract":
+        return ROOT / "tests" / "fixtures" / VINTAGES[vintage]["fixture"]
+    return ROOT / "tests" / "fixtures" / f"va_{level}_spotcheck_{vintage}.csv"
+
+
+def cube_path(vintage, level="tract"):
+    return ROOT / "build" / "acs" / vintage / level / "51.parquet"
 
 
 def table_id(variable, endyear):
@@ -64,32 +71,36 @@ def table_id(variable, endyear):
     return f"ACS{kind}5Y{endyear}.{table}"
 
 
-def fetch(variable, geoid, endyear):
-    q = urllib.parse.urlencode({"id": table_id(variable, endyear), "g": f"1400000US{geoid}"})
+def fetch(variable, geoid, endyear, level="tract"):
+    ucgid = GEO_PREFIX[level] + geoid
+    q = urllib.parse.urlencode({"id": table_id(variable, endyear), "g": ucgid})
     req = urllib.request.Request(f"{ENDPOINT}?{q}", headers={"User-Agent": "strata-spotcheck"})
+    # data.census.gov also answers 204 when throttling, sometimes several times
+    # running. "Not published" is recorded only after five 204s spread over
+    # about two minutes; anything else is retried.
     no_content = 0
-    for attempt in range(5):
+    for attempt in range(8):
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 if r.status == 204:
-                    # Not published for this geography -- but confirm it, so a
-                    # throttled empty reply is not recorded as "not published".
                     no_content += 1
-                    if no_content == 2:
+                    if no_content == 5:
                         return ""
-                    time.sleep(5)
+                    time.sleep(8 * no_content)
                     continue
                 body = json.load(r)
             break
         except (json.JSONDecodeError, OSError) as e:  # throttled responses come back as non-JSON
-            if attempt == 4:
+            if attempt == 7:
                 raise RuntimeError(f"{variable} {geoid}: {e}") from e
-            time.sleep(5 * 2 ** attempt)
+            time.sleep(5 * 2 ** min(attempt, 4))
+    else:
+        raise RuntimeError(f"{variable} {geoid}: no usable response")
     header, *data = body["response"]["data"]
     if len(data) != 1:
         raise RuntimeError(f"{variable} {geoid}: expected 1 row, got {len(data)}")
     row = dict(zip(header, data[0]))
-    if row["GEO_ID"] != f"1400000US{geoid}":
+    if row["GEO_ID"] != ucgid:
         raise RuntimeError(f"{variable} {geoid}: got {row['GEO_ID']}")
     # Annotation columns (…EA/…MA) carry the published symbol when the value is
     # suppressed; the value column then holds a jam value. The symbol wins.
@@ -99,8 +110,8 @@ def fetch(variable, geoid, endyear):
     return "" if row[variable] is None else row[variable]
 
 
-def sample(vintage):
-    geoids = pq.read_table(cube_path(vintage), columns=["GEOID"]).column("GEOID").to_pylist()
+def sample(vintage, level="tract"):
+    geoids = pq.read_table(cube_path(vintage, level), columns=["GEOID"]).column("GEOID").to_pylist()
     variables = VINTAGES[vintage]["variables"]
     rng = random.Random(SEED)
     pairs = set()
@@ -112,11 +123,12 @@ def sample(vintage):
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--vintage", choices=sorted(VINTAGES), required=True)
+    ap.add_argument("--level", default="tract", choices=sorted(GEO_PREFIX))
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
-    pairs = sample(args.vintage)
+    pairs = sample(args.vintage, args.level)
     endyear = VINTAGES[args.vintage]["endyear"]
-    fixture = fixture_path(args.vintage)
+    fixture = fixture_path(args.vintage, args.level)
     if args.dry_run:
         for p in pairs:
             print(*p)
@@ -125,7 +137,7 @@ def main(argv=None):
         sys.exit(f"{fixture} exists; the gate fixture is not regenerated. Delete it deliberately.")
     rows = []
     for geoid, var in pairs:
-        rows.append({"GEOID": geoid, "variable": var, "value": fetch(var, geoid, endyear), "source": "data.census.gov"})
+        rows.append({"GEOID": geoid, "variable": var, "value": fetch(var, geoid, endyear, args.level), "source": "data.census.gov"})
         print(geoid, var, rows[-1]["value"])
         time.sleep(0.5)
     with open(fixture, "w", newline="") as f:

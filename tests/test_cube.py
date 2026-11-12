@@ -6,20 +6,22 @@ import pyarrow as pa
 import pytest
 
 from etl.build_cube import build
-from etl.clean import tract_universe
+from etl.clean import GEOID_LENGTH, geo_universe
 from etl.common import load_measures
 
 
-def test_geoid_sorted_unique_virginia(cube):
+def test_geoid_sorted_unique_virginia(cube, level):
     g = cube.read(columns=["GEOID"]).column("GEOID").to_pylist()
     assert g == sorted(g)
     assert len(g) == len(set(g))
-    assert all(len(x) == 11 and x.startswith("51") for x in g)
+    assert all(len(x) == GEOID_LENGTH[level] for x in g)
+    if level != "zcta":  # ZCTA codes carry no state FIPS
+        assert all(x.startswith("51") for x in g)
 
 
-def test_rows_match_geography_file(cube, vintage):
+def test_rows_match_geography_file(cube, vintage, level):
     g = cube.read(columns=["GEOID"]).column("GEOID").to_pylist()
-    assert g == list(tract_universe(vintage, "51"))
+    assert g == list(geo_universe(vintage, "51", level))
 
 
 def test_layout(cube):
@@ -61,20 +63,37 @@ def test_no_nan_only_nulls(cube):
         assert np.isnan(v).sum() == col.null_count, f"{name} has NaN that is not null"
 
 
-def test_refuses_to_overwrite(cube, vintage):
+def test_refuses_to_overwrite(cube, vintage, level):
     from tests.conftest import BUILD
     with pytest.raises(FileExistsError):
-        build("51", vintage, "tract", BUILD)
+        build("51", vintage, level, BUILD)
 
 
-def test_cube_metadata_names_its_vintage(cube, vintage):
-    assert json.loads(cube.schema_arrow.metadata[b"strata"])["vintage"] == vintage
+def test_cube_metadata_names_its_vintage_and_level(cube, vintage, level):
+    meta = json.loads(cube.schema_arrow.metadata[b"strata"])
+    assert (meta["vintage"], meta["level"]) == (vintage, level)
 
 
-def test_vintages_share_columns():
-    from tests.conftest import VINTAGES, open_cube
-    schemas = [open_cube(v).schema_arrow for v in VINTAGES]
+def test_all_cubes_share_columns():
+    from tests.conftest import built_combos, cube_path
+    import pyarrow.parquet as pq
+    schemas = [pq.ParquetFile(cube_path(v, lv)).schema_arrow for v, lv in built_combos() if cube_path(v, lv).exists()]
     assert all(s.names == schemas[0].names for s in schemas)
+
+
+def test_published_county_counts_equal_summed_tracts():
+    """Population and households are controlled totals: tracts sum exactly to the
+    published county. (Dollar aggregates need not: each geography is estimated.)"""
+    from tests.conftest import cube_path
+    import pyarrow.parquet as pq
+    for v in ["2016-2020", "2006-2010"]:
+        if not (cube_path(v, "county").exists() and cube_path(v).exists()):
+            pytest.skip("county or tract cube not built")
+        cols = ["GEOID", "total_population_e", "households_e"]
+        tr = pq.read_table(cube_path(v), columns=cols).to_pandas()
+        co = pq.read_table(cube_path(v, "county"), columns=cols).to_pandas().set_index("GEOID")
+        summed = tr.groupby(tr.GEOID.str[:5])[cols[1:]].sum()
+        assert (summed.reindex(co.index) == co).all().all(), v
 
 
 def test_cube_is_current_with_registry(cube):

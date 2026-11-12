@@ -16,12 +16,18 @@
 
   <header class="masthead">
     <p class="kicker">STRATA · local preview</p>
-    <h1>Virginia, tract by tract</h1>
+    <h1>Virginia, place by place</h1>
     <p class="deck">American Community Survey 5-year estimates, built from the Census Summary File.</p>
   </header>
 
   <main class="layout">
     <aside class="panel" aria-label="Controls and legend">
+      <section>
+        <label class="eyebrow" for="level">Geography</label>
+        <select id="level"></select>
+        <p class="note" id="level-note" hidden></p>
+      </section>
+
       <section>
         <label class="eyebrow" for="measure">Measure</label>
         <select id="measure"></select>
@@ -43,9 +49,9 @@
       </section>
 
       <section class="inspector" aria-labelledby="inspector-title">
-        <h2 class="eyebrow" id="inspector-title">Selected tract</h2>
+        <h2 class="eyebrow" id="inspector-title">Selected area</h2>
         <div id="inspector" aria-live="polite">
-          <p class="note">Hover or tap a tract, or pick one from the table.</p>
+          <p class="note">Hover or tap the map, or pick from the table.</p>
         </div>
       </section>
 
@@ -66,11 +72,11 @@
         </fieldset>
       </div>
 
-      <div id="map" role="application" aria-label="Map of Virginia census tracts. Arrow keys pan, plus and minus zoom. Every value is also in the table view."></div>
+      <div id="map" role="application" aria-label="Map of Virginia. Arrow keys pan, plus and minus zoom. Every value is also in the table view."></div>
 
       <div id="table-view" class="table-view" hidden tabindex="-1">
         <div class="table-tools">
-          <label class="eyebrow" for="filter">Find a tract</label>
+          <label class="eyebrow" for="filter" id="filter-label">Find a tract</label>
           <input id="filter" type="search" placeholder="County, city or GEOID" autocomplete="off">
           <p class="note" id="table-count" aria-live="polite"></p>
         </div>
@@ -78,7 +84,7 @@
           <table id="tracts">
             <caption class="sr-only" id="table-caption"></caption>
             <thead><tr>
-              <th scope="col" aria-sort="none"><button type="button" data-sort="name">Tract</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="name" id="name-col">Tract</button></th>
               <th scope="col" aria-sort="none" class="num"><button type="button" data-sort="e">Estimate</button></th>
               <th scope="col" aria-sort="none" class="num"><button type="button" data-sort="m">Margin (90%)</button></th>
               <th scope="col" aria-sort="none" class="num"><button type="button" data-sort="cv">CV</button></th>

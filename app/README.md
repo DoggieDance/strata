@@ -11,6 +11,10 @@ in the browser via feature state, hyparquet for the cube, no Census API calls.
 HOST=0.0.0.0 ./preview.sh    # also reachable from a phone on the same network
 ```
 
+- Geographies: census tracts, counties & independent cities, towns & places
+  (incorporated + CDPs), and ZIP code areas (ZCTAs, 2016–20 only: Census
+  published none for 2006–10). Each is Census's own published estimate for that
+  geography, not a sum of tracts.
 - Measures: the cube's means, percents and counts, per vintage (2006–10, 2016–20).
 - Dollars are shown as published in each vintage's own dollars. No deflation yet.
 - Quintile breaks over tracts that are not low-reliability.

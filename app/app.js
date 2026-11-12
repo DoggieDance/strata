@@ -1,4 +1,4 @@
-// STRATA local preview. Reads the built cube (Parquet) and tract geometry from
+// STRATA local preview. Reads the built cubes (Parquet) and geometry from
 // ../build/, joins them in the browser by GEOID via feature state (spec 03).
 // Never calls a Census API.
 //
@@ -13,6 +13,17 @@ const STATE = "51";
 const VINTAGES = [
   { id: "2006-2010", label: "2006–10", dollars: "2010 dollars" },
   { id: "2016-2020", label: "2016–20", dollars: "2020 dollars" },
+];
+
+// Census-published geographies. Values are Census's own estimates for each,
+// not sums of tracts. ZCTAs exist from the 2011-15 release on, so not 2006-10.
+const LEVELS = [
+  { id: "tract", label: "Census tracts", noun: "tract", plural: "tracts", vintages: ["2006-2010", "2016-2020"] },
+  { id: "county", label: "Counties & independent cities", noun: "county or city", plural: "counties and cities", vintages: ["2006-2010", "2016-2020"] },
+  { id: "place", label: "Towns & places", noun: "place", plural: "places", vintages: ["2006-2010", "2016-2020"],
+    note: "Places are incorporated towns and cities plus census-designated places. They cover only part of the state; blank ground is outside any place." },
+  { id: "zcta", label: "ZIP codes", noun: "ZIP code area", plural: "ZIP code areas", vintages: ["2016-2020"],
+    note: "ZIP Code Tabulation Areas: Census's area version of USPS ZIP codes. Not published for 2006–10." },
 ];
 
 const MEASURES = [
@@ -56,6 +67,7 @@ const TIER_TEXT = { high: "High", medium: "Medium, use with care", low: "Low, no
 
 const state = {
   vintage: "2016-2020",
+  level: "tract",
   measure: "mean_household_income",
   view: "map",
   cubes: {}, geo: {}, names: {}, bbox: {},
@@ -77,16 +89,20 @@ async function getJSON(path) {
   return res.json();
 }
 
-async function loadVintage(v) {
-  if (!state.cubes[v]) {
-    const url = new URL(`acs/${v}/tract/${STATE}.parquet`, DATA);
+const key = () => `${state.vintage}/${state.level}`;
+const levelDef = () => LEVELS.find((x) => x.id === state.level);
+
+async function loadData() {
+  const k = key();
+  if (!state.cubes[k]) {
+    const url = new URL(`acs/${k}/${STATE}.parquet`, DATA);
     const res = await fetch(url);
     if (!res.ok) throw new Error(`${url.pathname}: ${res.status}`);
     const rows = await parquetReadObjects({ file: await res.arrayBuffer(), compressors });
-    state.cubes[v] = new Map(rows.map((r) => [r.GEOID, r]));
+    state.cubes[k] = new Map(rows.map((r) => [r.GEOID, r]));
   }
-  if (!state.geo[v]) state.geo[v] = await getJSON(`geo/${v}/tract/${STATE}.geojson`);
-  if (!state.names[v]) state.names[v] = await getJSON(`geo/${v}/tract/${STATE}.names.json`).catch(() => ({}));
+  if (!state.geo[k]) state.geo[k] = await getJSON(`geo/${k}/${STATE}.geojson`);
+  if (!state.names[k]) state.names[k] = await getJSON(`geo/${k}/${STATE}.names.json`).catch(() => ({}));
 }
 
 function quantileBreaks(values, k) {
@@ -180,20 +196,53 @@ function addLayers() {
 
 // ---------------------------------------------------------------- render
 
-async function setVintage(v) {
-  state.vintage = v;
+async function reload() {
   $("status").textContent = "Loading…";
-  await loadVintage(v);
+  syncAvailability();
+  await loadData();
+  if (state.selected) map.setFeatureState({ source: "tracts", id: state.selected }, { sel: false });
   state.selected = null;
   state.bbox = {};
-  map.getSource("tracts").setData(state.geo[v]);
+  map.getSource("tracts").setData(state.geo[key()]);
+  map.setPaintProperty("tract-line", "line-width", lineWidth());
   recolor();
   renderInspector();
+  renderLabels();
+}
+
+function lineWidth() {
+  const big = state.level === "county" ? 1.4 : state.level === "tract" ? 0 : 0.5;
+  return ["interpolate", ["linear"], ["zoom"], 6, 0.2 + big * 0.5, 11, 1 + big];
+}
+
+// A level Census did not publish for a vintage cannot be picked with it.
+function syncAvailability() {
+  const lv = levelDef();
+  for (const o of $("level").options) {
+    const def = LEVELS.find((x) => x.id === o.value);
+    o.disabled = !def.vintages.includes(state.vintage);
+    o.textContent = def.label + (o.disabled ? " (2016–20 only)" : "");
+  }
+  for (const r of document.querySelectorAll('input[name="vintage"]')) {
+    r.disabled = !lv.vintages.includes(r.value);
+    r.closest("label").title = r.disabled ? `Census published no ${lv.plural} for this period` : "";
+  }
+  $("level-note").textContent = lv.note || "";
+  $("level-note").hidden = !lv.note;
+}
+
+function renderLabels() {
+  const lv = levelDef();
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+  $("inspector-title").textContent = `Selected ${lv.noun}`;
+  $("filter-label").textContent = `Find a ${lv.noun}`;
+  $("name-col").textContent = cap(lv.noun);
+  $("map").setAttribute("aria-label", `Map of Virginia ${lv.plural}. Arrow keys pan, plus and minus zoom. Every value is also in the table view.`);
 }
 
 function recolor() {
   const t0 = performance.now();
-  const cube = state.cubes[state.vintage];
+  const cube = state.cubes[key()];
   const m = state.measure;
   const vals = [];
   for (const r of cube.values()) {
@@ -203,7 +252,7 @@ function recolor() {
   state.breaks = quantileBreaks(vals, 5);
   state.reliable = vals.length;
   let low = 0, none = 0;
-  for (const f of state.geo[state.vintage].features) {
+  for (const f of state.geo[key()].features) {
     const id = f.properties.GEOID;
     const r = cube.get(id);
     const e = r?.[`${m}_e`];
@@ -217,7 +266,7 @@ function recolor() {
   state.counts = { low, none };
   renderLegend();
   const ms = performance.now() - t0;
-  $("status").textContent = `${state.geo[state.vintage].features.length.toLocaleString()} tracts · ${ms.toFixed(0)} ms`;
+  $("status").textContent = `${state.geo[key()].features.length.toLocaleString()} ${levelDef().plural} · ${ms.toFixed(0)} ms`;
   renderTable();
   if (state.selected) renderInspector();
 }
@@ -246,21 +295,21 @@ function renderLegend() {
   const vin = VINTAGES.find((x) => x.id === state.vintage);
   const dollars = measureDef().fmt === "usd"
     ? `In ${vin.dollars}, as published, not inflation-adjusted. ` : "";
-  $("dollar-note").textContent = `${dollars}Fifths (quintiles) of ${state.reliable.toLocaleString()} reliable tracts.`;
+  $("dollar-note").textContent = `${dollars}Fifths (quintiles) of ${state.reliable.toLocaleString()} reliable ${levelDef().plural}.`;
 }
 
 function tractRow(id) {
-  const r = state.cubes[state.vintage].get(id);
+  const r = state.cubes[key()].get(id);
   const m = state.measure;
   const e = r?.[`${m}_e`], mo = r?.[`${m}_m`];
   const t = tier(e, mo);
-  return { id, name: state.names[state.vintage][id] || `Tract ${id}`, r, e: t ? e : null, m: t ? mo : null,
+  return { id, name: state.names[key()][id] || id, r, e: t ? e : null, m: t ? mo : null,
            cv: t ? cvOf(e, mo) : null, t };
 }
 
 function renderInspector() {
   if (!state.selected) {
-    $("inspector").innerHTML = `<p class="note">Hover or tap a tract, or pick one from the table.</p>`;
+    $("inspector").innerHTML = `<p class="note">Hover or tap the map, or pick from the table.</p>`;
     return;
   }
   const def = measureDef(), f = fmt[def.fmt];
@@ -293,17 +342,17 @@ function renderTable() {
   const def = measureDef(), f = fmt[def.fmt];
   const vin = VINTAGES.find((x) => x.id === state.vintage);
   const q = state.filter.trim().toLowerCase();
-  let rows = [...state.cubes[state.vintage].keys()].map(tractRow);
+  let rows = [...state.cubes[key()].keys()].map(tractRow);
   if (q) rows = rows.filter((x) => x.name.toLowerCase().includes(q) || x.id.includes(q));
-  const { key, dir } = state.sort;
+  const { key: sortKey, dir } = state.sort;
   rows.sort((a, b) => {
-    const av = a[key], bv = b[key];
+    const av = a[sortKey], bv = b[sortKey];
     if (av == null && bv == null) return a.id.localeCompare(b.id);
     if (av == null) return 1;               // no estimate always sorts last
     if (bv == null) return -1;
     return (typeof av === "string" ? av.localeCompare(bv) : av - bv) * dir || a.id.localeCompare(b.id);
   });
-  const hasGeo = new Set(state.geo[state.vintage].features.map((x) => x.properties.GEOID));
+  const hasGeo = new Set(state.geo[key()].features.map((x) => x.properties.GEOID));
   $("tracts").querySelector("tbody").innerHTML = rows.map((x) => `
     <tr>
       <th scope="row"><span class="tract-name">${esc(x.name)}</span><span class="geoid">${x.id}</span></th>
@@ -313,19 +362,19 @@ function renderTable() {
       <td class="${x.t ? "tier-" + x.t : ""}">${x.t ? TIER_TEXT[x.t] : ""}</td>
       <td>${hasGeo.has(x.id)
         ? `<button type="button" class="show" data-id="${x.id}" aria-label="Show ${esc(x.name)} on the map">Show on map</button>`
-        : `<span class="note">No boundary (water)</span>`}</td>
+        : `<span class="note">No boundary</span>`}</td>
     </tr>`).join("");
-  $("table-caption").textContent = `${def.label}, ${vin.label}, Virginia census tracts. ${rows.length} rows.`;
-  $("table-count").textContent = q ? `${rows.length.toLocaleString()} of ${state.cubes[state.vintage].size.toLocaleString()} tracts match.` : `${rows.length.toLocaleString()} tracts.`;
+  $("table-caption").textContent = `${def.label}, ${vin.label}, Virginia ${levelDef().plural}. ${rows.length} rows.`;
+  $("table-count").textContent = q ? `${rows.length.toLocaleString()} of ${state.cubes[key()].size.toLocaleString()} ${levelDef().plural} match.` : `${rows.length.toLocaleString()} ${levelDef().plural}.`;
   for (const th of $("tracts").querySelectorAll("th[aria-sort]")) {
     const k = th.querySelector("button").dataset.sort;
-    th.setAttribute("aria-sort", k === key ? (dir > 0 ? "ascending" : "descending") : "none");
+    th.setAttribute("aria-sort", k === sortKey ? (dir > 0 ? "ascending" : "descending") : "none");
   }
 }
 
 function featureBBox(id) {
   if (!state.bbox[id]) {
-    const f = state.geo[state.vintage].features.find((x) => x.properties.GEOID === id);
+    const f = state.geo[key()].features.find((x) => x.properties.GEOID === id);
     let w = 180, s = 90, e = -180, n = -90;
     const walk = (c) => typeof c[0] === "number"
       ? (w = Math.min(w, c[0]), e = Math.max(e, c[0]), s = Math.min(s, c[1]), n = Math.max(n, c[1]))
@@ -358,7 +407,10 @@ $("measure").addEventListener("change", (ev) => { state.measure = ev.target.valu
 
 $("vintage-options").innerHTML = VINTAGES.map((v) =>
   `<label><input type="radio" name="vintage" value="${v.id}" ${v.id === state.vintage ? "checked" : ""}><span>${v.label}</span></label>`).join("");
-$("vintage").addEventListener("change", (ev) => { setVintage(ev.target.value).catch(fail); });
+$("vintage").addEventListener("change", (ev) => { state.vintage = ev.target.value; reload().catch(fail); });
+
+$("level").innerHTML = LEVELS.map((l) => `<option value="${l.id}">${l.label}</option>`).join("");
+$("level").addEventListener("change", (ev) => { state.level = ev.target.value; reload().catch(fail); });
 
 for (const r of document.querySelectorAll('input[name="view"]')) r.addEventListener("change", () => setView(r.value));
 $("filter").addEventListener("input", (ev) => { state.filter = ev.target.value; renderTable(); });
@@ -378,8 +430,10 @@ document.querySelector(".skip").addEventListener("click", (ev) => {
   $("filter").focus();
 });
 
-map.on("mousemove", "tract-fill", (e) => select(e.features[0]?.id));
-map.on("click", "tract-fill", (e) => select(e.features[0]?.id));
+// Ignore features from the previous level while new data is still swapping in.
+const pick = (e) => { const id = e.features[0]?.id; if (id && state.cubes[key()]?.has(id)) select(id); };
+map.on("mousemove", "tract-fill", pick);
+map.on("click", "tract-fill", pick);
 map.on("mouseenter", "tract-fill", () => (map.getCanvas().style.cursor = "crosshair"));
 map.on("mouseleave", "tract-fill", () => (map.getCanvas().style.cursor = ""));
 
@@ -406,5 +460,5 @@ function fail(err) {
 map.on("load", () => {
   addLayers();
   applyTheme();
-  setVintage(state.vintage).then(() => { window.__strataReady = true; }).catch(fail);
+  reload().then(() => { window.__strataReady = true; }).catch(fail);
 });

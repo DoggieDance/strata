@@ -25,6 +25,7 @@ import pyarrow.parquet as pq
 from etl.clean import build_measures
 from etl.common import (
     JAM_FLOOR,
+    LevelUnavailable,
     check_scope,
     load_measures,
     load_summary_files,
@@ -39,9 +40,9 @@ def cube_path(out: Path, vintage: str, level: str, state: str) -> Path:
     return out / "acs" / vintage / level / f"{state}.parquet"
 
 
-def _sources(vintage: str, state: str) -> list[dict]:
+def _sources(vintage: str, state: str, level: str) -> list[dict]:
     out = []
-    for _, path in raw_files(vintage, state):
+    for _, path in raw_files(vintage, state, level):
         meta = json.loads(path.with_name(path.name + ".meta.json").read_text())
         out.append({k: meta.get(k) for k in ("url", "last_modified", "etag", "size", "sha256")})
     return out
@@ -88,7 +89,7 @@ def build(state: str, vintage: str, level: str, out: Path) -> Path:
         "registry_version": load_measures()["registry_version"],
         "summary_file": load_summary_files()["vintages"][vintage],
         "measures": notes,
-        "sources": _sources(vintage, state),
+        "sources": _sources(vintage, state, level),
     }
     table = table.replace_schema_metadata({"strata": json.dumps(meta)})
 
@@ -109,16 +110,24 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--states", default="51")
     ap.add_argument("--vintages", default="2016-2020")
-    ap.add_argument("--level", default="tract")
+    ap.add_argument("--levels", "--level", dest="levels", default="tract",
+                    help="comma list: tract,county,place,zcta")
     ap.add_argument("--out", type=Path, default=Path("build"))
     args = ap.parse_args(argv)
     states = [s.strip() for s in args.states.split(",")]
     vintages = [resolve_vintage(v.strip()) for v in args.vintages.split(",")]
-    check_scope(states, vintages, args.level)
+    levels = [x.strip() for x in args.levels.split(",")]
+    for level in levels:
+        check_scope(states, vintages, level)
     for v in vintages:
-        for s in states:
-            p = build(s, v, args.level, args.out)
-            print(f"wrote {p} ({p.stat().st_size:,} bytes)")
+        for level in levels:
+            for s in states:
+                try:
+                    p = build(s, v, level, args.out)
+                except LevelUnavailable as e:
+                    print(f"skipped {e}")
+                    continue
+                print(f"wrote {p} ({p.stat().st_size:,} bytes)")
     return 0
 
 

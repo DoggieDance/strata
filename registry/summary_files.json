@@ -15,13 +15,51 @@
         "The spec's table-based-SF/ path does not exist for 2020 (404). The prototype/ directory is the only table-based release of this vintage.",
         "No ETag is served by www2.census.gov for these files; the fetcher falls back to Last-Modified + Content-Length validators.",
         "Tract rows use 2020 tract definitions (all 2,147 VA rows match the 2020 Gazetteer). Geos20205YR.csv lists 2,198 VA tracts; the rest are absent from the data tables."
-      ]
+      ],
+      "levels": {
+        "tract": {
+          "sumlevel": "140",
+          "prefix": "1400000US",
+          "geoid": [
+            "STATE",
+            "COUNTY",
+            "TRACT"
+          ]
+        },
+        "county": {
+          "sumlevel": "050",
+          "prefix": "0500000US",
+          "geoid": [
+            "STATE",
+            "COUNTY"
+          ],
+          "note": "Counties and county-equivalents. Virginia's 38 independent cities are county-equivalents here."
+        },
+        "place": {
+          "sumlevel": "160",
+          "prefix": "1600000US",
+          "geoid": [
+            "STATE",
+            "PLACE"
+          ],
+          "note": "Incorporated towns and cities plus census-designated places (CDPs). Places do not cover the whole state."
+        },
+        "zcta": {
+          "sumlevel": "860",
+          "prefix": "8600000US",
+          "geoid": [
+            "ZCTA5"
+          ],
+          "state_rule": "zcta_largest_land_share",
+          "note": "ZIP Code Tabulation Areas (Census approximations of USPS ZIP codes). National rows with no state; assigned to the state holding the largest share of their land (registry: zcta_state)."
+        }
+      }
     },
     "2006-2010": {
       "endyear": 2010,
       "status": "official",
       "format": "sequence",
-      "data_base": "https://www2.census.gov/programs-surveys/acs/summary_file/2010/data/5_year_seq_by_state/{state_name}/Tracts_Block_Groups_Only/",
+      "data_base": "https://www2.census.gov/programs-surveys/acs/summary_file/2010/data/5_year_seq_by_state/{state_name}/",
       "sequence_file": "20105{stusab}{sequence:04d}000.zip",
       "geos": "g20105{stusab}.csv",
       "lookup": "https://www2.census.gov/programs-surveys/acs/summary_file/2010/documentation/5_year/user_tools/Sequence_Number_and_Table_Number_Lookup.txt",
@@ -39,7 +77,8 @@
         "COUNTY": 10,
         "TRACT": 13,
         "GEOID": 48,
-        "NAME": 49
+        "NAME": 49,
+        "PLACE": 12
       },
       "sequence_header_fields": 6,
       "missing_tokens": {
@@ -54,7 +93,53 @@
         "Rows are keyed by LOGRECNO; GEOID comes from the geography file. The Tracts_Block_Groups_Only archive holds the tract rows.",
         "No negative jam sentinels appear in Virginia tract rows of the sequences used; missing values are '.' or blank instead. The numeric jam guard still runs.",
         "B15003 does not exist in 2006-2010; education uses B15002 (sex by educational attainment)."
-      ]
+      ],
+      "archives": {
+        "tracts": {
+          "dir": "Tracts_Block_Groups_Only/",
+          "local": ""
+        },
+        "other": {
+          "dir": "All_Geographies_Not_Tracts_Block_Groups/",
+          "local": "all_geographies/"
+        }
+      },
+      "geos_archive": "tracts",
+      "levels": {
+        "tract": {
+          "sumlevel": "140",
+          "archive": "tracts",
+          "geoid": [
+            "STATE",
+            "COUNTY",
+            "TRACT"
+          ]
+        },
+        "county": {
+          "sumlevel": "050",
+          "archive": "other",
+          "geoid": [
+            "STATE",
+            "COUNTY"
+          ],
+          "note": "134 rows: includes Bedford city (51515), merged into Bedford County in 2013."
+        },
+        "place": {
+          "sumlevel": "160",
+          "archive": "other",
+          "geoid": [
+            "STATE",
+            "PLACE"
+          ]
+        }
+      },
+      "unavailable_levels": {
+        "zcta": "The 2006-2010 5-year Summary File has no ZCTA rows (state or national files). 2010-2020 ZIP change needs the tract crosswalk (Phase 02)."
+      }
     }
+  },
+  "zcta_state": {
+    "relationship": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt",
+    "rule": "A ZCTA belongs to the state containing the largest share of its land area (AREALAND_PART summed by state). ZCTAs that cross a state line appear in exactly one state's files."
   }
 }

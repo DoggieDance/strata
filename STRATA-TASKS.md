@@ -27,6 +27,7 @@ suggestions.
 |---|---|---|
 | v0.1 | Phase 00 — spec files committed | in progress |
 | v0.2 | Phase 01 — Virginia data spine | **gate passed 2026-11-12** — 20/20 data.census.gov values match; zero jams |
+| v0.2.1 | Published levels: county, place, ZCTA (owner request) | **passed 2026-11-12**: 100/100 spot-check values. Entered after the build, not before; the reserve-first rule was missed |
 | v0.3 | Phase 02 — harmonizer | in progress — 2006–2010 loader gate passed 2026-11-12; crosswalk next |
 
 Rule: reserve here first. A build that discovers its version is taken halts.

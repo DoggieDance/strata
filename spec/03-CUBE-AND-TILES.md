@@ -27,6 +27,35 @@ acs/{vintage}/{level}/{state_fips}.parquet
   never NaN.
 - Row group size ~8,000 rows. Compression zstd.
 
+### Geography levels
+
+Added 2026-11-12 at the owner's request. Each level is Census's **published**
+estimate for that geography, read from the same Summary File, never a sum of
+tracts. Published values carry Census's own margins of error; summed tracts do
+not reproduce them. Population and households (controlled totals) sum exactly
+from tracts to counties, which is tested. Dollar aggregates differ by up to 0.17%.
+
+| Level | Summary level | Virginia 2016–20 | 2006–10 | Note |
+|---|---|---|---|---|
+| `tract` | 140 | 2,198 | 1,907 | 2020 vs 2010 tract geography |
+| `county` | 050 | 133 | 134 | Includes the 38 independent cities. Bedford city (51515) exists only in 2010 |
+| `place` | 160 | 672 | 591 | Incorporated places + CDPs; does not cover the state |
+| `zcta` | 860 | 883 | — | National rows; assigned to the state with most of their land. None published for 2006–10 |
+
+Every level gets the same 20-value data.census.gov spot-check as tracts.
+
+**Comparing years across boundary changes** (tracts redrawn, ZCTAs redefined,
+Bedford city merged, places annexing land) is the harmonizer's job (spec 02),
+not the level's. Level maps show one vintage at a time.
+
+**Candidate levels, roughly in order of usefulness:** congressional districts
+(500), state legislative districts (610/620), school districts (950–970),
+county subdivisions (060: townships/magisterial districts), metro and
+micropolitan areas (310), PUMAs (795), block groups (150; finer than tracts,
+high margins). User-drawn and city-specific neighborhoods (Philadelphia first)
+come through the harmonizer as custom targets, since there is no national
+neighborhood standard.
+
 Parquet is columnar, so an index naming five measures fetches ten columns, not
 the whole file. Read with **hyparquet** (~10 KB) using HTTP range requests.
 
