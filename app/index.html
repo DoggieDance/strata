@@ -12,6 +12,8 @@
   <script src="https://unpkg.com/maplibre-gl@5.24.1/dist/maplibre-gl.js"></script>
 </head>
 <body>
+  <a class="skip" href="#table-view">Skip to the data table</a>
+
   <header class="masthead">
     <p class="kicker">STRATA · local preview</p>
     <h1>Virginia, tract by tract</h1>
@@ -19,37 +21,75 @@
   </header>
 
   <main class="layout">
-    <aside class="panel" aria-label="Controls">
+    <aside class="panel" aria-label="Controls and legend">
       <section>
-        <h2 class="eyebrow">Measure</h2>
-        <select id="measure" aria-label="Measure"></select>
+        <label class="eyebrow" for="measure">Measure</label>
+        <select id="measure"></select>
       </section>
 
       <section>
-        <h2 class="eyebrow">Vintage</h2>
-        <div class="segmented" role="radiogroup" aria-label="Vintage" id="vintage"></div>
+        <fieldset class="segmented" id="vintage">
+          <legend class="eyebrow">Vintage</legend>
+          <div class="seg-row" id="vintage-options"></div>
+        </fieldset>
         <p class="note" id="dollar-note"></p>
       </section>
 
-      <section>
-        <h2 class="eyebrow">Legend</h2>
-        <ol class="legend" id="legend"></ol>
-        <p class="note"><span class="swatch hatch"></span> Low reliability — CV above 40%, hatched, not colored.
-          A field convention; Census publishes no cutoff.</p>
+      <section aria-labelledby="legend-title">
+        <h2 class="eyebrow" id="legend-title">Legend</h2>
+        <ul class="legend" id="legend"></ul>
+        <p class="note"><span class="swatch hatch" aria-hidden="true"></span> Low reliability: CV above 40%,
+          hatched, not colored. A field convention; Census publishes no cutoff.</p>
       </section>
 
-      <section class="inspector" id="inspector" aria-live="polite">
-        <h2 class="eyebrow">Tract</h2>
-        <p class="note">Hover or tap a tract.</p>
+      <section class="inspector" aria-labelledby="inspector-title">
+        <h2 class="eyebrow" id="inspector-title">Selected tract</h2>
+        <div id="inspector" aria-live="polite">
+          <p class="note">Hover or tap a tract, or pick one from the table.</p>
+        </div>
       </section>
 
       <footer class="panel-foot">
-        <button type="button" id="theme" class="link">Dark</button>
-        <span class="mono" id="status">Loading…</span>
+        <button type="button" id="theme" class="link" aria-pressed="false">Dark theme</button>
+        <span class="mono" id="status" role="status">Loading…</span>
       </footer>
     </aside>
 
-    <div id="map" role="region" aria-label="Map of Virginia census tracts"></div>
+    <section class="stage" aria-label="Map and table">
+      <div class="viewbar">
+        <fieldset class="segmented compact">
+          <legend class="sr-only">View</legend>
+          <div class="seg-row">
+            <label><input type="radio" name="view" value="map" checked><span>Map</span></label>
+            <label><input type="radio" name="view" value="table"><span>Table</span></label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div id="map" role="application" aria-label="Map of Virginia census tracts. Arrow keys pan, plus and minus zoom. Every value is also in the table view."></div>
+
+      <div id="table-view" class="table-view" hidden tabindex="-1">
+        <div class="table-tools">
+          <label class="eyebrow" for="filter">Find a tract</label>
+          <input id="filter" type="search" placeholder="County, city or GEOID" autocomplete="off">
+          <p class="note" id="table-count" aria-live="polite"></p>
+        </div>
+        <div class="table-scroll">
+          <table id="tracts">
+            <caption class="sr-only" id="table-caption"></caption>
+            <thead><tr>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="name">Tract</button></th>
+              <th scope="col" aria-sort="none" class="num"><button type="button" data-sort="e">Estimate</button></th>
+              <th scope="col" aria-sort="none" class="num"><button type="button" data-sort="m">Margin (90%)</button></th>
+              <th scope="col" aria-sort="none" class="num"><button type="button" data-sort="cv">CV</button></th>
+              <th scope="col">Reliability</th>
+              <th scope="col"><span class="sr-only">Action</span></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script type="module" src="app.js"></script>

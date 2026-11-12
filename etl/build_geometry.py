@@ -17,6 +17,7 @@ import geopandas as gpd
 import pyarrow.parquet as pq
 import requests
 
+from etl.clean import tract_names
 from etl.common import RAW_DIR, REGISTRY_DIR, ROOT, check_scope, resolve_vintage
 from etl.fetch_summary_file import fetch
 
@@ -59,6 +60,11 @@ def build(state: str, vintage: str, out: Path) -> Path:
     part = dest.with_name(dest.name + ".part")
     gdf.to_file(part, driver="GeoJSON", COORDINATE_PRECISION=PRECISION, RFC7946="YES")
     part.replace(dest)
+    # Names ride beside the geometry, not in it: the tile contract stays GEOID-only.
+    names = {g: n.split(";")[0].split(", Virginia")[0].replace("Census Tract ", "Tract ")
+             for g, n in tract_names(vintage, state).items() if g in cube_ids}
+    names_path = dest.with_name(f"{state}.names.json")
+    names_path.write_text(json.dumps(dict(sorted(names.items())), separators=(",", ":")))
     meta = {"vintage": vintage, "state": state, "source": url, "features": len(gdf),
             "cube_tracts_without_geometry": missing, "bytes": dest.stat().st_size}
     dest.with_suffix(".meta.json").write_text(json.dumps(meta, indent=2) + "\n")

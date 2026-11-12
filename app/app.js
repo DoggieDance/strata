@@ -1,6 +1,9 @@
 // STRATA local preview. Reads the built cube (Parquet) and tract geometry from
 // ../build/, joins them in the browser by GEOID via feature state (spec 03).
 // Never calls a Census API.
+//
+// Accessibility: every value on the map is also in the table view (search,
+// sort, "Show on map"), so nothing depends on seeing color or using a mouse.
 import { parquetReadObjects } from "https://cdn.jsdelivr.net/npm/hyparquet@1.31.5/+esm";
 import { compressors } from "https://cdn.jsdelivr.net/npm/hyparquet-compressors@1.1.2/+esm";
 
@@ -22,9 +25,17 @@ const MEASURES = [
   { id: "households", label: "Households", fmt: "count" },
 ];
 
-// Warm half of the diverging ramp (spec 07): single-measure level maps.
-// Lightest step sits clearly below --paper so the bottom quintile never reads as empty.
-const RAMP = ["#E2C994", "#CDA460", "#B47B36", "#925722", "#6B3311"];
+// Warm half of the diverging ramp (spec 07), lowest to highest. One hue family
+// stepping in lightness, so it reads under every common color-vision deficiency.
+// Paper: dark ink rises out of light ground. Vellum: the same hues run dim to
+// bright, so high values never sink into the dark ground (darkest step 2.2:1,
+// brightest 12:1 against --paper).
+const RAMPS = {
+  light: ["#E2C994", "#CDA460", "#B47B36", "#925722", "#6B3311"],
+  dark: ["#6B4423", "#8F5E2C", "#B47B36", "#D4A25E", "#EBCB93"],
+};
+
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
 const fmt = {
   usd: (v) => "$" + Math.round(v).toLocaleString("en-US"),
@@ -36,24 +47,37 @@ const fmt = {
 function tier(e, m) {
   if (e == null || m == null || Number.isNaN(e)) return null;
   if (e === 0) return m === 0 ? "high" : "low";
-  const cv = (m / 1.645 / Math.abs(e)) * 100;
+  // Tier on the CV as displayed (one decimal), so "12.0%" never reads as High.
+  const cv = Math.round((m / 1.645 / Math.abs(e)) * 1000) / 10;
   return cv < 12 ? "high" : cv <= 40 ? "medium" : "low";
 }
 const cvOf = (e, m) => (e ? (m / 1.645 / Math.abs(e)) * 100 : null);
+const TIER_TEXT = { high: "High", medium: "Medium, use with care", low: "Low, not colored" };
 
 const state = {
   vintage: "2016-2020",
   measure: "mean_household_income",
-  cubes: {}, // vintage -> Map(GEOID -> row)
-  geo: {},   // vintage -> GeoJSON
+  view: "map",
+  cubes: {}, geo: {}, names: {}, bbox: {},
   breaks: [],
-  hover: null,
+  selected: null,
+  sort: { key: "name", dir: 1 },
+  filter: "",
 };
 
 const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const measureDef = () => MEASURES.find((x) => x.id === state.measure);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-async function loadCube(v) {
+async function getJSON(path) {
+  const url = new URL(path, DATA);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`${url.pathname}: ${res.status}`);
+  return res.json();
+}
+
+async function loadVintage(v) {
   if (!state.cubes[v]) {
     const url = new URL(`acs/${v}/tract/${STATE}.parquet`, DATA);
     const res = await fetch(url);
@@ -61,17 +85,8 @@ async function loadCube(v) {
     const rows = await parquetReadObjects({ file: await res.arrayBuffer(), compressors });
     state.cubes[v] = new Map(rows.map((r) => [r.GEOID, r]));
   }
-  return state.cubes[v];
-}
-
-async function loadGeo(v) {
-  if (!state.geo[v]) {
-    const url = new URL(`geo/${v}/tract/${STATE}.geojson`, DATA);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`${url.pathname}: ${res.status}`);
-    state.geo[v] = await res.json();
-  }
-  return state.geo[v];
+  if (!state.geo[v]) state.geo[v] = await getJSON(`geo/${v}/tract/${STATE}.geojson`);
+  if (!state.names[v]) state.names[v] = await getJSON(`geo/${v}/tract/${STATE}.names.json`).catch(() => ({}));
 }
 
 function quantileBreaks(values, k) {
@@ -79,6 +94,20 @@ function quantileBreaks(values, k) {
   const out = [];
   for (let i = 1; i < k; i++) out.push(s[Math.floor((i / k) * (s.length - 1))]);
   return out;
+}
+
+// ---------------------------------------------------------------- theme
+
+function currentTheme() {
+  const set = document.documentElement.dataset.theme;
+  return set || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+const ramp = () => RAMPS[currentTheme()];
+
+function syncThemeButton() {
+  const dark = currentTheme() === "dark";
+  $("theme").setAttribute("aria-pressed", String(dark));
+  $("theme").textContent = "Dark theme";
 }
 
 // ---------------------------------------------------------------- map
@@ -95,61 +124,71 @@ const map = new maplibregl.Map({
   pitchWithRotate: false,
 });
 map.touchZoomRotate.disableRotation();
+map.keyboard.disableRotation();
 map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
 function hatchImage(color) {
   const n = 8, c = document.createElement("canvas");
   c.width = c.height = n;
   const g = c.getContext("2d");
-  g.strokeStyle = color; g.lineWidth = 1; g.globalAlpha = 0.85;
+  g.strokeStyle = color; g.lineWidth = 1.25;
   g.beginPath();
   for (let o = -n; o <= n; o += n) { g.moveTo(o, n); g.lineTo(o + n, 0); }
   g.stroke();
   return g.getImageData(0, 0, n, n);
 }
 
-function applyTheme() {
-  if (!map.getLayer("bg")) return;
-  map.setPaintProperty("bg", "background-color", css("--paper"));
-  map.setPaintProperty("tract-line", "line-color", css("--rule"));
-  map.setPaintProperty("tract-hover", "line-color", css("--ink"));
-  map.setPaintProperty("tract-fill", "fill-color", fillColor());
-  if (map.hasImage("hatch")) map.removeImage("hatch");
-  map.addImage("hatch", hatchImage(css("--ink-3")));
-}
-
 function fillColor() {
+  const r = ramp();
   return ["match", ["feature-state", "cls"],
-    0, RAMP[0], 1, RAMP[1], 2, RAMP[2], 3, RAMP[3], 4, RAMP[4],
+    0, r[0], 1, r[1], 2, r[2], 3, r[3], 4, r[4],
     -2, css("--paper"),   // low reliability: uncolored ground under the hatch
     css("--nodata")];     // no estimate
 }
 
+function applyTheme() {
+  syncThemeButton();
+  if (!map.getLayer("tract-fill")) return;
+  map.setPaintProperty("bg", "background-color", css("--paper"));
+  map.setPaintProperty("tract-line", "line-color", css("--rule"));
+  map.setPaintProperty("tract-sel-casing", "line-color", css("--paper"));
+  map.setPaintProperty("tract-sel", "line-color", css("--accent"));
+  map.setPaintProperty("tract-fill", "fill-color", fillColor());
+  if (map.hasImage("hatch")) map.removeImage("hatch");
+  map.addImage("hatch", hatchImage(css("--ink-2")));
+  if (state.breaks.length) renderLegend();
+}
+
 function addLayers() {
   map.addSource("tracts", { type: "geojson", data: { type: "FeatureCollection", features: [] }, promoteId: "GEOID" });
-  map.addImage("hatch", hatchImage(css("--ink-3")));
+  map.addImage("hatch", hatchImage(css("--ink-2")));
   map.addLayer({ id: "tract-fill", type: "fill", source: "tracts",
-    paint: { "fill-color": fillColor(), "fill-color-transition": { duration: 180 } } });
+    paint: { "fill-color": fillColor(), "fill-color-transition": { duration: reduceMotion.matches ? 0 : 180 } } });
   map.addLayer({ id: "tract-hatch", type: "fill", source: "tracts",
     paint: { "fill-pattern": "hatch",
              "fill-opacity": ["case", ["boolean", ["feature-state", "low"], false], 1, 0] } });
   map.addLayer({ id: "tract-line", type: "line", source: "tracts",
     paint: { "line-color": css("--rule"), "line-width": ["interpolate", ["linear"], ["zoom"], 6, 0.2, 11, 1] } });
-  map.addLayer({ id: "tract-hover", type: "line", source: "tracts",
-    paint: { "line-color": css("--ink"),
-             "line-width": ["case", ["boolean", ["feature-state", "hover"], false], 2, 0] } });
+  // Selection: accent line on a paper casing, visible on every ramp step in both themes.
+  map.addLayer({ id: "tract-sel-casing", type: "line", source: "tracts",
+    paint: { "line-color": css("--paper"),
+             "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 6, 0] } });
+  map.addLayer({ id: "tract-sel", type: "line", source: "tracts",
+    paint: { "line-color": css("--accent"),
+             "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 3, 0] } });
 }
 
 // ---------------------------------------------------------------- render
 
 async function setVintage(v) {
   state.vintage = v;
-  renderVintageButtons();
   $("status").textContent = "Loading…";
-  const [geo] = await Promise.all([loadGeo(v), loadCube(v)]);
-  state.hover = null;
-  map.getSource("tracts").setData(geo);
+  await loadVintage(v);
+  state.selected = null;
+  state.bbox = {};
+  map.getSource("tracts").setData(state.geo[v]);
   recolor();
+  renderInspector();
 }
 
 function recolor() {
@@ -161,110 +200,209 @@ function recolor() {
     const e = r[`${m}_e`];
     if (e != null && !Number.isNaN(e) && tier(e, r[`${m}_m`]) !== "low") vals.push(e);
   }
-  state.breaks = quantileBreaks(vals, RAMP.length);
+  state.breaks = quantileBreaks(vals, 5);
+  state.reliable = vals.length;
   let low = 0, none = 0;
   for (const f of state.geo[state.vintage].features) {
     const id = f.properties.GEOID;
     const r = cube.get(id);
-    const e = r?.[`${m}_e`], mo = r?.[`${m}_m`];
-    const t = tier(e, mo);
+    const e = r?.[`${m}_e`];
+    const t = tier(e, r?.[`${m}_m`]);
     let cls = -1;
     if (t === null) none++;
     else if (t === "low") { low++; cls = -2; }
-    else { cls = 0; while (cls < state.breaks.length && e > state.breaks[cls]) cls++; }
+    else cls = classOf(e);
     map.setFeatureState({ source: "tracts", id }, { cls, low: t === "low" });
   }
-  renderLegend(vals.length, low, none);
+  state.counts = { low, none };
+  renderLegend();
   const ms = performance.now() - t0;
   $("status").textContent = `${state.geo[state.vintage].features.length.toLocaleString()} tracts · ${ms.toFixed(0)} ms`;
-  if (state.hover) inspect(state.hover);
+  renderTable();
+  if (state.selected) renderInspector();
 }
 
-function renderLegend(n, low, none) {
-  const f = fmt[MEASURES.find((x) => x.id === state.measure).fmt];
-  const b = state.breaks;
-  const items = RAMP.map((c, i) => {
-    const lo = i === 0 ? "≤ " + f(b[0]) : i === RAMP.length - 1 ? "> " + f(b[i - 1]) : `${f(b[i - 1])} – ${f(b[i])}`;
-    return `<li><span class="swatch" style="background:${c}"></span>${lo}</li>`;
-  });
-  items.push(`<li><span class="swatch hatch"></span>${low.toLocaleString()} low reliability</li>`);
-  if (none) items.push(`<li><span class="swatch" style="background:var(--nodata)"></span>${none.toLocaleString()} no estimate</li>`);
+function classOf(e) {
+  let c = 0;
+  while (c < state.breaks.length && e > state.breaks[c]) c++;
+  return c;
+}
+
+function rangeLabel(i) {
+  const f = fmt[measureDef().fmt], b = state.breaks;
+  if (i === 0) return `${f(b[0])} or less`;
+  if (i === 4) return `more than ${f(b[3])}`;
+  return `${f(b[i - 1])} to ${f(b[i])}`;
+}
+
+function renderLegend() {
+  const r = ramp();
+  const { low, none } = state.counts;
+  const items = r.map((c, i) =>
+    `<li><span class="swatch" style="background:${c}" aria-hidden="true"></span>${["Lowest", "Low", "Middle", "High", "Highest"][i]} fifth: ${rangeLabel(i)}</li>`);
+  items.push(`<li><span class="swatch hatch" aria-hidden="true"></span>${low.toLocaleString()} low reliability</li>`);
+  if (none) items.push(`<li><span class="swatch" style="background:var(--nodata)" aria-hidden="true"></span>${none.toLocaleString()} no estimate</li>`);
   $("legend").innerHTML = items.join("");
-  const dollars = MEASURES.find((x) => x.id === state.measure).fmt === "usd";
   const vin = VINTAGES.find((x) => x.id === state.vintage);
-  $("dollar-note").textContent = dollars
-    ? `In ${vin.dollars}, as published — not inflation-adjusted. Quintiles of ${n.toLocaleString()} reliable tracts.`
-    : `Quintiles of ${n.toLocaleString()} reliable tracts.`;
+  const dollars = measureDef().fmt === "usd"
+    ? `In ${vin.dollars}, as published, not inflation-adjusted. ` : "";
+  $("dollar-note").textContent = `${dollars}Fifths (quintiles) of ${state.reliable.toLocaleString()} reliable tracts.`;
 }
 
-function inspect(id) {
+function tractRow(id) {
   const r = state.cubes[state.vintage].get(id);
-  const def = MEASURES.find((x) => x.id === state.measure);
-  const f = fmt[def.fmt];
-  const e = r?.[`${def.id}_e`], m = r?.[`${def.id}_m`];
-  const t = tier(e, m);
-  const cv = t ? cvOf(e, m) : null;
-  const tierText = { high: "High", medium: "Medium — use with care", low: "Low — not colored" }[t];
+  const m = state.measure;
+  const e = r?.[`${m}_e`], mo = r?.[`${m}_m`];
+  const t = tier(e, mo);
+  return { id, name: state.names[state.vintage][id] || `Tract ${id}`, r, e: t ? e : null, m: t ? mo : null,
+           cv: t ? cvOf(e, mo) : null, t };
+}
+
+function renderInspector() {
+  if (!state.selected) {
+    $("inspector").innerHTML = `<p class="note">Hover or tap a tract, or pick one from the table.</p>`;
+    return;
+  }
+  const def = measureDef(), f = fmt[def.fmt];
+  const x = tractRow(state.selected);
+  const fifth = x.t && x.t !== "low" ? ["lowest", "low", "middle", "high", "highest"][classOf(x.e)] + " fifth" : null;
   $("inspector").innerHTML = `
-    <h2 class="eyebrow">Tract</h2>
+    <p class="name">${esc(x.name)}</p>
     <dl>
-      <dt>GEOID</dt><dd>${id}</dd>
-      <dt>${def.label}</dt><dd>${t ? f(e) : "No estimate"}</dd>
-      ${t ? `<dt>Margin (90%)</dt><dd>± ${f(m)}</dd>
-      <dt>CV</dt><dd>${cv == null ? "—" : cv.toFixed(1) + "%"}</dd>
-      <dt>Reliability</dt><dd class="tier-${t}">${tierText}</dd>` : ""}
-      <dt>Population</dt><dd>${r ? fmt.count(r.total_population_e) : "—"}</dd>
+      <dt>GEOID</dt><dd>${x.id}</dd>
+      <dt>${esc(def.label)}</dt><dd>${x.t ? f(x.e) : "No estimate"}</dd>
+      ${x.t ? `<dt>Margin (90%)</dt><dd>± ${f(x.m)}</dd>
+      <dt>CV</dt><dd>${x.cv == null ? "n/a" : x.cv.toFixed(1) + "%"}</dd>
+      <dt>Reliability</dt><dd class="tier-${x.t}">${TIER_TEXT[x.t]}</dd>` : ""}
+      ${fifth ? `<dt>Class</dt><dd>${fifth}</dd>` : ""}
+      <dt>Population</dt><dd>${x.r ? fmt.count(x.r.total_population_e) : "n/a"}</dd>
     </dl>`;
 }
 
-function renderVintageButtons() {
-  $("vintage").innerHTML = VINTAGES.map((v) =>
-    `<button type="button" role="radio" aria-checked="${v.id === state.vintage}" data-v="${v.id}">${v.label}</button>`).join("");
+function select(id) {
+  if (state.selected === id) return;
+  if (state.selected) map.setFeatureState({ source: "tracts", id: state.selected }, { sel: false });
+  state.selected = id;
+  if (id) map.setFeatureState({ source: "tracts", id }, { sel: true });
+  renderInspector();
+}
+
+// ---------------------------------------------------------------- table
+
+function renderTable() {
+  const def = measureDef(), f = fmt[def.fmt];
+  const vin = VINTAGES.find((x) => x.id === state.vintage);
+  const q = state.filter.trim().toLowerCase();
+  let rows = [...state.cubes[state.vintage].keys()].map(tractRow);
+  if (q) rows = rows.filter((x) => x.name.toLowerCase().includes(q) || x.id.includes(q));
+  const { key, dir } = state.sort;
+  rows.sort((a, b) => {
+    const av = a[key], bv = b[key];
+    if (av == null && bv == null) return a.id.localeCompare(b.id);
+    if (av == null) return 1;               // no estimate always sorts last
+    if (bv == null) return -1;
+    return (typeof av === "string" ? av.localeCompare(bv) : av - bv) * dir || a.id.localeCompare(b.id);
+  });
+  const hasGeo = new Set(state.geo[state.vintage].features.map((x) => x.properties.GEOID));
+  $("tracts").querySelector("tbody").innerHTML = rows.map((x) => `
+    <tr>
+      <th scope="row"><span class="tract-name">${esc(x.name)}</span><span class="geoid">${x.id}</span></th>
+      <td class="num">${x.t ? f(x.e) : "No estimate"}</td>
+      <td class="num">${x.t ? "± " + f(x.m) : ""}</td>
+      <td class="num">${x.cv == null ? "" : x.cv.toFixed(1) + "%"}</td>
+      <td class="${x.t ? "tier-" + x.t : ""}">${x.t ? TIER_TEXT[x.t] : ""}</td>
+      <td>${hasGeo.has(x.id)
+        ? `<button type="button" class="show" data-id="${x.id}" aria-label="Show ${esc(x.name)} on the map">Show on map</button>`
+        : `<span class="note">No boundary (water)</span>`}</td>
+    </tr>`).join("");
+  $("table-caption").textContent = `${def.label}, ${vin.label}, Virginia census tracts. ${rows.length} rows.`;
+  $("table-count").textContent = q ? `${rows.length.toLocaleString()} of ${state.cubes[state.vintage].size.toLocaleString()} tracts match.` : `${rows.length.toLocaleString()} tracts.`;
+  for (const th of $("tracts").querySelectorAll("th[aria-sort]")) {
+    const k = th.querySelector("button").dataset.sort;
+    th.setAttribute("aria-sort", k === key ? (dir > 0 ? "ascending" : "descending") : "none");
+  }
+}
+
+function featureBBox(id) {
+  if (!state.bbox[id]) {
+    const f = state.geo[state.vintage].features.find((x) => x.properties.GEOID === id);
+    let w = 180, s = 90, e = -180, n = -90;
+    const walk = (c) => typeof c[0] === "number"
+      ? (w = Math.min(w, c[0]), e = Math.max(e, c[0]), s = Math.min(s, c[1]), n = Math.max(n, c[1]))
+      : c.forEach(walk);
+    walk(f.geometry.coordinates);
+    state.bbox[id] = [[w, s], [e, n]];
+  }
+  return state.bbox[id];
+}
+
+function setView(v) {
+  state.view = v;
+  $("map").hidden = v !== "map";
+  $("table-view").hidden = v !== "table";
+  for (const r of document.querySelectorAll('input[name="view"]')) r.checked = r.value === v;
+  if (v === "map") map.resize();
+}
+
+function showOnMap(id) {
+  setView("map");
+  select(id);
+  map.fitBounds(featureBBox(id), { padding: 60, maxZoom: 12, duration: reduceMotion.matches ? 0 : 600 });
+  map.getCanvas().focus();
 }
 
 // ---------------------------------------------------------------- wiring
 
 $("measure").innerHTML = MEASURES.map((m) => `<option value="${m.id}">${m.label}</option>`).join("");
 $("measure").addEventListener("change", (ev) => { state.measure = ev.target.value; recolor(); });
-$("vintage").addEventListener("click", (ev) => {
-  const v = ev.target.closest("button")?.dataset.v;
-  if (v && v !== state.vintage) setVintage(v).catch(fail);
+
+$("vintage-options").innerHTML = VINTAGES.map((v) =>
+  `<label><input type="radio" name="vintage" value="${v.id}" ${v.id === state.vintage ? "checked" : ""}><span>${v.label}</span></label>`).join("");
+$("vintage").addEventListener("change", (ev) => { setVintage(ev.target.value).catch(fail); });
+
+for (const r of document.querySelectorAll('input[name="view"]')) r.addEventListener("change", () => setView(r.value));
+$("filter").addEventListener("input", (ev) => { state.filter = ev.target.value; renderTable(); });
+$("tracts").querySelector("thead").addEventListener("click", (ev) => {
+  const k = ev.target.closest("button")?.dataset.sort;
+  if (!k) return;
+  state.sort = { key: k, dir: state.sort.key === k ? -state.sort.dir : (k === "name" ? 1 : -1) };
+  renderTable();
+});
+$("tracts").querySelector("tbody").addEventListener("click", (ev) => {
+  const id = ev.target.closest("button.show")?.dataset.id;
+  if (id) showOnMap(id);
+});
+document.querySelector(".skip").addEventListener("click", (ev) => {
+  ev.preventDefault(); // the default jump would move focus off the search box
+  setView("table");
+  $("filter").focus();
 });
 
-function setHover(id) {
-  if (state.hover === id) return;
-  if (state.hover) map.setFeatureState({ source: "tracts", id: state.hover }, { hover: false });
-  state.hover = id;
-  if (id) { map.setFeatureState({ source: "tracts", id }, { hover: true }); inspect(id); }
-}
-map.on("mousemove", "tract-fill", (e) => setHover(e.features[0]?.id));
-map.on("click", "tract-fill", (e) => setHover(e.features[0]?.id));
+map.on("mousemove", "tract-fill", (e) => select(e.features[0]?.id));
+map.on("click", "tract-fill", (e) => select(e.features[0]?.id));
 map.on("mouseenter", "tract-fill", () => (map.getCanvas().style.cursor = "crosshair"));
 map.on("mouseleave", "tract-fill", () => (map.getCanvas().style.cursor = ""));
 
-function currentTheme() {
-  const set = document.documentElement.dataset.theme;
-  return set || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-}
-function syncThemeButton() { $("theme").textContent = currentTheme() === "dark" ? "Light" : "Dark"; }
 $("theme").addEventListener("click", () => {
   const next = currentTheme() === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = next;
   try { localStorage.setItem("strata-theme", next); } catch {}
-  syncThemeButton(); applyTheme();
+  applyTheme();
 });
 try { const t = localStorage.getItem("strata-theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { syncThemeButton(); applyTheme(); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+reduceMotion.addEventListener("change", () => {
+  if (map.getLayer("tract-fill"))
+    map.setPaintProperty("tract-fill", "fill-color-transition", { duration: reduceMotion.matches ? 0 : 180 });
+});
 syncThemeButton();
 
 function fail(err) {
   console.error(err);
   $("status").textContent = "Error";
-  $("inspector").innerHTML = `<h2 class="eyebrow">Error</h2><p class="note">${err.message}.
-    Build the data first: see app/README.md.</p>`;
+  $("inspector").innerHTML = `<p class="note">${esc(err.message)}. Build the data first: see app/README.md.</p>`;
 }
 
-renderVintageButtons();
 map.on("load", () => {
   addLayers();
   applyTheme();

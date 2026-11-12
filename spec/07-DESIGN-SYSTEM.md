@@ -14,22 +14,30 @@ the ground.
 ```css
 :root {                        /* Paper */
   --paper:#EFE4CE;  --surface:#F8F1E0;  --surface-2:#E7D9BE;
-  --ink:#2E241C;    --ink-2:#6B5844;    --ink-3:#8C7A63;
-  --rule:#CDB894;   --rule-soft:#DCCCAE;
+  --ink:#2E241C;    --ink-2:#6B5844;    --ink-3:#6A5C4B;   /* was #8C7A63: 3.3:1 */
+  --rule:#CDB894;   --rule-soft:#DCCCAE; --control:#9D7E49;
   --accent:#9E2B25;                     /* oxblood */
   --cool:#2C5A5E;                       /* verdigris */
-  --warn:#996515;
+  --warn:#815512;                       /* was #996515: 3.9:1 */
 }
 
 [data-theme="dark"] {          /* Vellum */
   --paper:#16110C;  --surface:#1F1812;  --surface-2:#2A2118;
-  --ink:#EADCC0;    --ink-2:#B5A182;    --ink-3:#8A7962;
-  --rule:#3B2E22;   --rule-soft:#2C2219;
+  --ink:#EADCC0;    --ink-2:#B5A182;    --ink-3:#9A8870;   /* was #8A7962: 4.2:1 */
+  --rule:#3B2E22;   --rule-soft:#2C2219; --control:#7B6047;
   --accent:#DB6A57;
   --cool:#7FB3AC;
   --warn:#C79A47;
 }
 ```
+
+**Accessibility (WCAG 2.2 AA), adjusted 2026-11-12.** Lightness only; hue and
+saturation unchanged. Every text token clears 4.5:1 on `--paper`, `--surface`
+and `--surface-2` in both themes. `--control` is the border of anything you can
+operate (selects, toggles, inputs) and clears 3:1 (SC 1.4.11). `--rule` stays a
+decorative hairline, which is exempt. The cost: light `--ink-3` now sits close
+to `--ink-2`, so muted labels are distinguished by size, case and the mono face
+rather than by color alone.
 
 > **Open item.** These are derived from sepia conventions, not lifted from the
 > Clean Sepia theme JSON — the VS Code marketplace would not surrender its
@@ -56,7 +64,18 @@ interface from reading like a dashboard.
 decline  ——————   mean     ——————   intensification
 ```
 
-Sequential ramps for single-measure level maps use the warm half alone.
+Sequential ramps for single-measure level maps use the warm half alone, low to high:
+
+```
+Paper   #E2C994  #CDA460  #B47B36  #925722  #6B3311   light ground, dark = high
+Vellum  #6B4423  #8F5E2C  #B47B36  #D4A25E  #EBCB93   dark ground, bright = high
+```
+
+On Vellum the order of lightness is reversed so the highest class is the most
+visible (12:1 against the ground) instead of sinking into it (it was 1.9:1).
+One hue family stepping in lightness reads under every common color-vision
+deficiency. Color is never the only channel: every value is also in the
+inspector and the table view, and low reliability is a pattern, not a hue.
 Categorical typology classes use hue, never ramp position.
 
 **Unreliable tracts are hatched** with a 45° line pattern in `--ink-3` at low

@@ -20,3 +20,21 @@ HOST=0.0.0.0 ./preview.sh    # also reachable from a phone on the same network
 
 Libraries from CDNs, pinned: MapLibre GL 5.24.1, hyparquet 1.31.5,
 hyparquet-compressors 1.1.2 (the cube is zstd).
+
+## Accessibility (WCAG 2.2 AA)
+
+- Every map value is also in the **table view**: search by county, city or
+  GEOID, sort by any column, and "Show on map" zooms to and selects the tract.
+  A skip link (first Tab stop) goes straight to the table's search box.
+- Keyboard: everything is reachable by Tab. Vintage and view are native radio
+  groups (arrow keys). The map pans with arrow keys and zooms with + and −.
+- Color is never the only channel: the inspector and table give each tract's
+  value, margin, CV, reliability and fifth in words. Low reliability is a hatch
+  pattern. The ramp is one hue stepping in lightness, safe for color-blind readers.
+- Text clears 4.5:1 and control borders 3:1 in both themes (token changes are
+  recorded in spec 07). `prefers-reduced-motion` turns off recolor fades and
+  map fly-to animation. Targets are at least 24 px.
+- Checked with axe-core 4.10 (WCAG 2.0/2.1/2.2 A and AA plus best practice) in
+  both themes, in map and table views, with no violations, and with a scripted
+  keyboard-only run. Automated checks catch only part of WCAG; a screen-reader
+  pass (NVDA or VoiceOver) by a person is still due.

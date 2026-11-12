@@ -239,3 +239,22 @@ is untouched.
   Recolor 8–89 ms on 2,186 tracts. First ramp step was nearly the paper color
   and indistinguishable from no-data; darkened, and no-data got its own gray.
 - Tests: unchanged (no app tests yet; visual regression is spec 08 Phase 03 work).
+
+## 2026-11-12 (later) — preview accessibility pass (WCAG 2.2 AA)
+
+Owner request: make the preview accessible without losing the palette.
+- Before: axe-core flagged text contrast (`--ink-3` both themes, `--warn` light).
+  By hand: tract values were mouse-only, the vintage toggle was not a real radio
+  group, and the dark-theme high class (#6B3311) sat at 1.9:1 on the ground.
+- Tokens: lightness-only shifts (spec 07 updated): ink-3 #6A5C4B / #9A8870,
+  warn #815512 (light), new `--control` borders at 3:1. Dark ramp reversed in
+  lightness (dim → bright, 2.2:1 → 12:1).
+- Table view with search, sort and "Show on map"; skip link to it; tract names
+  (`build/geo/{v}/tract/51.names.json`, kept out of the GEOID-only geometry);
+  native radios; labels; aria-live inspector; reduced motion; 24 px targets;
+  selection outline in accent on a paper casing.
+- Reliability tier now uses the CV as displayed (one decimal), so 12.0% is Medium.
+- Verified: axe-core 4.10, WCAG 2.0/2.1/2.2 A+AA + best practice: 0 violations,
+  both themes, map and table views. Scripted keyboard-only run: skip link →
+  search → Show on map → canvas focus + inspector → arrow-key vintage change.
+  Not done: a human screen-reader pass.
