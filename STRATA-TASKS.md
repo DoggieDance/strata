@@ -28,7 +28,7 @@ suggestions.
 | v0.1 | Phase 00 — spec files committed | in progress |
 | v0.2 | Phase 01 — Virginia data spine | **gate passed 2026-11-12** — 20/20 data.census.gov values match; zero jams |
 | v0.2.1 | Published levels: county, place, ZCTA (owner request) | **passed 2026-11-12**: 100/100 spot-check values; ZCTA definitions corrected after milestone review. Entered after the build, not before; the reserve-first rule was missed |
-| v0.3 | Phase 02 — harmonizer | in progress — 2006–2010 loader gate passed 2026-11-12; crosswalk next |
+| v0.3 | Phase 02 — harmonizer | in progress — loader gate passed; VA crosswalk + harmonizer built, conservation gate passes 2026-11-12; Philadelphia replication blocked on PA scope |
 
 Rule: reserve here first. A build that discovers its version is taken halts.
 
@@ -52,11 +52,11 @@ A phase ships when its gate passes. Writing the code is not shipping it.
 
 ## CURRENT DIRECTIVE
 
-**Phase 02, crosswalk.** The 2006–2010 loader passed its gate 2026-11-12.
-Next: the 2020-block-population-weighted 2010→2020 tract crosswalk for
-Virginia (spec 02), checked for conservation and against HUD/Geocorr.
-The Phase 02 gate itself needs Philadelphia (PA, FIPS 42); widening the
-scope lock to PA is an owner decision, not yet taken.
+**Phase 02, remaining.** The VA crosswalk and harmonizer are built and pass the
+conservation half of the gate. Next: compare 2010- vs 2020-population weights
+(spec 02 open question), deflators (registry/deflators.json is empty), and the
+change map with significance testing (spec 05). The Philadelphia replication
+needs Pennsylvania (FIPS 42) in the scope lock, which is the owner's decision.
 
 Phase 01 gate passed 2026-11-12. Still blocked for Phase 03: Cloudflare R2
 bucket + repo secrets. See `spec/03-CUBE-AND-TILES.md`.

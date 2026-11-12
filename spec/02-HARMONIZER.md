@@ -101,6 +101,41 @@ Free inputs, no license encumbrance:
 better, but its terms prohibit redistribution and a public web app is not covered
 by the academic exception. STRATA builds its own.
 
+### Built — Virginia, 2026-11-12
+
+`etl/crosswalk.py` builds `build/crosswalk/2010-2020/tract/51.parquet`.
+`etl/harmonize.py` uses it to put 2006–10 values on 2020 tracts
+(`build/harmonized/2006-2010/tract-2020/51.parquet`).
+
+- **Inputs:** 322,610 block intersections (Census 2010–2020 block relationship
+  file) and 163,491 2020 block counts (PL 94-171 P1_001).
+- **Conservation:** all 8,631,393 people in Virginia's 2020 blocks are assigned.
+  7.6 of them sit in 2010 blocks belonging to other states (boundary
+  corrections) and are reported, not dropped.
+- **Coverage and basis:** 2,943 tract pairs. All 1,907 2010 tracts are sources:
+  1,890 population-weighted, 7 land-weighted (no 2020 residents), 10 even
+  (pure water).
+- **Cross-check:** pair land areas equal Census's 2020–2010 tract relationship
+  file exactly. Census lists 477 more land-overlap pairs that hold nobody.
+- **Population vs area weights:** they differ by more than 0.2 in 173 of 2,929
+  pairs. That is the whole case for population weighting, concentrated where
+  it should be.
+- **Harmonized 2006–10:** counts are conserved statewide to Float32 precision.
+  County totals change only by the 4,184 people whose tracts cross a 2010→2020
+  county line (boundary corrections; Bedford city's merger counted as same-county).
+  Percents and means are recomputed from apportioned counts. Registry v5 stores
+  the numerators (`bachelors_plus`, `nh_white`) so they can be.
+
+**Open question, not yet decided.** The spec weights 2010 data by *2020*
+population. People who arrived after 2010 (new subdivisions) therefore pull
+2010 values toward places that were empty in 2010. Splitting 2010 tracts by
+*2010* block population (2010 PL file) would follow where people lived in the
+source year. Worth comparing before the Philadelphia replication, where it
+could explain part of the deviation.
+
+**Still owed for the gate:** the Philadelphia replication (needs Pennsylvania in
+scope), and agreement with HUD's ratios (needs an API token) and a Geocorr extract.
+
 ## The structural insight
 
 **Temporal harmonization and spatial aggregation are the same operation.**

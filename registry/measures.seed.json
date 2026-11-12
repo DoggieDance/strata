@@ -1,5 +1,5 @@
 {
-  "registry_version": 4,
+  "registry_version": 5,
   "note": "Seed measures from the Philadelphia study (GEOG 376, 2025). Per-vintage sources are mandatory: table definitions drift between decennial-anchored redesigns.",
   "measures": [
     {
@@ -119,6 +119,7 @@
       "label": "Bachelor's degree or higher, age 25+",
       "kind": "percent",
       "denominator": "pop_25_plus",
+      "count_numerator": "bachelors_plus", "count_denominator": "pop_25_plus",
       "sources": {
         "2006-2010": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"],
                        "summary_file_substitute": {
@@ -137,6 +138,7 @@
       "id": "pct_nh_white",
       "label": "Non-Hispanic white share of population",
       "kind": "ratio",
+      "count_numerator": "nh_white", "count_denominator": "total_population",
       "numerator_source": { "table": "B03002", "cells": ["003"] },
       "denominator_source": { "table": "B03002", "cells": ["001"] },
       "sources": {
@@ -158,7 +160,14 @@
                              "2006-2010": { "dataset": "acs5", "table": "B15002", "cells": ["001"],
                                             "note": "B15002 'Total:' is population 25 years and over, the same universe as S1501_C01_006." },
                              "2016-2020": { "dataset": "acs5", "table": "B15003", "cells": ["001"],
-                                            "note": "Same universe (population 25 years and over) as S1501_C01_006." } } }
+                                            "note": "Same universe (population 25 years and over) as S1501_C01_006." } } },
+    "bachelors_plus":    { "dataset": "acs5/subject", "table": "S1501", "cells": ["C01_015"],
+                           "note": "Numerator of pct_bachelors_plus, kept as a count (v5) so the harmonizer can apportion it and recompute the percent; a percent cannot be apportioned.",
+                           "summary_file_substitute": {
+                             "2006-2010": { "dataset": "acs5", "table": "B15002", "cells": ["015:018", "032:035"] },
+                             "2016-2020": { "dataset": "acs5", "table": "B15003", "cells": ["022:025"] } } },
+    "nh_white":          { "table": "B03002", "cells": ["003"],
+                           "note": "Numerator of pct_nh_white (Not Hispanic or Latino: White alone), kept as a count (v5) for the same reason." }
   },
   "jam_values": [-666666666, -999999999, -888888888, -222222222, -333333333],
   "controlled_moe_value": -555555555,

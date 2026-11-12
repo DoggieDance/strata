@@ -304,3 +304,25 @@ An independent review of origin/main..HEAD (3 commits) before pushing:
 4. Not changed: tier() calls estimate 0 with MOE 0 "High" (CV undefined). No
    such rows exist; an exact zero is reliable.
 Tests: 276 passed. Browser: all levels load; axe 0 violations.
+
+## 2026-11-12 (later) — crosswalk + harmonizer (Phase 02, conservation half)
+
+- Pushed f980448 (levels + review fixes). Milestones page published
+  (https://claude.ai/artifact/4neVSE1MouULa94ajXJNGn).
+- `etl/crosswalk.py` + `registry/crosswalk.json`: 2020-block-population
+  crosswalk, VA 2010→2020 tracts. All 8,631,393 people conserved (7.6 in
+  foreign 2010 blocks, reported). Pair land = Census tract relationship file exactly.
+- Registry v5: `bachelors_plus` and `nh_white` counts stored, plus
+  `count_numerator`/`count_denominator` on the percent measures. All 7 cubes
+  rebuilt; every v4 column is byte-identical.
+- `etl/harmonize.py`: extensive columns apportioned (MOE: RSS of weighted MOEs,
+  documented as an approximation); intensive recomputed; medians refused; a null
+  piece nulls the target instead of undercounting. 6 2020 tracts get no data
+  (water, or tracts nothing maps into).
+- Tests: tests/test_harmonize.py (weights, coverage, conservation, land vs
+  Census, county identity, recomputed percents, synthetic formula, null rule,
+  median refusal). 291 passed.
+- Preview: "Show on 2020 tract lines" for 2006–10 tracts. Fixed: the check row
+  ignored [hidden]. Browser: toggle works; rapid level switching no longer flashes
+  "Error"; axe 0 violations.
+- Open question recorded in spec 02: 2010 vs 2020 block population as weights.

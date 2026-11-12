@@ -1,0 +1,15 @@
+{
+  "note": "Inputs for the harmonizer's crosswalks (spec 02). Free, redistributable Census products only; IPUMS NHGIS is excluded by its terms.",
+  "2010-2020": {
+    "method": "2020 block population (PL 94-171 P1_001), split across 2010x2020 block intersections by intersecting land area, summed to tract pairs and normalized per 2010 tract. Tracts with no 2020 population fall back to land area.",
+    "states": {
+      "51": {
+        "stusab": "va",
+        "blocks": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/t10t20/TAB2010_TAB2020_ST51.zip",
+        "population": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Virginia/va2020.pl.zip",
+        "tract_relationship": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/tract/tab20_tract20_tract10_st51.txt"
+      }
+    },
+    "validation": "Pair land areas must equal Census's 2020-2010 tract relationship file (independent product). HUD-USPS ratios need an API token; Geocorr is form-only. Both are pending as further references."
+  }
+}

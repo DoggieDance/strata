@@ -68,6 +68,7 @@ const TIER_TEXT = { high: "High", medium: "Medium, use with care", low: "Low, no
 const state = {
   vintage: "2016-2020",
   level: "tract",
+  onNew: false, // 2006-10 tract values on 2020 tract lines (harmonized)
   measure: "mean_household_income",
   view: "map",
   cubes: {}, geo: {}, names: {}, bbox: {},
@@ -89,20 +90,24 @@ async function getJSON(path) {
   return res.json();
 }
 
-const key = () => `${state.vintage}/${state.level}`;
+// Harmonized view: 2006-10 values apportioned onto 2020 tracts (etl/harmonize.py).
+const harmonized = () => state.onNew && state.level === "tract" && state.vintage === "2006-2010";
+const key = () => (harmonized() ? "harmonized" : `${state.vintage}/${state.level}`);
+const cubePath = () => (harmonized() ? "harmonized/2006-2010/tract-2020" : `acs/${key()}`);
+const geoPath = () => (harmonized() ? "geo/2016-2020/tract" : `geo/${key()}`);
 const levelDef = () => LEVELS.find((x) => x.id === state.level);
 
 async function loadData() {
   const k = key();
   if (!state.cubes[k]) {
-    const url = new URL(`acs/${k}/${STATE}.parquet`, DATA);
+    const url = new URL(`${cubePath()}/${STATE}.parquet`, DATA);
     const res = await fetch(url);
     if (!res.ok) throw new Error(`${url.pathname}: ${res.status}`);
     const rows = await parquetReadObjects({ file: await res.arrayBuffer(), compressors });
     state.cubes[k] = new Map(rows.map((r) => [r.GEOID, r]));
   }
-  if (!state.geo[k]) state.geo[k] = await getJSON(`geo/${k}/${STATE}.geojson`);
-  if (!state.names[k]) state.names[k] = await getJSON(`geo/${k}/${STATE}.names.json`).catch(() => ({}));
+  if (!state.geo[k]) state.geo[k] = await getJSON(`${geoPath()}/${STATE}.geojson`);
+  if (!state.names[k]) state.names[k] = await getJSON(`${geoPath()}/${STATE}.names.json`).catch(() => ({}));
 }
 
 function quantileBreaks(values, k) {
@@ -231,6 +236,9 @@ function syncAvailability() {
   }
   $("level-note").textContent = lv.note || "";
   $("level-note").hidden = !lv.note;
+  const can = state.level === "tract" && state.vintage === "2006-2010";
+  $("on-new").disabled = !can;
+  $("on-new-row").hidden = !can;
 }
 
 function renderLabels() {
@@ -297,7 +305,8 @@ function renderLegend() {
   const vin = VINTAGES.find((x) => x.id === state.vintage);
   const dollars = measureDef().fmt === "usd"
     ? `In ${vin.dollars}, as published, not inflation-adjusted. ` : "";
-  $("dollar-note").textContent = `${dollars}Fifths (quintiles) of ${state.reliable.toLocaleString()} reliable ${levelDef().plural}.`;
+  const moved = harmonized() ? "Moved onto 2020 tract lines in proportion to where people live (2020 block counts). " : "";
+  $("dollar-note").textContent = `${moved}${dollars}Fifths (quintiles) of ${state.reliable.toLocaleString()} reliable ${levelDef().plural}.`;
 }
 
 function tractRow(id) {
@@ -410,6 +419,8 @@ $("measure").addEventListener("change", (ev) => { state.measure = ev.target.valu
 $("vintage-options").innerHTML = VINTAGES.map((v) =>
   `<label><input type="radio" name="vintage" value="${v.id}" ${v.id === state.vintage ? "checked" : ""}><span>${v.label}</span></label>`).join("");
 $("vintage").addEventListener("change", (ev) => { state.vintage = ev.target.value; reload().catch(fail); });
+
+$("on-new").addEventListener("change", (ev) => { state.onNew = ev.target.checked; reload().catch(fail); });
 
 $("level").innerHTML = LEVELS.map((l) => `<option value="${l.id}">${l.label}</option>`).join("");
 $("level").addEventListener("change", (ev) => { state.level = ev.target.value; reload().catch(fail); });
