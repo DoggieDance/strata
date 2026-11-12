@@ -351,3 +351,42 @@ Also:
 - **Change engine**: `app/engine/change.js` (spec 05 Z-test with deflation;
   "no measurable change" state), node tests run under pytest (tests/test_js.py).
 Tests: 307 passed.
+
+## 2026-11-12 (evening) — nationwide scope, national view, change map, Philadelphia Table 3
+
+Owner: "you need to continue the progress. the goal is for it to be nationwide
+eventually", then "we need to see individual states and also nationwide view.
+nationwide view should be the default". Recorded as the scope decision in
+STRATA-TASKS.md (v0.3.1 and v0.3.2 reserved before building).
+- **Scope**: registry/states.json (50 + DC); the lock, the sequence-file and
+  crosswalk URLs and every CLI take `--states` (FIPS, postal codes, `all`).
+- **Pennsylvania** end to end: cubes (both vintages, all levels), crosswalk
+  (13,002,700 people conserved, 0 in foreign blocks), harmonized cube, geometry,
+  and 140 data.census.gov spot-check values (7 fixtures), all matching.
+- **National build** `etl/national.sh` running for all states; `etl/national.py`
+  for the U.S. county file, outlines and boxes; manifest gains `us` entries and
+  national breaks.
+- **App**: manifest-driven; opens on the whole country (counties); state picker
+  and `#XX` deep links; per-state levels load for the states in view.
+- **Change map** (spec 05): Period → Change, for tracts (harmonized) and
+  counties. A change is colored only if Z ≥ 1.645; the rest is dotted "no
+  measurable change". PA mean income: 3,048 of 3,445 tracts show no measurable change.
+- **Philadelphia Table 3**: 4 of 5 indicators reproduced; income needed the
+  study's owner-household denominator (a study error); education unresolved.
+  158 vs 159 resolved (Airport). Details in spec 02.
+- **Review of this work** (independent agent): 9 findings, all fixed with tests or
+  browser repro: county change across boundary changes (Bedford, VA showed a
+  significant +11,268 people; registry/county_changes.json + a test that every
+  one-period county is registered); theme/measure toggles during change loads
+  threw; change mode stranded on states without 2010 data; per-viewport change
+  shade split (now national, from the manifest); stale selection outline;
+  national.py not resumable; ambiguous county names in the partial national
+  view; half-up rounding in tier_ok; unbounded state cache (LRU of 16).
+- **National build complete**: 51 states, both periods, all levels; 51
+  crosswalks conserve 2020 population; national county file (3,143) at 1:5M.
+  Kentucky 2020 places: the boundary file carries Louisville's consolidated
+  area (2148000) over its balance (2148006); the overlap is dropped (tested).
+- Tests: 1,015 passed, 1 xfailed (Philadelphia education). axe: 0 violations,
+  national counties/tracts/change, both themes.
+- Next (owner, same evening): an inventory of every ACS table, then pull the
+  demographic detail (race, age, ...) into the site. analysis/acs_inventory.py started.

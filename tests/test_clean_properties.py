@@ -172,13 +172,28 @@ def test_gross_rent_uses_cash_rent_universe():
 
 
 @pytest.mark.parametrize("states,vintages,level", [
-    (["51", "42"], ["2016-2020"], "tract"),
+    (["51", "72"], ["2016-2020"], "tract"),   # Puerto Rico: deferred (PRCS)
+    (["51", "99"], ["2016-2020"], "tract"),
     (["51"], ["2011-2015"], "tract"),
     (["51"], ["2016-2020"], "block group"),
 ])
 def test_scope_lock(states, vintages, level):
     with pytest.raises(ScopeError):
         check_scope(states, vintages, level)
+
+
+def test_national_scope():
+    """Owner, 2026-11-12: nationwide. 50 states + DC, nothing else."""
+    from etl.common import load_states, parse_states
+    states = load_states()
+    assert len(states) == 51 and "11" in states and "72" not in states
+    check_scope(sorted(states), ["2016-2020"], "tract")
+    assert parse_states("va,PA") == ["42", "51"] and parse_states("all") == sorted(states)
+    with pytest.raises(ScopeError):
+        parse_states("PR")
+    # Census directory names that cannot be derived naively.
+    assert states["11"]["acs2010_dir"] == "DistrictOfColumbia" and states["11"]["pl_dir"] == "District_of_Columbia"
+    assert states["36"]["acs2010_dir"] == "NewYork" and states["36"]["pl_dir"] == "New_York"
 
 
 def test_2006_2010_in_phase_02_scope():

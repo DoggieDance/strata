@@ -17,6 +17,8 @@ in Philadelphia, which is also the acceptance test.
 - **Work only on the current phase.** The directive in `STRATA-TASKS.md` names it.
   Do not generalize to other states, geography levels, or vintages before its
   gate passes. Virginia (FIPS 51), tract level, until Phase 01 is green.
+  Phase 01 passed 2026-11-12; the owner then set the scope to nationwide
+  (50 states + DC, `registry/states.json`), Pennsylvania first.
 - **Jam values are a hard failure.** `-666666666`, `-999999999`, `-888888888`,
   `-222222222`, `-333333333`, `-555555555`. None may survive into a built artifact.
 - **Per-vintage variable registries, never one global schema.** ACS table

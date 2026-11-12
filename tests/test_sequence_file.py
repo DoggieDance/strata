@@ -71,5 +71,12 @@ def test_missing_tokens_become_nan_and_others_raise(lookup):
 
 
 def test_unknown_state_raises():
-    with pytest.raises(ValueError, match="no sequence-file location"):
-        sf.state_cfg(V, "42")
+    from etl.common import ScopeError
+    with pytest.raises(ScopeError, match="not in registry/states.json"):
+        sf.state_cfg(V, "72")
+
+
+def test_state_paths_from_registry():
+    assert sf.state_cfg(V, "42") == {"state_name": "Pennsylvania", "stusab": "pa"}
+    assert sf.data_url(V, "11", sf.geos_name(V, "11")).endswith(
+        "/5_year_seq_by_state/DistrictOfColumbia/Tracts_Block_Groups_Only/g20105dc.csv")

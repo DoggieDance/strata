@@ -151,3 +151,21 @@ The app reads one small JSON, committed to the repo, that says what exists.
 ```
 
 The manifest is the contract between the ETL and the app. Neither reaches past it.
+
+## National scope (2026-11-12)
+
+The owner set the goal as nationwide, with the national view as the default.
+`registry/states.json` holds the 50 states and DC (Puerto Rico deferred: PRCS).
+`etl/national.sh` builds every state, resumably; `etl/national.py` writes:
+
+- `geo/states.geojson` (1:20M outlines) and `geo/states.json` (bounding boxes),
+- `acs/{vintage}/county/us.parquet`: the 51 state county cubes stacked, written
+  only when all 51 exist, with `geo/{vintage}/county/us.geojson` at 1:5M.
+
+The manifest lists per-state files plus `us` where it exists, and
+`national_breaks` per level and vintage: quintiles over every reliable U.S.
+tract (place, ZIP), computed with the app's own tier rule, so a color means the
+same thing in every state. The app opens on national counties; tracts, places
+and ZIP codes load for the states in view from zoom 5.5 (at most six states),
+which is the viewport-scoped fallback Phase 07 allows. Picking a state shows it
+alone on its own breaks; `#PA` deep-links a state.

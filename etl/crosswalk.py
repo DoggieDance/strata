@@ -35,7 +35,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import requests
 
-from etl.common import RAW_DIR, REGISTRY_DIR, ROOT, check_scope
+from etl.common import RAW_DIR, REGISTRY_DIR, ROOT, check_scope, parse_states, state_info
 
 
 def registry() -> dict:
@@ -46,9 +46,15 @@ def _raw(url: str) -> Path:
     return RAW_DIR.parent / "crosswalk" / url.rsplit("/", 1)[1]
 
 
+def state_urls(state: str) -> dict:
+    info = state_info(state)
+    return {k: u.format(fips=state, stusab=info["stusab"], pl_dir=info["pl_dir"])
+            for k, u in registry()["2010-2020"]["urls"].items()} | {"stusab": info["stusab"]}
+
+
 def fetch_inputs(state: str) -> dict[str, Path]:
     from etl.fetch_summary_file import fetch
-    cfg = registry()["2010-2020"]["states"][state]
+    cfg = state_urls(state)
     out = {}
     with requests.Session() as s:
         s.headers["User-Agent"] = "strata-etl (static ACS build)"
@@ -141,7 +147,7 @@ def build(state: str, out: Path) -> Path:
     dest = out / "crosswalk" / "2010-2020" / "tract" / f"{state}.parquet"
     if dest.exists():
         raise FileExistsError(f"{dest} exists; delete it deliberately to rebuild.")
-    cfg = registry()["2010-2020"]["states"][state]
+    cfg = state_urls(state)
     paths = fetch_inputs(state)
     pop20 = block_population(paths["population"], cfg["stusab"])
     frame, diag = weights(intersections(paths["blocks"]), pop20, state)
@@ -162,10 +168,10 @@ def build(state: str, out: Path) -> Path:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--states", default="51")
+    ap.add_argument("--states", default="51", help="FIPS or postal codes, comma-separated, or 'all'")
     ap.add_argument("--out", type=Path, default=Path("build"))
     args = ap.parse_args(argv)
-    for s in args.states.split(","):
+    for s in parse_states(args.states):
         build(s.strip(), args.out)
     return 0
 

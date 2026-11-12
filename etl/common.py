@@ -10,8 +10,39 @@ REGISTRY_DIR = ROOT / "registry"
 RAW_DIR = ROOT / "data" / "raw" / "acs"
 
 # Current phase scope (STRATA-TASKS.md, CURRENT DIRECTIVE). Phase 01 passed
-# 2026-11-12; Phase 02's first task adds the 2006-2010 vintage, Virginia only.
-PHASE_STATES = frozenset({"51"})
+# 2026-11-12 on Virginia. The same day the owner set the goal as nationwide, so
+# the lock now admits the 50 states and DC (registry/states.json). Puerto Rico
+# is deferred: its survey (PRCS) has its own tables and gets its own review.
+
+
+def load_states() -> dict[str, dict]:
+    """state FIPS -> {stusab, name, acs2010_dir, pl_dir}."""
+    return json.loads((REGISTRY_DIR / "states.json").read_text())["states"]
+
+
+def state_info(fips: str) -> dict:
+    try:
+        return load_states()[fips]
+    except KeyError:
+        raise ScopeError(f"state {fips!r} is not in registry/states.json") from None
+
+
+def parse_states(arg: str) -> list[str]:
+    """CLI helper: "51,42", "VA,PA" or "all" -> sorted FIPS codes."""
+    states = load_states()
+    if arg.strip().lower() == "all":
+        return sorted(states)
+    by_abbr = {v["stusab"]: k for k, v in states.items()}
+    out = []
+    for tok in (t.strip() for t in arg.split(",") if t.strip()):
+        fips = by_abbr.get(tok.lower(), tok.zfill(2) if tok.isdigit() else tok)
+        if fips not in states:
+            raise ScopeError(f"unknown state {tok!r}")
+        out.append(fips)
+    return sorted(set(out))
+
+
+PHASE_STATES = frozenset(json.loads((REGISTRY_DIR / "states.json").read_text())["states"])
 PHASE_VINTAGES = frozenset({"2006-2010", "2016-2020"})
 # Levels the owner asked for 2026-11-12: Census-published counties/cities,
 # places and ZCTAs, alongside tracts. Values are Census's own estimates for
@@ -61,7 +92,7 @@ def check_scope(states, vintages, level) -> None:
         bad.append(f"level {level!r}")
     if bad:
         raise ScopeError(
-            f"Outside the current phase scope (Virginia; {', '.join(sorted(PHASE_VINTAGES))}; "
+            f"Outside the current phase scope (50 states + DC; {', '.join(sorted(PHASE_VINTAGES))}; "
             f"{', '.join(sorted(PHASE_LEVELS))}): " + ", ".join(bad)
         )
 

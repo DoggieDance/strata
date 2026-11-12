@@ -1,0 +1,17 @@
+{
+  "note": "County and county-equivalent changes between the 2006-2010 ACS (2010 geography) and the 2016-2020 ACS (2020 geography), from Census's 'Substantial Changes to Counties and County Equivalent Entities: 2010-present'. A change map must not difference a county across a boundary change: county population MOEs are 0, so any boundary artifact would read as a significant change. tests/test_county_changes.py fails if a county exists in only one period and is not listed here.",
+  "renamed": {
+    "46102": {"was": "46113", "what": "Shannon County, SD renamed Oglala Lakota County (2015); new code, same land."},
+    "02158": {"was": "02270", "what": "Wade Hampton Census Area, AK renamed Kusilvak Census Area (2015); new code, same land."}
+  },
+  "not_comparable": {
+    "51019": "Bedford County, VA absorbed Bedford city (51515) in 2013.",
+    "51515": "Bedford city, VA: merged into Bedford County (51019) in 2013; 2010 only.",
+    "02195": "Petersburg Borough, AK (2013) replaced Petersburg Census Area with different boundaries, taking area from Hoonah-Angoon.",
+    "02105": "Hoonah-Angoon Census Area, AK lost area to Petersburg Borough (2013).",
+    "02198": "Prince of Wales-Hyder Census Area, AK gained part of the former Petersburg Census Area (2013).",
+    "02261": "Valdez-Cordova Census Area, AK split into Chugach (02063) and Copper River (02066) in 2019; 2010 only.",
+    "02063": "Chugach Census Area, AK: created 2019 from Valdez-Cordova (02261); 2020 only.",
+    "02066": "Copper River Census Area, AK: created 2019 from Valdez-Cordova (02261); 2020 only."
+  }
+}

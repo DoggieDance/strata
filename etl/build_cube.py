@@ -24,6 +24,7 @@ import pyarrow.parquet as pq
 
 from etl.clean import build_measures
 from etl.common import (
+    parse_states,
     JAM_FLOOR,
     LevelUnavailable,
     check_scope,
@@ -108,13 +109,13 @@ def build(state: str, vintage: str, level: str, out: Path) -> Path:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--states", default="51")
+    ap.add_argument("--states", default="51", help="FIPS or postal codes, comma-separated, or 'all'")
     ap.add_argument("--vintages", default="2016-2020")
     ap.add_argument("--levels", "--level", dest="levels", default="tract",
                     help="comma list: tract,county,place,zcta")
     ap.add_argument("--out", type=Path, default=Path("build"))
     args = ap.parse_args(argv)
-    states = [s.strip() for s in args.states.split(",")]
+    states = parse_states(args.states)
     vintages = [resolve_vintage(v.strip()) for v in args.vintages.split(",")]
     levels = [x.strip() for x in args.levels.split(",")]
     for level in levels:

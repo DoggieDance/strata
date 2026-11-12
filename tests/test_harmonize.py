@@ -6,7 +6,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 
-from etl.crosswalk import _raw, registry
+from etl.crosswalk import _raw, registry, state_urls
 from etl.harmonize import MedianApportionError, apportion
 from tests.conftest import BUILD, cube_path
 
@@ -44,7 +44,7 @@ def test_block_population_conserved():
 
 
 def test_pair_land_matches_census_tract_relationship_file(xw):
-    path = _raw(registry()["2010-2020"]["states"]["51"]["tract_relationship"])
+    path = _raw(state_urls("51")["tract_relationship"])
     if not path.exists():
         pytest.skip("tract relationship file not fetched")
     rel = pd.read_csv(path, sep="|", dtype=str, encoding="utf-8-sig")

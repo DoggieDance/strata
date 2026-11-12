@@ -216,3 +216,34 @@ named-user restriction and an explicit anti-scraping clause. Both are closed.
    neighborhood-level 2010 values within a documented tolerance.
 
 Failure of either gate halts Phase 02. There is no partial pass.
+
+## Replication results (2026-11-12, Table 3 half)
+
+`analysis/philly_table3.py`, tested by `tests/test_philly_replication.py`. The
+study's method, reproduced as written: each vintage's own tracts area-weighted
+onto the OpenDataPhilly neighborhoods, dollars × 1.187, percent change per
+neighborhood.
+
+- **Area weighting meant counts, not rates.** Apportioning counts and dollar
+  totals by area share and then dividing reproduces the study; area-averaging
+  tract rates does not (15/25 vs 20/25 top-five hits before the income fix).
+- **Rent, home value, non-Hispanic white: reproduced.** Every study entry in
+  the same rank, within 1 point (Glenwood nh_white 1,049.5% vs 1,053.5%, 0.4%
+  relative).
+- **Income: reproduced once the study's denominator is used.** The study divided
+  aggregate household income (B19025, all households) by owner-occupied
+  households (B25003_002). With that, all five within 0.8 points, same order.
+  With all households, Roxborough Park is 60%, not 139%. This is an error in the
+  study, like the renter-household rent denominator; STRATA's
+  `mean_household_income` stays correct and the replication uses the study's.
+- **Bachelor's or higher: not reproduced.** STRATA puts McGuire at 126%; the
+  study at 1,969%. Counting only men's degrees in 2010 (B15002_015:018)
+  reproduces the study's top-five set and McGuire's exact value (male/male 25+
+  both years: 1,969.0%), but no numerator/denominator combination matches all
+  five. Needs the study's worksheet; the test is a strict xfail until then.
+- **158 vs 159 resolved.** The boundary file has 159 polygons; Airport has no
+  estimates (no residents), so 158 neighborhoods carry values. Both the charter
+  and the index spec were right.
+
+Still owed for the gate: the 159-neighborhood z-score fixture (Figure 5 values)
+and STRATA-method results beside the study's.

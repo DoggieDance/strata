@@ -65,12 +65,6 @@
       "geos": "g20105{stusab}.csv",
       "lookup": "https://www2.census.gov/programs-surveys/acs/summary_file/2010/documentation/5_year/user_tools/Sequence_Number_and_Table_Number_Lookup.txt",
       "lookup_sha256": "a458000b01db2b32d9eb7e615b4b5397b1cdcbf9cda69905326d409983ef9f00",
-      "states": {
-        "51": {
-          "state_name": "Virginia",
-          "stusab": "va"
-        }
-      },
       "geos_columns": {
         "LOGRECNO": 4,
         "SUMLEVEL": 2,
@@ -136,7 +130,8 @@
       },
       "unavailable_levels": {
         "zcta": "The 2006-2010 5-year Summary File has no ZCTA rows (state or national files). 2010-2020 ZIP change needs the tract crosswalk (Phase 02)."
-      }
+      },
+      "states_from": "registry/states.json (acs2010_dir, stusab)"
     }
   },
   "zcta_state": {

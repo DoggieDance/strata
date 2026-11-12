@@ -27,6 +27,7 @@ import requests
 from etl.common import (
     ROOT,
     LevelUnavailable,
+    parse_states,
     check_scope,
     level_cfg,
     load_measures,
@@ -186,11 +187,13 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--vintage", default="2016-2020")
     ap.add_argument("--levels", default="tract", help="comma list: tract,county,place,zcta")
+    ap.add_argument("--states", default="51", help="FIPS or postal codes, comma-separated, or 'all'")
     args = ap.parse_args(argv)
     vintage = resolve_vintage(args.vintage)
     levels = [x.strip() for x in args.levels.split(",")]
+    states = parse_states(args.states)
     for level in levels:
-        check_scope(["51"], [vintage], level)
+        check_scope(states, [vintage], level)
 
     with requests.Session() as s:
         s.headers["User-Agent"] = "strata-etl (static ACS build)"
@@ -199,9 +202,9 @@ def main(argv=None) -> int:
             print(f"{fetch(url, dest, s):10s} {dest.relative_to(ROOT)}")
             verify_lookup(vintage)
         seen = set()
-        for level in levels:
+        for level, st in ((lv, st) for lv in levels for st in states):
             try:
-                targets = raw_files(vintage, "51", level)
+                targets = raw_files(vintage, st, level)
             except LevelUnavailable as e:
                 print(f"skipped    {e}")
                 continue

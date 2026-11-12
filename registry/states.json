@@ -1,0 +1,311 @@
+{
+ "note": "The 50 states and DC: the national scope the owner set on 2026-11-12 (\"the goal is for it to be nationwide\"). Puerto Rico (72) is deferred: its ACS is the Puerto Rico Community Survey, with different tables, and gets its own review. Directory names are derived here, not guessed per script: acs2010_dir is Census's 2006-2010 sequence directory (\"DistrictOfColumbia\"), pl_dir the 2020 PL 94-171 directory (\"District_of_Columbia\").",
+ "states": {
+  "01": {
+   "stusab": "al",
+   "name": "Alabama",
+   "acs2010_dir": "Alabama",
+   "pl_dir": "Alabama"
+  },
+  "02": {
+   "stusab": "ak",
+   "name": "Alaska",
+   "acs2010_dir": "Alaska",
+   "pl_dir": "Alaska"
+  },
+  "04": {
+   "stusab": "az",
+   "name": "Arizona",
+   "acs2010_dir": "Arizona",
+   "pl_dir": "Arizona"
+  },
+  "05": {
+   "stusab": "ar",
+   "name": "Arkansas",
+   "acs2010_dir": "Arkansas",
+   "pl_dir": "Arkansas"
+  },
+  "06": {
+   "stusab": "ca",
+   "name": "California",
+   "acs2010_dir": "California",
+   "pl_dir": "California"
+  },
+  "08": {
+   "stusab": "co",
+   "name": "Colorado",
+   "acs2010_dir": "Colorado",
+   "pl_dir": "Colorado"
+  },
+  "09": {
+   "stusab": "ct",
+   "name": "Connecticut",
+   "acs2010_dir": "Connecticut",
+   "pl_dir": "Connecticut"
+  },
+  "10": {
+   "stusab": "de",
+   "name": "Delaware",
+   "acs2010_dir": "Delaware",
+   "pl_dir": "Delaware"
+  },
+  "11": {
+   "stusab": "dc",
+   "name": "District of Columbia",
+   "acs2010_dir": "DistrictOfColumbia",
+   "pl_dir": "District_of_Columbia"
+  },
+  "12": {
+   "stusab": "fl",
+   "name": "Florida",
+   "acs2010_dir": "Florida",
+   "pl_dir": "Florida"
+  },
+  "13": {
+   "stusab": "ga",
+   "name": "Georgia",
+   "acs2010_dir": "Georgia",
+   "pl_dir": "Georgia"
+  },
+  "15": {
+   "stusab": "hi",
+   "name": "Hawaii",
+   "acs2010_dir": "Hawaii",
+   "pl_dir": "Hawaii"
+  },
+  "16": {
+   "stusab": "id",
+   "name": "Idaho",
+   "acs2010_dir": "Idaho",
+   "pl_dir": "Idaho"
+  },
+  "17": {
+   "stusab": "il",
+   "name": "Illinois",
+   "acs2010_dir": "Illinois",
+   "pl_dir": "Illinois"
+  },
+  "18": {
+   "stusab": "in",
+   "name": "Indiana",
+   "acs2010_dir": "Indiana",
+   "pl_dir": "Indiana"
+  },
+  "19": {
+   "stusab": "ia",
+   "name": "Iowa",
+   "acs2010_dir": "Iowa",
+   "pl_dir": "Iowa"
+  },
+  "20": {
+   "stusab": "ks",
+   "name": "Kansas",
+   "acs2010_dir": "Kansas",
+   "pl_dir": "Kansas"
+  },
+  "21": {
+   "stusab": "ky",
+   "name": "Kentucky",
+   "acs2010_dir": "Kentucky",
+   "pl_dir": "Kentucky"
+  },
+  "22": {
+   "stusab": "la",
+   "name": "Louisiana",
+   "acs2010_dir": "Louisiana",
+   "pl_dir": "Louisiana"
+  },
+  "23": {
+   "stusab": "me",
+   "name": "Maine",
+   "acs2010_dir": "Maine",
+   "pl_dir": "Maine"
+  },
+  "24": {
+   "stusab": "md",
+   "name": "Maryland",
+   "acs2010_dir": "Maryland",
+   "pl_dir": "Maryland"
+  },
+  "25": {
+   "stusab": "ma",
+   "name": "Massachusetts",
+   "acs2010_dir": "Massachusetts",
+   "pl_dir": "Massachusetts"
+  },
+  "26": {
+   "stusab": "mi",
+   "name": "Michigan",
+   "acs2010_dir": "Michigan",
+   "pl_dir": "Michigan"
+  },
+  "27": {
+   "stusab": "mn",
+   "name": "Minnesota",
+   "acs2010_dir": "Minnesota",
+   "pl_dir": "Minnesota"
+  },
+  "28": {
+   "stusab": "ms",
+   "name": "Mississippi",
+   "acs2010_dir": "Mississippi",
+   "pl_dir": "Mississippi"
+  },
+  "29": {
+   "stusab": "mo",
+   "name": "Missouri",
+   "acs2010_dir": "Missouri",
+   "pl_dir": "Missouri"
+  },
+  "30": {
+   "stusab": "mt",
+   "name": "Montana",
+   "acs2010_dir": "Montana",
+   "pl_dir": "Montana"
+  },
+  "31": {
+   "stusab": "ne",
+   "name": "Nebraska",
+   "acs2010_dir": "Nebraska",
+   "pl_dir": "Nebraska"
+  },
+  "32": {
+   "stusab": "nv",
+   "name": "Nevada",
+   "acs2010_dir": "Nevada",
+   "pl_dir": "Nevada"
+  },
+  "33": {
+   "stusab": "nh",
+   "name": "New Hampshire",
+   "acs2010_dir": "NewHampshire",
+   "pl_dir": "New_Hampshire"
+  },
+  "34": {
+   "stusab": "nj",
+   "name": "New Jersey",
+   "acs2010_dir": "NewJersey",
+   "pl_dir": "New_Jersey"
+  },
+  "35": {
+   "stusab": "nm",
+   "name": "New Mexico",
+   "acs2010_dir": "NewMexico",
+   "pl_dir": "New_Mexico"
+  },
+  "36": {
+   "stusab": "ny",
+   "name": "New York",
+   "acs2010_dir": "NewYork",
+   "pl_dir": "New_York"
+  },
+  "37": {
+   "stusab": "nc",
+   "name": "North Carolina",
+   "acs2010_dir": "NorthCarolina",
+   "pl_dir": "North_Carolina"
+  },
+  "38": {
+   "stusab": "nd",
+   "name": "North Dakota",
+   "acs2010_dir": "NorthDakota",
+   "pl_dir": "North_Dakota"
+  },
+  "39": {
+   "stusab": "oh",
+   "name": "Ohio",
+   "acs2010_dir": "Ohio",
+   "pl_dir": "Ohio"
+  },
+  "40": {
+   "stusab": "ok",
+   "name": "Oklahoma",
+   "acs2010_dir": "Oklahoma",
+   "pl_dir": "Oklahoma"
+  },
+  "41": {
+   "stusab": "or",
+   "name": "Oregon",
+   "acs2010_dir": "Oregon",
+   "pl_dir": "Oregon"
+  },
+  "42": {
+   "stusab": "pa",
+   "name": "Pennsylvania",
+   "acs2010_dir": "Pennsylvania",
+   "pl_dir": "Pennsylvania"
+  },
+  "44": {
+   "stusab": "ri",
+   "name": "Rhode Island",
+   "acs2010_dir": "RhodeIsland",
+   "pl_dir": "Rhode_Island"
+  },
+  "45": {
+   "stusab": "sc",
+   "name": "South Carolina",
+   "acs2010_dir": "SouthCarolina",
+   "pl_dir": "South_Carolina"
+  },
+  "46": {
+   "stusab": "sd",
+   "name": "South Dakota",
+   "acs2010_dir": "SouthDakota",
+   "pl_dir": "South_Dakota"
+  },
+  "47": {
+   "stusab": "tn",
+   "name": "Tennessee",
+   "acs2010_dir": "Tennessee",
+   "pl_dir": "Tennessee"
+  },
+  "48": {
+   "stusab": "tx",
+   "name": "Texas",
+   "acs2010_dir": "Texas",
+   "pl_dir": "Texas"
+  },
+  "49": {
+   "stusab": "ut",
+   "name": "Utah",
+   "acs2010_dir": "Utah",
+   "pl_dir": "Utah"
+  },
+  "50": {
+   "stusab": "vt",
+   "name": "Vermont",
+   "acs2010_dir": "Vermont",
+   "pl_dir": "Vermont"
+  },
+  "51": {
+   "stusab": "va",
+   "name": "Virginia",
+   "acs2010_dir": "Virginia",
+   "pl_dir": "Virginia"
+  },
+  "53": {
+   "stusab": "wa",
+   "name": "Washington",
+   "acs2010_dir": "Washington",
+   "pl_dir": "Washington"
+  },
+  "54": {
+   "stusab": "wv",
+   "name": "West Virginia",
+   "acs2010_dir": "WestVirginia",
+   "pl_dir": "West_Virginia"
+  },
+  "55": {
+   "stusab": "wi",
+   "name": "Wisconsin",
+   "acs2010_dir": "Wisconsin",
+   "pl_dir": "Wisconsin"
+  },
+  "56": {
+   "stusab": "wy",
+   "name": "Wyoming",
+   "acs2010_dir": "Wyoming",
+   "pl_dir": "Wyoming"
+  }
+ }
+}

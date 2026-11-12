@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>STRATA — Virginia</title>
+  <title>STRATA — United States</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,100,1&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
@@ -16,12 +16,18 @@
 
   <header class="masthead">
     <p class="kicker">STRATA · local preview</p>
-    <h1>Virginia, place by place</h1>
+    <h1 id="place-title">The United States, place by place</h1>
     <p class="deck">American Community Survey 5-year estimates, built from the Census Summary File.</p>
   </header>
 
   <main class="layout">
     <aside class="panel" aria-label="Controls and legend">
+      <section>
+        <label class="eyebrow" for="scope">Where</label>
+        <select id="scope"><option value="us">United States (all states)</option></select>
+        <p class="note" id="scope-note" hidden></p>
+      </section>
+
       <section>
         <label class="eyebrow" for="level">Geography</label>
         <select id="level"></select>
@@ -35,13 +41,14 @@
 
       <section>
         <fieldset class="segmented" id="vintage">
-          <legend class="eyebrow">Vintage</legend>
+          <legend class="eyebrow">Period</legend>
           <div class="seg-row" id="vintage-options"></div>
         </fieldset>
         <p class="check" id="on-new-row" hidden>
           <input type="checkbox" id="on-new">
           <label for="on-new">Show on 2020 tract lines</label>
         </p>
+        <p class="note" id="period-note" role="status"></p>
         <p class="note" id="dollar-note"></p>
       </section>
 
@@ -76,12 +83,15 @@
         </fieldset>
       </div>
 
-      <div id="map" role="application" aria-label="Map of Virginia. Arrow keys pan, plus and minus zoom. Every value is also in the table view."></div>
+      <div class="map-wrap">
+        <div id="map" role="application" aria-label="Map of the United States. Arrow keys pan, plus and minus zoom. Every value is also in the table view."></div>
+        <p class="map-hint" id="zoom-hint" role="status" hidden></p>
+      </div>
 
       <div id="table-view" class="table-view" hidden tabindex="-1">
         <div class="table-tools">
           <label class="eyebrow" for="filter" id="filter-label">Find a tract</label>
-          <input id="filter" type="search" placeholder="County, city or GEOID" autocomplete="off">
+          <input id="filter" type="search" placeholder="Name or GEOID" autocomplete="off">
           <p class="note" id="table-count" aria-live="polite"></p>
         </div>
         <div class="table-scroll">

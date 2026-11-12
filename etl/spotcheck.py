@@ -1,4 +1,4 @@
-"""Vintage gates: fill a Virginia tract spot-check fixture from data.census.gov.
+"""Vintage gates: fill a state's spot-check fixture from data.census.gov.
 
 Draws a seeded random sample of (tract, published variable) pairs and fetches
 each value from data.census.gov's table endpoint — the published tables, an
@@ -27,7 +27,7 @@ import urllib.request
 
 import pyarrow.parquet as pq
 
-from etl.common import ROOT
+from etl.common import ROOT, parse_states, state_info
 
 ENDPOINT = "https://data.census.gov/api/access/data/table"
 SEED = 51
@@ -55,14 +55,17 @@ VINTAGES = {
 GEO_PREFIX = {"tract": "1400000US", "county": "0500000US", "place": "1600000US", "zcta": "8600000US"}
 
 
-def fixture_path(vintage, level="tract"):
-    if level == "tract":
+def fixture_path(vintage, level="tract", state="51"):
+    """Virginia keeps its original gate names; every other state is
+    {stusab}_{level}_spotcheck_{vintage}.csv."""
+    if state == "51" and level == "tract":
         return ROOT / "tests" / "fixtures" / VINTAGES[vintage]["fixture"]
-    return ROOT / "tests" / "fixtures" / f"va_{level}_spotcheck_{vintage}.csv"
+    ab = state_info(state)["stusab"]
+    return ROOT / "tests" / "fixtures" / f"{ab}_{level}_spotcheck_{vintage}.csv"
 
 
-def cube_path(vintage, level="tract"):
-    return ROOT / "build" / "acs" / vintage / level / "51.parquet"
+def cube_path(vintage, level="tract", state="51"):
+    return ROOT / "build" / "acs" / vintage / level / f"{state}.parquet"
 
 
 def table_id(variable, endyear):
@@ -110,10 +113,11 @@ def fetch(variable, geoid, endyear, level="tract"):
     return "" if row[variable] is None else row[variable]
 
 
-def sample(vintage, level="tract"):
-    geoids = pq.read_table(cube_path(vintage, level), columns=["GEOID"]).column("GEOID").to_pylist()
+def sample(vintage, level="tract", state="51"):
+    geoids = pq.read_table(cube_path(vintage, level, state), columns=["GEOID"]).column("GEOID").to_pylist()
     variables = VINTAGES[vintage]["variables"]
-    rng = random.Random(SEED)
+    # Seed = the state's FIPS number (Virginia's 51 was the original seed).
+    rng = random.Random(SEED if state == "51" else int(state))
     pairs = set()
     while len(pairs) < N:
         pairs.add((rng.choice(geoids), rng.choice(variables)))
@@ -124,11 +128,13 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--vintage", choices=sorted(VINTAGES), required=True)
     ap.add_argument("--level", default="tract", choices=sorted(GEO_PREFIX))
+    ap.add_argument("--state", default="51", help="FIPS or postal code")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
-    pairs = sample(args.vintage, args.level)
+    (state,) = parse_states(args.state)
+    pairs = sample(args.vintage, args.level, state)
     endyear = VINTAGES[args.vintage]["endyear"]
-    fixture = fixture_path(args.vintage, args.level)
+    fixture = fixture_path(args.vintage, args.level, state)
     if args.dry_run:
         for p in pairs:
             print(*p)

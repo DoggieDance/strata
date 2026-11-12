@@ -58,7 +58,7 @@ COLUMN = {
     },
 }
 
-# (vintage, level, fixture)
+# (vintage, level, fixture); the state comes from the fixture's prefix.
 FILES = [
     ("2016-2020", "tract", "va_tract_spotcheck.csv"),
     ("2006-2010", "tract", "va_tract_spotcheck_2006-2010.csv"),
@@ -69,7 +69,11 @@ FILES = [
     ("2016-2020", "zcta", "va_zcta_spotcheck_2016-2020.csv"),
     ("2006-2010", "county", "va_county_spotcheck_2006-2010.csv"),
     ("2006-2010", "place", "va_place_spotcheck_2006-2010.csv"),
+    # Pennsylvania, the second state (national scope, 2026-11-12).
+    *[(v, lv, f"pa_{lv}_spotcheck_{v}.csv") for v in ("2016-2020", "2006-2010")
+      for lv in ("tract", "county", "place", "zcta") if not (v == "2006-2010" and lv == "zcta")],
 ]
+STATE_OF = {"va": "51", "pa": "42"}
 RANDOM = {name for _, _, name in FILES if "nulls" not in name and "education" not in name}
 
 NULL = ("", "-", "N", "(X)", "**", "null")
@@ -93,7 +97,7 @@ def cases():
 def test_spotcheck(vintage, level, name, row):
     if row is None:
         pytest.skip(f"tests/fixtures/{name} not filled in yet")
-    cube = open_cube(vintage, level)
+    cube = open_cube(vintage, level, STATE_OF[name[:2]])
     col, tol = COLUMN[vintage][row["variable"]]
     t = cube.read(columns=["GEOID", col]).to_pydict()
     got = t[col][t["GEOID"].index(row["GEOID"])]

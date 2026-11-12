@@ -36,7 +36,7 @@ import pyarrow.parquet as pq
 
 from etl.build_cube import to_table
 from etl.clean import ratio
-from etl.common import check_scope, load_measures
+from etl.common import parse_states, check_scope, load_measures
 
 EXTENSIVE = {"count", "aggregate"}
 
@@ -162,10 +162,10 @@ def build(state: str, out: Path, source_vintage="2006-2010", target_vintage="201
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--states", default="51")
+    ap.add_argument("--states", default="51", help="FIPS or postal codes, comma-separated, or 'all'")
     ap.add_argument("--out", type=Path, default=Path("build"))
     args = ap.parse_args(argv)
-    for s in args.states.split(","):
+    for s in parse_states(args.states):
         build(s.strip(), args.out)
     return 0
 

@@ -18,7 +18,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from etl.common import level_cfg, load_summary_files, raw_dir
+from etl.common import state_info, level_cfg, load_summary_files, raw_dir
 
 
 @dataclass(frozen=True)
@@ -38,10 +38,10 @@ def cfg(vintage: str) -> dict:
 
 
 def state_cfg(vintage: str, state: str) -> dict:
-    try:
-        return cfg(vintage)["states"][state]
-    except KeyError:
-        raise ValueError(f"{vintage}: no sequence-file location recorded for state {state}") from None
+    """Template fields for one state's files: {state_name} is Census's directory
+    name ("DistrictOfColumbia"), {stusab} the lowercase postal code."""
+    info = state_info(state)
+    return {"state_name": info["acs2010_dir"], "stusab": info["stusab"]}
 
 
 def lookup_path(vintage: str):

@@ -121,8 +121,15 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 
 .stage { display: grid; grid-template-rows: auto 1fr; min-height: 0; min-width: 0; }
 .viewbar { padding: 8px 12px; border-bottom: 1px solid var(--rule-soft); display: flex; }
+.map-wrap { position: relative; min-height: 0; display: grid; }
 #map { min-height: 0; background: var(--paper); }
-#map[hidden] { display: none; }
+.map-hint {
+  position: absolute; left: 50%; top: 16px; transform: translateX(-50%); margin: 0;
+  max-width: calc(100% - 32px); padding: 8px 14px; border: 1px solid var(--control);
+  background: var(--surface); color: var(--ink); font-size: 15px; box-shadow: 0 2px 8px rgb(0 0 0 / .12);
+  pointer-events: none;
+}
+#map[hidden], .map-wrap[hidden] { display: none; }
 .maplibregl-canvas:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
 .maplibregl-ctrl-attrib { font: 12px var(--mono); }
 
@@ -166,3 +173,9 @@ td button.show {
 .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
 .check label { cursor: pointer; }
 .check[hidden] { display: none; }
+
+.swatch.dots {
+  background-image: radial-gradient(circle, var(--ink-2) 1.1px, transparent 1.3px);
+  background-size: 6px 6px;
+}
+.legend .count { color: var(--ink-3); font-family: var(--mono); font-size: 13px; }

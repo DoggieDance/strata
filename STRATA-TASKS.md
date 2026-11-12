@@ -28,6 +28,8 @@ suggestions.
 | v0.1 | Phase 00 — spec files committed | in progress |
 | v0.2 | Phase 01 — Virginia data spine | **gate passed 2026-11-12** — 20/20 data.census.gov values match; zero jams |
 | v0.2.1 | Published levels: county, place, ZCTA (owner request) | **passed 2026-11-12**: 100/100 spot-check values; ZCTA definitions corrected after milestone review. Entered after the build, not before; the reserve-first rule was missed |
+| v0.3.1 | National scope: 50 states + DC (owner, 2026-11-12: "the goal is for it to be nationwide eventually"); Pennsylvania first; manifest-driven app with a state picker | **built 2026-11-12**: all 51 cubes, crosswalks (population conserved in every state), harmonized cubes, national county layer; PA 140/140 spot-check values |
+| v0.3.2 | 2010→2020 change map with significance testing (spec 05) | **built 2026-11-12**: tracts + counties, national shade split, county boundary-change registry |
 | v0.3 | Phase 02 — harmonizer | in progress — loader gate passed; VA crosswalk + harmonizer built, conservation gate passes 2026-11-12; Philadelphia replication blocked on PA scope |
 
 Rule: reserve here first. A build that discovers its version is taken halts.
@@ -51,6 +53,15 @@ A phase ships when its gate passes. Writing the code is not shipping it.
 ---
 
 ## CURRENT DIRECTIVE
+
+**Owner decision 2026-11-12: nationwide.** "you need to continue the progress.
+the goal is for it to be nationwide eventually." The scope lock
+(`etl/common.py`) now admits the 50 states and DC from `registry/states.json`;
+Puerto Rico is deferred (PRCS tables differ). This also settles the pending
+"add PA" decision. Order: Pennsylvania end to end (spot-checks, crosswalk,
+harmonizer) as the second state, then the rest in batches, each state passing
+the conservation check and a jam scan before it ships. Phase 07 (85,000 tracts
+in one view) stays a later gate; until then the app loads one state at a time.
 
 **Phase 02, remaining.** The VA crosswalk and harmonizer are built and pass the
 conservation half of the gate. Next: compare 2010- vs 2020-population weights
