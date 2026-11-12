@@ -1,0 +1,25 @@
+{
+  "note": "Display text and formats the app shows. Data definitions live in measures.seed.json; this file only says how to present them.",
+  "states": { "51": "Virginia" },
+  "vintages": {
+    "2006-2010": { "label": "2006–10" },
+    "2016-2020": { "label": "2016–20" }
+  },
+  "levels": {
+    "tract":  { "label": "Census tracts", "noun": "tract", "plural": "tracts" },
+    "county": { "label": "Counties & independent cities", "noun": "county or city", "plural": "counties and cities" },
+    "place":  { "label": "Towns & places", "noun": "place", "plural": "places",
+                "note": "Places are incorporated towns and cities plus census-designated places. They cover only part of the state; blank ground is outside any place." },
+    "zcta":   { "label": "ZIP codes", "noun": "ZIP code area", "plural": "ZIP code areas",
+                "note": "ZIP Code Tabulation Areas: Census's area version of USPS ZIP codes, as defined in 2010 (the 2016–20 survey still uses those). Not published for 2006–10." }
+  },
+  "measures": [
+    { "id": "mean_household_income", "label": "Mean household income", "fmt": "usd" },
+    { "id": "mean_gross_rent", "label": "Mean gross rent (cash renters)", "fmt": "usd" },
+    { "id": "mean_home_value", "label": "Mean home value", "fmt": "usd" },
+    { "id": "pct_bachelors_plus", "label": "Bachelor’s degree or higher, 25+", "fmt": "pct" },
+    { "id": "pct_nh_white", "label": "Non-Hispanic white", "fmt": "pct" },
+    { "id": "total_population", "label": "Total population", "fmt": "count" },
+    { "id": "households", "label": "Households", "fmt": "count" }
+  ]
+}

@@ -326,3 +326,28 @@ Tests: 276 passed. Browser: all levels load; axe 0 violations.
   ignored [hidden]. Browser: toggle works; rapid level switching no longer flashes
   "Error"; axe 0 violations.
 - Open question recorded in spec 02: 2010 vs 2020 block population as weights.
+
+## 2026-11-12 (later) — review of cac3bfd; deflators; manifest; change engine
+
+Review findings, fixed before push:
+1. **Zero-universe pieces blanked targets.** A null aggregate whose source
+   universe is 0 now counts as 0. Harmonized null income 59 → 12, rent 138 → 80.
+   Regression tests for the synthetic case and the reviewed tracts (51059482505, 51810044004).
+2. Weak tests: new independent identity test (986 one-to-one tracts equal their
+   source in every column); land test now requires real overlap and full Census
+   source coverage; circular tests relabeled for what they show.
+3. pct_nh_white is recomputed over B03002_001 (`race_universe`, registry v6),
+   matching the cube. All cubes rebuilt: earlier columns identical.
+4. Empty 2020 water targets null rather than 0: documented.
+Also:
+- **Deflators**: R-CPI-U-RS annual 2004–2025 in registry/deflators.json (BLS 403s
+  scripted requests; fetched via a web-fetch tool, sha256 recorded).
+  2010→2020 = 1.1906; the study used 1.187 (0.3% gap, to explain at Phase 04).
+  `etl/deflate.py` + tests.
+- **2010 vs 2020 weights** compared for VA: immaterial (spec 02).
+- **Manifest**: `etl/write_manifest.py` + `registry/presentation.json` →
+  build/manifest.json (inventory, labels, deflators, valid comparisons,
+  significance and reliability thresholds). The app does not read it yet.
+- **Change engine**: `app/engine/change.js` (spec 05 Z-test with deflation;
+  "no measurable change" state), node tests run under pytest (tests/test_js.py).
+Tests: 307 passed.
