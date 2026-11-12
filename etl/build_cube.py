@@ -28,10 +28,9 @@ from etl.common import (
     check_scope,
     load_measures,
     load_summary_files,
-    raw_dir,
     resolve_vintage,
 )
-from etl.fetch_summary_file import required_tables
+from etl.fetch_summary_file import raw_files
 
 ROW_GROUP_SIZE = 8000
 
@@ -40,13 +39,10 @@ def cube_path(out: Path, vintage: str, level: str, state: str) -> Path:
     return out / "acs" / vintage / level / f"{state}.parquet"
 
 
-def _sources(vintage: str) -> list[dict]:
-    cfg = load_summary_files()["vintages"][vintage]
-    names = [cfg["table_file"].format(table=t.lower()) for t in required_tables(vintage)]
-    names += [cfg[k].rsplit("/", 1)[1] for k in ("geos", "table_shells")]
+def _sources(vintage: str, state: str) -> list[dict]:
     out = []
-    for n in names:
-        meta = json.loads((raw_dir(vintage) / f"{n}.meta.json").read_text())
+    for _, path in raw_files(vintage, state):
+        meta = json.loads(path.with_name(path.name + ".meta.json").read_text())
         out.append({k: meta.get(k) for k in ("url", "last_modified", "etag", "size", "sha256")})
     return out
 
@@ -92,7 +88,7 @@ def build(state: str, vintage: str, level: str, out: Path) -> Path:
         "registry_version": load_measures()["registry_version"],
         "summary_file": load_summary_files()["vintages"][vintage],
         "measures": notes,
-        "sources": _sources(vintage),
+        "sources": _sources(vintage, state),
     }
     table = table.replace_schema_metadata({"strata": json.dumps(meta)})
 

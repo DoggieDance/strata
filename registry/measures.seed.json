@@ -1,5 +1,5 @@
 {
-  "registry_version": 3,
+  "registry_version": 4,
   "note": "Seed measures from the Philadelphia study (GEOG 376, 2025). Per-vintage sources are mandatory: table definitions drift between decennial-anchored redesigns.",
   "measures": [
     {
@@ -120,7 +120,11 @@
       "kind": "percent",
       "denominator": "pop_25_plus",
       "sources": {
-        "2006-2010": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"] },
+        "2006-2010": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"],
+                       "summary_file_substitute": {
+                         "dataset": "acs5", "table": "B15002",
+                         "numerator_cells": ["015:018", "032:035"], "denominator_cells": ["001"],
+                         "note": "B15003 does not exist in 2006-2010. Recomputed from B15002 (sex by educational attainment, population 25+): male bachelor's, master's, professional and doctorate (015-018) plus the same four for women (032-035), over 001. Labels checked against the 2010 lookup file. Same RSS + proportion MOE method as 2016-2020." } },
         "2016-2020": { "dataset": "acs5/subject", "table": "S1501", "cells": ["C02_015"],
                        "summary_file_substitute": {
                          "dataset": "acs5", "table": "B15003",
@@ -151,6 +155,8 @@
     "total_population":  { "table": "B01003", "cells": ["001"] },
     "pop_25_plus":       { "dataset": "acs5/subject", "table": "S1501", "cells": ["C01_006"],
                            "summary_file_substitute": {
+                             "2006-2010": { "dataset": "acs5", "table": "B15002", "cells": ["001"],
+                                            "note": "B15002 'Total:' is population 25 years and over, the same universe as S1501_C01_006." },
                              "2016-2020": { "dataset": "acs5", "table": "B15003", "cells": ["001"],
                                             "note": "Same universe (population 25 years and over) as S1501_C01_006." } } }
   },

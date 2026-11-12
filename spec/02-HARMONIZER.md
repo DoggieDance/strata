@@ -57,6 +57,29 @@ The task is to decide and document:
 Gate for this task: 20 Virginia 2006–2010 tract values match data.census.gov,
 and the jam guard passes, exactly as for Phase 01.
 
+### Decided and passed — 2026-11-12
+
+1. **Source:** the sequence-based Summary File, per-state per-sequence zips under
+   `5_year_seq_by_state/Virginia/Tracts_Block_Groups_Only/`, plus `g20105va.csv`.
+   Only the 7 sequences the registry needs are fetched (~11 MB), not the state archive.
+   The lookup file is pinned by sha256 in `registry/summary_files.json`; the
+   fetcher refuses a lookup file that differs, because every cell position comes from it.
+2. **Loader:** `etl/sequence_file.py`. Field of table line *n* =
+   Start Position + *n* − 1 (1-based, counting the 6 header fields). Rows join
+   to GEOID through LOGRECNO; the geography file's own GEOID is checked against
+   STATE+COUNTY+TRACT. Output matches the `.dat` loader's frame.
+3. **Missing values.** No negative jam sentinels appear in these sequences.
+   Missing cells are `.` (not computable — for tract aggregates, a zero
+   universe; data.census.gov publishes `-666666666`) or blank (table not
+   published for the tract; data.census.gov returns 204). Both become null.
+   Any other non-numeric token raises. 39 tracts lack B19025, 102 lack B25065.
+4. **Education:** `B15002_015:018 + _032:035` over `B15002_001`. Matches the
+   2010 S1501 (where the percent is `C01_015`, not `C02_015`) to its decimal.
+5. **Registry v4.** Rebuilding 2016–2020 under v4 produced identical data.
+
+**Gate:** 20/20 random values match (`tests/fixtures/va_tract_spotcheck_2006-2010.csv`),
+both missing-value cases match, jam guard passes. 1,907 tracts, 2010 geography.
+
 ## The decision: population weighting
 
 Apportion using **2020 decennial census block population** as the weight rather

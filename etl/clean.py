@@ -9,9 +9,13 @@
 - Derived measures (means, shares, the binned home-value aggregate) carry an
   MOE propagated with the ACS Handbook approximation formulas.
 
-No deflation happens here yet: 2016-2020 is published in 2020 dollars and is
-the only vintage in scope, so the factor would be 1. Deflation arrives with the
-second vintage.
+No deflation happens here. The cube holds each vintage as published (2016-2020
+in 2020 dollars, 2006-2010 in 2010 dollars) so the spot-check can demand exact
+matches; deflators (registry/deflators.json) are applied where vintages meet.
+
+Vintages come in two formats (registry/summary_files.json "format"): the
+table-based Summary File, and the older sequence-based one, read by
+etl.sequence_file into the same frame shape.
 """
 from __future__ import annotations
 
@@ -33,7 +37,9 @@ from etl.common import (
     load_summary_files,
     raw_dir,
     table_path,
+    vintage_format,
 )
+from etl import sequence_file
 
 
 class JamValueError(ValueError):
@@ -68,6 +74,11 @@ def strip_jams(df: pd.DataFrame, jams=None, controlled=None) -> pd.DataFrame:
 
 def load_table(vintage: str, table: str, state: str, level: str = "tract") -> pd.DataFrame:
     """One table, one state, one level. Index = GEOID; columns E001, M001, ..."""
+    if vintage_format(vintage) == "sequence":
+        if level != "tract":
+            raise ValueError("sequence-file reader handles tracts only")
+        df = sequence_file.to_numeric(sequence_file.load_table(vintage, table, state), vintage)
+        return strip_jams(df)
     prefix = SUMLEVEL_PREFIX[level] + state
     path = table_path(vintage, table)
     with open(path, encoding="latin-1") as f:
@@ -87,6 +98,8 @@ def load_table(vintage: str, table: str, state: str, level: str = "tract") -> pd
 
 
 def _state_tracts(vintage: str, state: str) -> pd.DataFrame:
+    if vintage_format(vintage) == "sequence":
+        return sequence_file.tracts(vintage, state)
     cfg = load_summary_files()["vintages"][vintage]
     path = raw_dir(vintage) / cfg["geos"].rsplit("/", 1)[1]
     geos = pd.read_csv(path, dtype=str, encoding="latin-1",
@@ -155,6 +168,8 @@ def _num(s: str) -> int:
 
 @lru_cache(maxsize=None)
 def _shell_labels(vintage: str) -> dict:
+    if vintage_format(vintage) == "sequence":
+        return sequence_file.labels(vintage)
     cfg = load_summary_files()["vintages"][vintage]
     path = raw_dir(vintage) / cfg["table_shells"].rsplit("/", 1)[1]
     with open(path, encoding="latin-1", newline="") as f:

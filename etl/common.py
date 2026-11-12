@@ -9,12 +9,12 @@ ROOT = Path(__file__).resolve().parent.parent
 REGISTRY_DIR = ROOT / "registry"
 RAW_DIR = ROOT / "data" / "raw" / "acs"
 
-# Phase 01 scope. Nothing outside this set may be built until the Phase 01
-# gate passes (STRATA-TASKS.md, CURRENT DIRECTIVE).
+# Current phase scope (STRATA-TASKS.md, CURRENT DIRECTIVE). Phase 01 passed
+# 2026-11-12; Phase 02's first task adds the 2006-2010 vintage, Virginia only.
 PHASE_STATES = frozenset({"51"})
-PHASE_VINTAGES = frozenset({"2016-2020"})
+PHASE_VINTAGES = frozenset({"2006-2010", "2016-2020"})
 PHASE_LEVELS = frozenset({"tract"})
-VINTAGE_ALIASES = {"2020": "2016-2020"}
+VINTAGE_ALIASES = {"2010": "2006-2010", "2020": "2016-2020"}
 
 SUMLEVEL_PREFIX = {"tract": "1400000US"}
 
@@ -58,7 +58,8 @@ def check_scope(states, vintages, level) -> None:
         bad.append(f"level {level!r}")
     if bad:
         raise ScopeError(
-            "Outside Phase 01 scope (Virginia, 2016-2020, tract): " + ", ".join(bad)
+            f"Outside the current phase scope (Virginia; {', '.join(sorted(PHASE_VINTAGES))}; "
+            "tract): " + ", ".join(bad)
         )
 
 
@@ -86,3 +87,8 @@ def raw_dir(vintage: str) -> Path:
 def table_path(vintage: str, table: str) -> Path:
     cfg = load_summary_files()["vintages"][vintage]
     return raw_dir(vintage) / cfg["table_file"].format(table=table.lower())
+
+
+def vintage_format(vintage: str) -> str:
+    """'table' (table-based Summary File) or 'sequence' (2006-2010 style)."""
+    return load_summary_files()["vintages"][vintage].get("format", "table")

@@ -173,9 +173,13 @@ def test_gross_rent_uses_cash_rent_universe():
 
 @pytest.mark.parametrize("states,vintages,level", [
     (["51", "42"], ["2016-2020"], "tract"),
-    (["51"], ["2006-2010"], "tract"),
+    (["51"], ["2011-2015"], "tract"),
     (["51"], ["2016-2020"], "block group"),
 ])
 def test_scope_lock(states, vintages, level):
     with pytest.raises(ScopeError):
         check_scope(states, vintages, level)
+
+
+def test_2006_2010_in_phase_02_scope():
+    check_scope(["51"], ["2006-2010", "2016-2020"], "tract")

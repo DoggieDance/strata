@@ -1,4 +1,4 @@
-"""Structure of the Phase 01 cube (spec 03)."""
+"""Structure of every built Virginia tract cube (spec 03), one run per vintage."""
 import json
 
 import numpy as np
@@ -17,9 +17,9 @@ def test_geoid_sorted_unique_virginia(cube):
     assert all(len(x) == 11 and x.startswith("51") for x in g)
 
 
-def test_rows_match_geography_file(cube):
+def test_rows_match_geography_file(cube, vintage):
     g = cube.read(columns=["GEOID"]).column("GEOID").to_pylist()
-    assert g == list(tract_universe("2016-2020", "51"))
+    assert g == list(tract_universe(vintage, "51"))
 
 
 def test_layout(cube):
@@ -61,10 +61,20 @@ def test_no_nan_only_nulls(cube):
         assert np.isnan(v).sum() == col.null_count, f"{name} has NaN that is not null"
 
 
-def test_refuses_to_overwrite(cube, tmp_path):
+def test_refuses_to_overwrite(cube, vintage):
     from tests.conftest import BUILD
     with pytest.raises(FileExistsError):
-        build("51", "2016-2020", "tract", BUILD)
+        build("51", vintage, "tract", BUILD)
+
+
+def test_cube_metadata_names_its_vintage(cube, vintage):
+    assert json.loads(cube.schema_arrow.metadata[b"strata"])["vintage"] == vintage
+
+
+def test_vintages_share_columns():
+    from tests.conftest import VINTAGES, open_cube
+    schemas = [open_cube(v).schema_arrow for v in VINTAGES]
+    assert all(s.names == schemas[0].names for s in schemas)
 
 
 def test_cube_is_current_with_registry(cube):

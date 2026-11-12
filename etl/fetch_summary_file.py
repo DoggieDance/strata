@@ -7,6 +7,11 @@ sends one, otherwise Last-Modified + Content-Length (www2.census.gov currently
 sends no ETag for these files).
 
     python -m etl.fetch_summary_file --vintage 2016-2020
+    python -m etl.fetch_summary_file --vintage 2006-2010
+
+Sequence-based vintages (2006-2010) fetch the lookup file first, check it
+against the sha256 the registry records, then fetch the per-state sequence zips
+that hold the required tables, plus the geography file.
 """
 from __future__ import annotations
 
@@ -27,7 +32,9 @@ from etl.common import (
     raw_dir,
     resolve_vintage,
     table_path,
+    vintage_format,
 )
+from etl import sequence_file
 
 TIMEOUT = 120
 CHUNK = 1 << 20
@@ -126,13 +133,12 @@ def fetch(url: str, dest: Path, session: requests.Session) -> str:
     return "downloaded"
 
 
-def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--vintage", default="2016-2020")
-    args = ap.parse_args(argv)
-    vintage = resolve_vintage(args.vintage)
-    check_scope(["51"], [vintage], "tract")
-
+def raw_files(vintage: str, state: str = "51") -> list[tuple[str, Path]]:
+    """(url, local path) for everything a vintage's build reads, in fetch order.
+    For sequence vintages the lookup file must already be cached to resolve
+    sequences; sequence_targets() handles that ordering."""
+    if vintage_format(vintage) == "sequence":
+        return sequence_targets(vintage, state)
     cfg = load_summary_files()["vintages"][vintage]
     targets = [
         (cfg["data_base"] + cfg["table_file"].format(table=t.lower()), table_path(vintage, t))
@@ -141,9 +147,46 @@ def main(argv=None) -> int:
     for key in ("geos", "table_shells"):
         url = cfg[key]
         targets.append((url, raw_dir(vintage) / url.rsplit("/", 1)[1]))
+    return targets
+
+
+def lookup_target(vintage: str) -> tuple[str, Path]:
+    return sequence_file.cfg(vintage)["lookup"], sequence_file.lookup_path(vintage)
+
+
+def sequence_targets(vintage: str, state: str) -> list[tuple[str, Path]]:
+    seqs = sorted({sequence_file.layout(vintage, t).sequence for t in required_tables(vintage)})
+    names = [sequence_file.sequence_name(vintage, state, q) for q in seqs]
+    names.append(sequence_file.geos_name(vintage, state))
+    return [lookup_target(vintage)] + [
+        (sequence_file.data_url(vintage, state, n), raw_dir(vintage) / n) for n in names
+    ]
+
+
+def verify_lookup(vintage: str) -> None:
+    want = sequence_file.cfg(vintage)["lookup_sha256"]
+    got = hashlib.sha256(sequence_file.lookup_path(vintage).read_bytes()).hexdigest()
+    if got != want:
+        raise ValueError(f"{vintage} lookup file sha256 {got} != registry {want}; "
+                         "cell positions cannot be trusted")
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--vintage", default="2016-2020")
+    args = ap.parse_args(argv)
+    vintage = resolve_vintage(args.vintage)
+    check_scope(["51"], [vintage], "tract")
 
     with requests.Session() as s:
         s.headers["User-Agent"] = "strata-etl (static ACS build)"
+        if vintage_format(vintage) == "sequence":
+            url, dest = lookup_target(vintage)
+            print(f"{fetch(url, dest, s):10s} {dest.relative_to(ROOT)}")
+            verify_lookup(vintage)
+        targets = raw_files(vintage)
+        if vintage_format(vintage) == "sequence":
+            targets = targets[1:]  # the lookup, fetched above
         for url, dest in targets:
             status = fetch(url, dest, s)
             print(f"{status:10s} {dest.relative_to(ROOT)}")

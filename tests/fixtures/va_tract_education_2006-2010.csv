@@ -1,0 +1,4 @@
+GEOID,variable,value,source
+51003010300,S1501_C01_015E,59.5,data.census.gov (2010 S1501: C01_015 is percent bachelor's or higher)
+51059481701,S1501_C01_015E,80.1,data.census.gov (2010 S1501: C01_015 is percent bachelor's or higher)
+51760041600,S1501_C01_015E,46.2,data.census.gov (2010 S1501: C01_015 is percent bachelor's or higher)

@@ -27,7 +27,7 @@ suggestions.
 |---|---|---|
 | v0.1 | Phase 00 — spec files committed | in progress |
 | v0.2 | Phase 01 — Virginia data spine | **gate passed 2026-11-12** — 20/20 data.census.gov values match; zero jams |
-| v0.3 | Phase 02 — harmonizer | in progress — first task: 2006–2010 loader |
+| v0.3 | Phase 02 — harmonizer | in progress — 2006–2010 loader gate passed 2026-11-12; crosswalk next |
 
 Rule: reserve here first. A build that discovers its version is taken halts.
 
@@ -51,10 +51,11 @@ A phase ships when its gate passes. Writing the code is not shipping it.
 
 ## CURRENT DIRECTIVE
 
-**Phase 02, first task.** Load the 2006–2010 5-year vintage for Virginia, tract
-level, from the sequence-based Summary File (spec 02, "First task"). Its gate:
-20 Virginia 2006–2010 tract values match data.census.gov; jam guard passes.
-No crosswalk work until that passes.
+**Phase 02, crosswalk.** The 2006–2010 loader passed its gate 2026-11-12.
+Next: the 2020-block-population-weighted 2010→2020 tract crosswalk for
+Virginia (spec 02), checked for conservation and against HUD/Geocorr.
+The Phase 02 gate itself needs Philadelphia (PA, FIPS 42); widening the
+scope lock to PA is an owner decision, not yet taken.
 
 Phase 01 gate passed 2026-11-12. Still blocked for Phase 03: Cloudflare R2
 bucket + repo secrets. See `spec/03-CUBE-AND-TILES.md`.

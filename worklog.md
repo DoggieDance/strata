@@ -192,3 +192,30 @@ these changes and still valid for the spot-check.
 - Tests: 69 passed, 0 skipped.
 - Ledger: v0.2 gate passed. v0.3 in progress. Directive → Phase 02 first task
   (2006–2010 loader). Nothing uploaded; R2 still blocked.
+
+## 2026-11-12 (later) — Phase 02 first task: 2006–2010 loader, gate passed
+
+`git pull --ff-only`: already up to date.
+
+- **Registry v4.** `summary_files.json` gains `2006-2010` (format `sequence`,
+  per-state URL templates, lookup file pinned by sha256, geography-file column
+  positions, missing tokens). `measures.seed.json`: 2006–2010 B15002 recipes for
+  `pct_bachelors_plus` and `pop_25_plus`.
+- **Code.** New `etl/sequence_file.py`. `clean`, `fetch_summary_file`,
+  `build_cube` dispatch on the vintage format. Scope lock widened to
+  2006-2010 (Virginia, tract only).
+- **Data.** Fetched lookup + 7 sequence zips + `g20105va.csv` (~11 MB, local only).
+  Built `build/acs/2006-2010/tract/51.parquet`: 1,907 rows, 31 columns, same
+  columns as 2016–2020. Rebuilt 2016–2020 under v4: data identical to the v3 build.
+- **Missing values.** No negative sentinels in the 2010 sequences. `.` = zero
+  universe (data.census.gov: -666666666), blank = table not published (204).
+  Both → null. Unknown tokens raise.
+- **Gate:** 20/20 random 2006–2010 values match data.census.gov. Also checked:
+  4 missing-value cases, and 3 tracts' recomputed bachelor's+ against the 2010
+  S1501 (C01_015 in that layout). VA population sums to 7,841,754.
+- `etl/spotcheck.py` now takes `--vintage`. Fixed: suppressed values come back
+  as a jam in the value field with the symbol in the annotation; the symbol is
+  now recorded. 204 = not published, confirmed by a second request.
+- Tests: 124 passed.
+- Not done: deflators (registry/deflators.json still empty — needed when
+  vintages meet), crosswalk. Nothing uploaded.

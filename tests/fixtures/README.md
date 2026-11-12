@@ -25,3 +25,16 @@ standardization over raw percent change.
   data.census.gov's table endpoint (`/api/access/data/table`), not copied by hand.
   The box has no CENSUS_API_KEY, but this endpoint serves the same published values
   the site's table viewer shows. The script refuses to overwrite the fixture.
+
+## Virginia 2006–2010
+
+- `va_tract_spotcheck_2006-2010.csv` — the Phase 02 first-task gate. Same
+  method and seed as above (`etl/spotcheck.py --vintage 2006-2010`), fetched
+  2026-11-12. No B15003 in this vintage; B15002_001 stands in.
+- `va_tract_nulls_2006-2010.csv` — the two missing-value tokens of the sequence
+  files, each checked against what data.census.gov publishes: `.` is a zero
+  universe (published `-666666666`, shown "-"), blank is a table not published
+  for that tract (the endpoint returns 204). Both must be null in the cube.
+- `va_tract_education_2006-2010.csv` — `pct_bachelors_plus` recomputed from
+  B15002 against the published 2010 S1501 (column C01_015 in that year's
+  layout), to its one published decimal.

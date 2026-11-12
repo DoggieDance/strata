@@ -1,0 +1,5 @@
+GEOID,variable,value,source
+51001980100,B19025_001E,-,data.census.gov (published -666666666; zero households; sequence file '.')
+51001980100,B25065_001E,-,data.census.gov (published -666666666; zero cash-rent units; sequence file '.')
+51013980200,B19025_001E,,data.census.gov 204 No Content (table not published; sequence file blank)
+51003010903,B25065_001E,,data.census.gov 204 No Content (table not published; sequence file blank)
