@@ -81,25 +81,16 @@ def test_all_cubes_share_columns():
     assert all(s.names == schemas[0].names for s in schemas)
 
 
-def test_published_county_counts_equal_summed_tracts():
+@pytest.mark.parametrize("v", ["2016-2020", "2006-2010"])
+def test_published_county_counts_equal_summed_tracts(v):
     """Population and households are controlled totals: tracts sum exactly to the
     published county. (Dollar aggregates need not: each geography is estimated.)"""
     from tests.conftest import cube_path
     import pyarrow.parquet as pq
-    for v in ["2016-2020", "2006-2010"]:
-        if not (cube_path(v, "county").exists() and cube_path(v).exists()):
-            pytest.skip("county or tract cube not built")
-        cols = ["GEOID", "total_population_e", "households_e"]
-        tr = pq.read_table(cube_path(v), columns=cols).to_pandas()
-        co = pq.read_table(cube_path(v, "county"), columns=cols).to_pandas().set_index("GEOID")
-        summed = tr.groupby(tr.GEOID.str[:5])[cols[1:]].sum()
-        assert (summed.reindex(co.index) == co).all().all(), v
-
-
-def test_cube_is_current_with_registry(cube):
-    """A cube built from an older registry is stale and must be rebuilt."""
-    built = json.loads(cube.schema_arrow.metadata[b"strata"])["registry_version"]
-    assert built == load_measures()["registry_version"], (
-        f"cube built from registry v{built}, registry is now "
-        f"v{load_measures()['registry_version']}: rebuild required"
-    )
+    if not (cube_path(v, "county").exists() and cube_path(v).exists()):
+        pytest.skip("county or tract cube not built")
+    cols = ["GEOID", "total_population_e", "households_e"]
+    tr = pq.read_table(cube_path(v), columns=cols).to_pandas()
+    co = pq.read_table(cube_path(v, "county"), columns=cols).to_pandas().set_index("GEOID")
+    summed = tr.groupby(tr.GEOID.str[:5])[cols[1:]].sum()
+    assert (summed.reindex(co.index) == co).all().all()

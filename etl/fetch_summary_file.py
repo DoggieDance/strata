@@ -151,7 +151,7 @@ def raw_files(vintage: str, state: str = "51", level: str = "tract") -> list[tup
         targets.append((url, raw_dir(vintage) / url.rsplit("/", 1)[1]))
     if level == "zcta":
         from etl.zcta import relationship_target
-        targets.append(relationship_target())
+        targets.append(relationship_target(vintage))
     return targets
 
 

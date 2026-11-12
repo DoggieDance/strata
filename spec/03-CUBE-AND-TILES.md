@@ -40,7 +40,7 @@ from tracts to counties, which is tested. Dollar aggregates differ by up to 0.17
 | `tract` | 140 | 2,198 | 1,907 | 2020 vs 2010 tract geography |
 | `county` | 050 | 133 | 134 | Includes the 38 independent cities. Bedford city (51515) exists only in 2010 |
 | `place` | 160 | 672 | 591 | Incorporated places + CDPs; does not cover the state |
-| `zcta` | 860 | 883 | — | National rows; assigned to the state with most of their land. None published for 2006–10 |
+| `zcta` | 860 | 896 | — | **2010 ZCTA definitions**: the 2016–20 ACS still tabulates them (2020 ZCTAs start with 2018–22). National rows, assigned to the state with most of their 2010 population. None published for 2006–10 |
 
 Every level gets the same 20-value data.census.gov spot-check as tracts.
 

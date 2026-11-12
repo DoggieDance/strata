@@ -29,9 +29,17 @@ def open_cube(vintage, level="tract"):
 
 
 def built_combos():
-    """(vintage, level) for every cube on disk, plus tract cubes even if absent (they skip)."""
-    out = [(v, "tract") for v in VINTAGES]
-    out += [(v, lv) for v in VINTAGES for lv in LEVELS[1:] if cube_path(v, lv).exists()]
+    """Every (vintage, level) Census published. A missing cube is collected and
+    skipped (open_cube), never silently left out."""
+    from etl.common import LevelUnavailable, level_cfg
+    out = []
+    for v in VINTAGES:
+        for lv in LEVELS:
+            try:
+                level_cfg(v, lv)
+            except LevelUnavailable:
+                continue
+            out.append((v, lv))
     return out
 
 

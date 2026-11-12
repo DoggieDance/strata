@@ -23,7 +23,7 @@ const LEVELS = [
   { id: "place", label: "Towns & places", noun: "place", plural: "places", vintages: ["2006-2010", "2016-2020"],
     note: "Places are incorporated towns and cities plus census-designated places. They cover only part of the state; blank ground is outside any place." },
   { id: "zcta", label: "ZIP codes", noun: "ZIP code area", plural: "ZIP code areas", vintages: ["2016-2020"],
-    note: "ZIP Code Tabulation Areas: Census's area version of USPS ZIP codes. Not published for 2006–10." },
+    note: "ZIP Code Tabulation Areas: Census's area version of USPS ZIP codes, as defined in 2010 (the 2016–20 survey still uses those). Not published for 2006–10." },
 ];
 
 const MEASURES = [
@@ -197,9 +197,11 @@ function addLayers() {
 // ---------------------------------------------------------------- render
 
 async function reload() {
+  const k = key();
   $("status").textContent = "Loading…";
   syncAvailability();
   await loadData();
+  if (key() !== k) return; // a newer switch happened while loading; it will render
   if (state.selected) map.setFeatureState({ source: "tracts", id: state.selected }, { sel: false });
   state.selected = null;
   state.bbox = {};

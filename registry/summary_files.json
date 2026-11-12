@@ -51,7 +51,8 @@
             "ZCTA5"
           ],
           "state_rule": "zcta_largest_land_share",
-          "note": "ZIP Code Tabulation Areas (Census approximations of USPS ZIP codes). National rows with no state; assigned to the state holding the largest share of their land (registry: zcta_state)."
+          "note": "ZIP Code Tabulation Areas. The 2016-2020 ACS still tabulates 2010 ZCTA definitions (33,120 nationally; 2020 ZCTAs arrive with the 2018-2022 release). National rows with no state; each is assigned to one state by the zcta_state rule for 2010 ZCTAs.",
+          "zcta_vintage": "2010"
         }
       }
     },
@@ -139,7 +140,15 @@
     }
   },
   "zcta_state": {
-    "relationship": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt",
-    "rule": "A ZCTA belongs to the state containing the largest share of its land area (AREALAND_PART summed by state). ZCTAs that cross a state line appear in exactly one state's files."
+    "2010": {
+      "relationship": "https://www2.census.gov/geo/docs/maps-data/data/rel/zcta_county_rel_10.txt",
+      "format": "zcta_county_rel_10",
+      "rule": "The state holding the largest share of the ZCTA's 2010 population (POPPT); land area (AREALANDPT) where it has none. Ties go to the lower state FIPS."
+    },
+    "2020": {
+      "relationship": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt",
+      "format": "tab20_zcta520_county20",
+      "rule": "The state holding the largest share of the ZCTA's land (AREALAND_PART). For ACS releases that tabulate 2020 ZCTAs (2018-2022 on)."
+    }
   }
 }

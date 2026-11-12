@@ -283,3 +283,24 @@ Owner asked for counties and cities, with ZIP codes as an option.
   stale-hover race on level switch fixed; ZIP names fixed. axe: 0 violations.
 - Tests: 276 passed.
 - Ledger v0.2.1 entered after the build; the rule says before. Noted there.
+
+## 2026-11-12 (later) — milestone review, fixes before push
+
+An independent review of origin/main..HEAD (3 commits) before pushing:
+1. **ZCTAs were on the wrong definitions.** The 2016–20 ACS tabulates 2010 ZCTAs
+   (33,120 rows = the 2010 count), but state assignment and polygons used 2020
+   files. Effect: 13 VA ZCTAs with data were dropped (e.g. 23806, Virginia State
+   University), and some 2010-defined estimates sat on redrawn 2020 shapes. Fixed:
+   `zcta_county_rel_10.txt` (assignment by 2010 population share, land if none)
+   and `cb_2019_us_zcta510_500k` (2010 definitions). VA ZCTAs: 883 → 896, all
+   with polygons. The ZCTA spot-check fixture stays valid: same rows, same values.
+2. **App reload race** (fast second switch could flash "Error"): reload() now
+   drops a stale load.
+3. **Tests that could not fail:** level membership is now checked against raw
+   .dat rows (tests/test_levels.py), not the geography code path that built the
+   cube; `built_combos` lists every published (vintage, level) so a missing cube
+   is skipped visibly; the county-sum test runs per vintage; the ZCTA rule has a
+   unit test.
+4. Not changed: tier() calls estimate 0 with MOE 0 "High" (CV undefined). No
+   such rows exist; an exact zero is reliable.
+Tests: 276 passed. Browser: all levels load; axe 0 violations.

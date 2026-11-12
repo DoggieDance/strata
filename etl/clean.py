@@ -112,7 +112,7 @@ def _state_geos(vintage: str, state: str, level: str) -> pd.DataFrame:
         "SUMLEVEL", "COMPONENT", "STATE", "COUNTY", "PLACE", "TRACT", "ZCTA5", "NAME"])
     sel = geos[(geos.SUMLEVEL == lc["sumlevel"]) & (geos.COMPONENT == "00")]
     if level == "zcta":
-        sel = sel[sel.ZCTA5.isin(zcta.for_state(state))]
+        sel = sel[sel.ZCTA5.isin(zcta.for_state(vintage, state))]
     else:
         sel = sel[sel.STATE == state]
     # This file writes short prefixes ("14000US"), the data files long ones
