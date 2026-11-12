@@ -1,0 +1,15 @@
+{
+  "note": "Cartographic Boundary tract files (1:500,000) per vintage, matching each vintage's tract geography. Geometry carries only GEOID; attributes join in the browser (spec 03).",
+  "vintages": {
+    "2016-2020": {
+      "tract_geography": "2020",
+      "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{state}_tract_500k.zip",
+      "geoid": "GEOID"
+    },
+    "2006-2010": {
+      "tract_geography": "2010",
+      "url": "https://www2.census.gov/geo/tiger/GENZ2010/gz_2010_{state}_140_00_500k.zip",
+      "geoid": ["STATE", "COUNTY", "TRACT"]
+    }
+  }
+}

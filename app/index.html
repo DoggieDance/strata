@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STRATA — Virginia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,100,1&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/maplibre-gl@5.24.1/dist/maplibre-gl.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <p class="kicker">STRATA · local preview</p>
+    <h1>Virginia, tract by tract</h1>
+    <p class="deck">American Community Survey 5-year estimates, built from the Census Summary File.</p>
+  </header>
+
+  <main class="layout">
+    <aside class="panel" aria-label="Controls">
+      <section>
+        <h2 class="eyebrow">Measure</h2>
+        <select id="measure" aria-label="Measure"></select>
+      </section>
+
+      <section>
+        <h2 class="eyebrow">Vintage</h2>
+        <div class="segmented" role="radiogroup" aria-label="Vintage" id="vintage"></div>
+        <p class="note" id="dollar-note"></p>
+      </section>
+
+      <section>
+        <h2 class="eyebrow">Legend</h2>
+        <ol class="legend" id="legend"></ol>
+        <p class="note"><span class="swatch hatch"></span> Low reliability — CV above 40%, hatched, not colored.
+          A field convention; Census publishes no cutoff.</p>
+      </section>
+
+      <section class="inspector" id="inspector" aria-live="polite">
+        <h2 class="eyebrow">Tract</h2>
+        <p class="note">Hover or tap a tract.</p>
+      </section>
+
+      <footer class="panel-foot">
+        <button type="button" id="theme" class="link">Dark</button>
+        <span class="mono" id="status">Loading…</span>
+      </footer>
+    </aside>
+
+    <div id="map" role="region" aria-label="Map of Virginia census tracts"></div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -219,3 +219,23 @@ these changes and still valid for the spot-check.
 - Tests: 124 passed.
 - Not done: deflators (registry/deflators.json still empty — needed when
   vintages meet), crosswalk. Nothing uploaded.
+
+## 2026-11-12 (later) — local preview (owner request), pushed Phase 01/02 commits
+
+Owner asked to see STRATA running on their machine; it is not a GitHub Pages
+site. Interface work, outside the Phase 02 directive by explicit request.
+Labeled a preview, not Phase 03 — that phase's gate (R2 byte ranges, PMTiles)
+is untouched.
+
+- Pushed dc48768 and 0fbf618 to origin/main (fast-forward).
+- `registry/geometry.json` + `etl/build_geometry.py`: 1:500k Cartographic
+  Boundary tracts → `build/geo/{vintage}/tract/51.geojson`, GEOID only.
+  2020: 2,186 polygons (12 cube tracts, all 99xxxx water tracts, have none).
+  2010: 1,905 (2 water tracts). Any polygon not in the cube raises.
+- `app/` (index.html, app.js, style.css): MapLibre + hyparquet, feature-state
+  join, quintiles, spec 05 hatching, spec 07 tokens and type, both themes,
+  phone layout. `./preview.sh` builds what is missing and serves it.
+- Checked in headless Chromium: light/dark, both vintages, inspector, 390 px.
+  Recolor 8–89 ms on 2,186 tracts. First ramp step was nearly the paper color
+  and indistinguishable from no-data; darkened, and no-data got its own gray.
+- Tests: unchanged (no app tests yet; visual regression is spec 08 Phase 03 work).
