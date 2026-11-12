@@ -1,8 +1,10 @@
 """Phase 01 gate: values hand-copied from data.census.gov must match the cube.
 
 Fixture: tests/fixtures/va_tract_spotcheck.csv, columns GEOID,variable,value
-(variable as data.census.gov names it, e.g. B19025_001E). Skipped until the
-fixture exists — it is filled by a person, not generated.
+(variable as data.census.gov names it, e.g. B19025_001E), plus a source column.
+Filled once by `python -m etl.spotcheck` (seed 51) from data.census.gov's
+published tables, an independent path from the Summary File prototype the cube
+is built from. Never regenerated; skipped if absent.
 """
 import csv
 import math

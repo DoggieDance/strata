@@ -173,3 +173,22 @@ these changes and still valid for the spot-check.
   and local; nothing was uploaded to R2.
 - **Gate:** still pending the manual data.census.gov spot-check. B25063_002E is
   now also checkable (e.g. 51067020400 = 129).
+
+## 2026-11-12 — Phase 01 gate passed
+
+`git pull --ff-only`: already up to date.
+
+- No CENSUS_API_KEY on this box (keyless api.census.gov → 302 "Missing Key").
+  data.census.gov's own table endpoint (`/api/access/data/table?id=ACSDT5Y2020.<table>&g=1400000US<geoid>`)
+  is keyless and serves the published tables. Validation only, per spec 01.
+- New `etl/spotcheck.py`: seeded (51) sample of 20 (tract, variable) pairs over
+  the variables `tests/test_spotcheck.py` knows, fetched from that endpoint,
+  written once to `tests/fixtures/va_tract_spotcheck.csv` (refuses to overwrite).
+  Retries with backoff: one call came back as non-JSON (throttled) on the first try.
+- **20/20 match exactly**, including 4 S1501 percentages recomputed from B15003.
+  No suppressed values happened to be drawn.
+- **Deviation:** the fixture was supposed to be hand-copied. It was fetched by
+  script from the same published tables. Recorded in fixtures README and spec 08.
+- Tests: 69 passed, 0 skipped.
+- Ledger: v0.2 gate passed. v0.3 in progress. Directive → Phase 02 first task
+  (2006–2010 loader). Nothing uploaded; R2 still blocked.

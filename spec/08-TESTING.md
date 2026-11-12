@@ -11,7 +11,7 @@ The load-bearing tests. Real published numbers, checked against.
 | `philly_2010_2020_zscores.csv` | The study's 159 neighborhood z-scores | The whole pipeline, end to end |
 | `philly_pct_change_top5.csv` | The study's Table 3 | Derivation and percent-change math |
 | `acs_handbook_moe_examples.json` | Census handbook worked examples | MOE propagation formulas |
-| `va_tract_spotcheck.csv` | 20 values pulled from data.census.gov by hand | The bulk extract itself |
+| `va_tract_spotcheck.csv` | 20 values pulled from data.census.gov (`etl/spotcheck.py`, seed 51) | The bulk extract itself |
 
 The Philadelphia fixture is already partly in hand — Table 3 gives the top five
 neighborhoods per indicator with their percent changes (Roxborough Park 139.46%
