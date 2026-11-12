@@ -1,5 +1,5 @@
 {
-  "registry_version": 5,
+  "registry_version": 6,
   "note": "Seed measures from the Philadelphia study (GEOG 376, 2025). Per-vintage sources are mandatory: table definitions drift between decennial-anchored redesigns.",
   "measures": [
     {
@@ -138,7 +138,7 @@
       "id": "pct_nh_white",
       "label": "Non-Hispanic white share of population",
       "kind": "ratio",
-      "count_numerator": "nh_white", "count_denominator": "total_population",
+      "count_numerator": "nh_white", "count_denominator": "race_universe",
       "numerator_source": { "table": "B03002", "cells": ["003"] },
       "denominator_source": { "table": "B03002", "cells": ["001"] },
       "sources": {
@@ -167,7 +167,9 @@
                              "2006-2010": { "dataset": "acs5", "table": "B15002", "cells": ["015:018", "032:035"] },
                              "2016-2020": { "dataset": "acs5", "table": "B15003", "cells": ["022:025"] } } },
     "nh_white":          { "table": "B03002", "cells": ["003"],
-                           "note": "Numerator of pct_nh_white (Not Hispanic or Latino: White alone), kept as a count (v5) for the same reason." }
+                           "note": "Numerator of pct_nh_white (Not Hispanic or Latino: White alone), kept as a count (v5) for the same reason." },
+    "race_universe":     { "table": "B03002", "cells": ["001"],
+                           "note": "B03002 total: the denominator pct_nh_white is computed over (v6). Equals B01003 in Virginia's tracts, but not guaranteed everywhere." }
   },
   "jam_values": [-666666666, -999999999, -888888888, -222222222, -333333333],
   "controlled_moe_value": -555555555,

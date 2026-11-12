@@ -15,6 +15,9 @@ hidden. Intensive columns (means, percents) are never apportioned: they are
 recomputed from the apportioned numerator and denominator with the same
 formulas the cube used. A median cannot be apportioned at all; asking raises.
 
+An aggregate whose source universe is zero counts as zero there. A target that
+receives no flow at all (water tracts nothing maps into) is null, not zero.
+
 Output: build/harmonized/{source vintage}/tract-{target geography}/{state}.parquet,
 with the same columns as the source cube and one row per target tract.
 """
@@ -52,6 +55,12 @@ def column_kinds(notes: dict) -> dict[str, str]:
     return kinds
 
 
+def aggregate_universes() -> dict[str, str]:
+    """aggregate measure -> the count of its universe (from the registry)."""
+    return {m["id"]: m["denominator"] for m in load_measures()["measures"]
+            if m["kind"] in ("aggregate", "derived") and m.get("denominator")}
+
+
 def intensive_recipes() -> dict[str, tuple[str, str, bool]]:
     """measure -> (numerator count, denominator count, is_proportion), from the registry."""
     reg = load_measures()
@@ -78,12 +87,24 @@ def apportion(source: pd.DataFrame, notes: dict, xw: pd.DataFrame, targets: pd.I
         raise ValueError(f"crosswalk targets {len(stray)} tracts outside the target universe, e.g. {sorted(stray)[:3]}")
 
     w = xw.weight.to_numpy()
+    universes = aggregate_universes()
     out = {}
     for name, kind in kinds.items():
         if kind not in EXTENSIVE:
             continue
-        e = source[f"{name}_e"].reindex(xw.source).to_numpy(dtype="float64") * w
-        m = (source[f"{name}_m"].reindex(xw.source).to_numpy(dtype="float64") * w) ** 2
+        se = source[f"{name}_e"].reindex(xw.source).to_numpy(dtype="float64")
+        sm = source[f"{name}_m"].reindex(xw.source).to_numpy(dtype="float64")
+        # An aggregate over an empty universe (0 households, 0 cash renters) is
+        # published as "not computable" but means zero: it contributes nothing,
+        # rather than blanking every target it touches (review of cac3bfd).
+        uni = universes.get(name)
+        if uni is not None and f"{uni}_e" in source:
+            empty = source[f"{uni}_e"].reindex(xw.source).to_numpy(dtype="float64") == 0
+            fill = empty & np.isnan(se)
+            se = np.where(fill, 0.0, se)
+            sm = np.where(fill, 0.0, sm)
+        e = se * w
+        m = (sm * w) ** 2
         # A null piece makes the target null (sum with min_count) rather than a
         # silent undercount.
         parts = pd.DataFrame({"t": xw.target.to_numpy(), "e": e, "m": m})

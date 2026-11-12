@@ -126,6 +126,20 @@ by the academic exception. STRATA builds its own.
   Percents and means are recomputed from apportioned counts. Registry v5 stores
   the numerators (`bachelors_plus`, `nh_white`) so they can be.
 
+- **Zero universes.** An aggregate published as "not computable" because its
+  universe is empty (0 households, 0 cash renters) counts as zero when
+  apportioned. Treating it as unknown blanked 47 populated targets' income and
+  58 targets' rent through weights as small as 0.00001 (caught in review).
+  Only a source with a real but small universe and a suppressed value still
+  nulls a target. Six 2020 tracts receive no flow at all and stay null.
+
+**Weights: 2010 vs 2020 population (checked for Virginia).** Splitting 2010
+data by *2010* block population instead (2010 PL file, 285,762 blocks,
+8,001,024 people conserved) moves 53 of 1,752 split pairs by more than 0.1. It
+changes harmonized 2010 mean income by more than 5% in only 3 of 2,159 tracts,
+so the 2020 weights stand. Rerun the comparison for Philadelphia, where the
+decade changed more.
+
 **Open question, not yet decided.** The spec weights 2010 data by *2020*
 population. People who arrived after 2010 (new subdivisions) therefore pull
 2010 values toward places that were empty in 2010. Splitting 2010 tracts by
