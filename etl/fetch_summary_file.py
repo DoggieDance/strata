@@ -200,6 +200,86 @@ def _fetch_once(url: str, dest: Path, session: requests.Session) -> str:
     return "downloaded"
 
 
+def bundle_for(vintage: str, state: str, url: str) -> str | None:
+    """Census's whole-state bundle that holds the sequence file at url, or None."""
+    c = load_summary_files()["vintages"][vintage]
+    if "bundle_url" not in c:
+        return None
+    for a in c["archives"].values():
+        if f"/{a['dir']}" in url:
+            return c["bundle_url"].format(**sequence_file.state_cfg(vintage, state), archive=a["dir"].strip("/"))
+    return None
+
+
+def from_bundle(url: str, dest: Path, session: requests.Session, bundle_url: str) -> str:
+    """Rebuild one sequence zip from Census's whole-state bundle, when Census's
+    firewall refuses the zip's own address (2026-11-18: KY 2011-15 seq 3,
+    MA 2015-19 seq 15, rejected for every client).
+
+    A sequence zip holds two text files, e{name}.txt (estimates) and m{name}.txt
+    (margins); the bundle holds the same text files for every sequence. Before
+    trusting the bundle, its copies for sequences that did download normally are
+    compared byte for byte with theirs (at least one, all must match). The
+    .meta.json records the bundle, its sha256 and the members used."""
+    bundle = dest.parent / "bundles" / bundle_url.rsplit("/", 1)[1]
+    print(f"{fetch(bundle_url, bundle, session):10s} {bundle.relative_to(ROOT)} (bundle)")
+    stem = dest.name.removesuffix(".zip")
+    want = [f"e{stem}.txt", f"m{stem}.txt"]
+    with zipfile.ZipFile(bundle) as z:
+        names = {m.rsplit("/", 1)[-1]: m for m in z.namelist()}
+        missing = [w for w in want if w not in names]
+        if missing:
+            raise NotTheFile(f"{dest.name}: {missing} not in {bundle.name}")
+        # The bundle must agree with the sequence zips Census did send.
+        compared = 0
+        for other in sorted(dest.parent.glob(f"{stem[:-7]}*.zip")):
+            if other == dest or not zipfile.is_zipfile(other):
+                continue
+            with zipfile.ZipFile(other) as o:
+                for m in o.namelist():
+                    if m in names:
+                        if o.read(m) != z.read(names[m]):
+                            raise NotTheFile(f"{bundle.name}: {m} differs from the copy in {other.name}")
+                        compared += 1
+        if compared == 0:
+            raise NotTheFile(f"{bundle.name}: no normally downloaded sequence to check it against")
+        data = {w: z.read(names[w]) for w in want}
+    for w, b in data.items():
+        check_content(w, b[:64])
+    part = dest.with_name(f"{dest.name}.{os.getpid()}.part")
+    with zipfile.ZipFile(part, "w", zipfile.ZIP_DEFLATED) as out:
+        for w, b in data.items():
+            out.writestr(w, b)
+    part.replace(dest)
+    bmeta = json.loads(bundle.with_name(bundle.name + ".meta.json").read_text())
+    blob = dest.read_bytes()
+    dest.with_name(dest.name + ".meta.json").write_text(json.dumps({
+        "url": url, "source": "bundle", "bundle_url": bundle_url, "bundle_sha256": bmeta["sha256"],
+        "members": want, "checked_against_direct_downloads": compared,
+        "why": "Census's firewall answered the file's own URL with a 'Request Rejected' page",
+        "size": len(blob), "sha256": hashlib.sha256(blob).hexdigest(),
+        "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}, indent=2) + "\n")
+    print(f"           {dest.name} rebuilt from {bundle.name}; bundle matched {compared} files Census sent directly")
+    return "bundle"
+
+
+def fetch_file(url: str, dest: Path, session: requests.Session, vintage: str, state: str) -> str:
+    """fetch(), falling back to the state bundle for a sequence file the server refuses."""
+    meta = dest.with_name(dest.name + ".meta.json")
+    if dest.exists() and meta.exists():
+        m = json.loads(meta.read_text())
+        if m.get("source") == "bundle" and dest.stat().st_size == m.get("size"):
+            return "cached"  # its own URL is refused; asking again only waits on retries
+    try:
+        return fetch(url, dest, session)
+    except NotTheFile:
+        b = bundle_for(vintage, state, url)
+        if b is None:
+            raise
+        print(f"{dest.name}: refused at its own URL; taking it from {b}", file=sys.stderr)
+        return from_bundle(url, dest, session, b)
+
+
 def raw_files(vintage: str, state: str = "51", level: str = "tract") -> list[tuple[str, Path]]:
     """(url, local path) for everything one (vintage, level) build reads, in fetch order.
     For sequence vintages the lookup file comes first: it resolves the sequences."""
@@ -277,7 +357,7 @@ def main(argv=None) -> int:
                 if dest in seen or fetched_above:
                     continue
                 seen.add(dest)
-                print(f"{fetch(url, dest, s):10s} {dest.relative_to(ROOT)}")
+                print(f"{fetch_file(url, dest, s, vintage, st):10s} {dest.relative_to(ROOT)}")
     return 0
 
 

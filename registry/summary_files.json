@@ -152,7 +152,9 @@
       "unavailable_levels": {
         "zcta": "The 2011-2015 ZCTA rows are only in the national sequence files; STRATA loads per-state files. Not loaded yet."
       },
-      "states_from": "registry/states.json (acs2010_dir, stusab)"
+      "states_from": "registry/states.json (acs2010_dir, stusab)",
+      "bundle_url": "https://www2.census.gov/programs-surveys/acs/summary_file/2015/data/5_year_by_state/{state_name}_{archive}.zip",
+      "bundle_note": "Census's whole-state bundle of every sequence file in one archive. Used only for a sequence file whose own address Census's firewall refuses (etl/fetch_summary_file.from_bundle); the file inside is the same file, by name."
     },
     "2015-2019": {
       "endyear": 2019,
@@ -228,7 +230,9 @@
       "unavailable_levels": {
         "zcta": "The 2015-2019 ZCTA rows are only in the national sequence files; STRATA loads per-state files. Not loaded yet."
       },
-      "states_from": "registry/states.json (acs2010_dir, stusab)"
+      "states_from": "registry/states.json (acs2010_dir, stusab)",
+      "bundle_url": "https://www2.census.gov/programs-surveys/acs/summary_file/2019/data/5_year_by_state/{state_name}_{archive}.zip",
+      "bundle_note": "Census's whole-state bundle of every sequence file in one archive. Used only for a sequence file whose own address Census's firewall refuses (etl/fetch_summary_file.from_bundle); the file inside is the same file, by name."
     },
     "2016-2020": {
       "endyear": 2020,

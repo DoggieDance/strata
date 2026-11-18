@@ -213,3 +213,4 @@ td button.show {
 .contrib .bar span { position: absolute; top: 0; bottom: 0; background: var(--ink-2); }
 .contrib .bar span.neg { background: var(--accent); }
 .contrib .v { text-align: right; }
+.pair[hidden], #one-period[hidden] { display: none; }

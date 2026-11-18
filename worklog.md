@@ -528,3 +528,32 @@ Also:
 - Swap: build/ (v6) archived to build-archive/v6-live; build-v8 is build/.
   On build/: pytest 7,433 passed, 30 skipped (broadband pre-2013), 1 xfail
   (Philadelphia education); JS 32/32. Committed as v0.3.3-v0.3.6.
+
+## 2026-11-18 — the two refused files, filled from Census's state bundles
+
+Owner: "show me the new strata and then get the missing data however works
+best for what we need."
+- Showed the app (opened locally; three screenshots sent). The tour found a
+  bug: in "One period" mode the empty From/To pickers showed, because
+  `.pair { display: grid }` beat the `hidden` attribute. Fixed in style.css.
+- **Missing data**: KY 2011-15 seq 3 (all geographies) and MA 2015-19 seq 15
+  (tracts) are refused by Census's firewall at their own URLs for every client.
+  `etl/fetch_summary_file.fetch_file` now falls back to Census's official
+  whole-state bundle (`5_year_by_state/{State}_{archive}.zip`, registered as
+  `bundle_url` for 2011-15 and 2015-19). The bundle holds the sequence's text
+  files (e*.txt estimates, m*.txt margins) rather than the per-sequence zip, so
+  the zip is rebuilt from exactly those two members. Before trusting a bundle,
+  its copies of every sequence that did download directly are compared byte
+  for byte: MA 40 files, KY 38 files, all identical. The file's .meta.json
+  records source=bundle, bundle URL and sha256, members, and the count checked.
+  Later runs do not re-request the refused URL.
+- Built: MA 2015-19 tract cube, harmonized cube and geometry; KY 2011-15
+  county and place cubes and geometry; the 2011-15 national county layer
+  (skipped before, one state short). Every level and period now covers 50
+  states + DC.
+- Checked: `etl/label_check --add` appends samples to a gate fixture without
+  regenerating it; MA 2015-19 (8 tracts, 2 counties) and KY 2011-15 (4
+  counties, 4 places) against Census's published Data Profiles: 676 checks,
+  0 failures. Full suite 8,117 passed, 38 skipped (broadband pre-2013),
+  1 xfail; JS 32/32.
+- Ledger: v0.3.7 was reserved after building, not before (rule missed).

@@ -36,11 +36,13 @@ def fixture(vintage: str):
     return ROOT / "tests" / "fixtures" / f"published_equivalents_{vintage}.csv"
 
 
-def sample(vintage: str, build=ROOT / "build") -> list[tuple[str, str]]:
+def sample(vintage: str, build=ROOT / "build", plan=None) -> list[tuple[str, str]]:
+    """plan: {state: {level: count}}; default STATES (tracts, plus 2 counties)."""
+    plan = plan or {st: {"tract": n, "county": 2} for st, n in STATES.items()}
     out = []
-    for st, n in STATES.items():
+    for st, levels in plan.items():
         rng = random.Random(int(st) * 1000 + YEAR[vintage])
-        for level, k in (("tract", n), ("county", 2)):
+        for level, k in levels.items():
             ids = pq.read_table(build / "acs" / vintage / level / f"{st}.parquet", columns=["GEOID"]).column(0).to_pylist()
             out += [(level, g) for g in sorted(rng.sample(ids, k))]
     return out
@@ -50,17 +52,28 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--vintage", choices=sorted(YEAR), required=True)
     ap.add_argument("--build", type=Path, default=ROOT / "build", help="build folder to sample GEOIDs from")
+    ap.add_argument("--add", help="add geographies to an existing fixture, e.g. 25:tract=8,county=2;21:county=4,place=4. "
+                    "Rows already there are kept untouched; new ones are appended.")
     args = ap.parse_args(argv)
     dest = fixture(args.vintage)
-    if dest.exists():
-        sys.exit(f"{dest} exists; the gate fixture is not regenerated. Delete it deliberately.")
+    plan, kept = None, []
+    if args.add:
+        plan = {st: {lv: int(n) for lv, n in (x.split("=") for x in spec.split(","))}
+                for st, spec in (part.split(":") for part in args.add.split(";"))}
+        if dest.exists():
+            kept = list(csv.DictReader(open(dest, newline="")))
+    elif dest.exists():
+        sys.exit(f"{dest} exists; the gate fixture is not regenerated. Delete it deliberately (or use --add).")
     need = {}
     for m, d in registry()["equivalents"].items():
         if args.vintage in d:
             for v in d[args.vintage]["variables"]:
                 need.setdefault(v.split("_")[0], set()).add(v)
     rows = []
-    for level, geoid in sample(args.vintage, args.build):
+    have = {(r["level"], r["GEOID"]) for r in kept}
+    for level, geoid in sample(args.vintage, args.build, plan):
+        if (level, geoid) in have:
+            continue
         for table, variables in sorted(need.items()):
             row = fetch_row(f"ACSDP5Y{YEAR[args.vintage]}.{table}", GEO_PREFIX[level] + geoid)
             for v in sorted(variables):
@@ -71,8 +84,8 @@ def main(argv=None) -> int:
     with open(dest, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["level", "GEOID", "variable", "value"])
         w.writeheader()
-        w.writerows(rows)
-    print(f"wrote {dest} ({len(rows)} values)")
+        w.writerows(kept + rows)
+    print(f"wrote {dest} ({len(kept)} kept + {len(rows)} new values)")
     return 0
 
 
