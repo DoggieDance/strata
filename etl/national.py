@@ -37,6 +37,9 @@ SOURCES = {
     "states": ("https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_state_20m.zip", "GEOID"),
     "2016-2020": ("https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_5m.zip", "GEOID"),
     "2006-2010": ("https://www2.census.gov/geo/tiger/GENZ2010/gz_2010_us_050_00_5m.zip", ["STATE", "COUNTY"]),
+    "2011-2015": ("https://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_5m.zip", "GEOID"),
+    "2015-2019": ("https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_county_5m.zip", "GEOID"),
+    "2020-2024": ("https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_5m.zip", "GEOID"),
 }
 
 
@@ -146,7 +149,7 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, default=Path("build"))
     args = ap.parse_args(argv)
     states_layer(args.out)
-    for v in ("2016-2020", "2006-2010"):
+    for v in sorted(k for k in SOURCES if k != "states"):
         county_layer(args.out, v)
     return 0
 

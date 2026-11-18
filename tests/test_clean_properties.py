@@ -174,7 +174,7 @@ def test_gross_rent_uses_cash_rent_universe():
 @pytest.mark.parametrize("states,vintages,level", [
     (["51", "72"], ["2016-2020"], "tract"),   # Puerto Rico: deferred (PRCS)
     (["51", "99"], ["2016-2020"], "tract"),
-    (["51"], ["2011-2015"], "tract"),
+    (["51"], ["2012-2016"], "tract"),     # a period not in registry/summary_files.json
     (["51"], ["2016-2020"], "block group"),
 ])
 def test_scope_lock(states, vintages, level):

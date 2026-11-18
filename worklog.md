@@ -390,3 +390,141 @@ STRATA-TASKS.md (v0.3.1 and v0.3.2 reserved before building).
   national counties/tracts/change, both themes.
 - Next (owner, same evening): an inventory of every ACS table, then pull the
   demographic detail (race, age, ...) into the site. analysis/acs_inventory.py started.
+
+## 2026-11-17 — share measures, label gate, five periods, methods audit
+
+Owner, 2026-11-17: "expand to new year ranges and also expand and make scalable
+the change maps ... audit the methods ... academically supported and sound ...
+an index builder and a complete list of variables", and "we also need to check
+that the variables/fields are labeled correctly online".
+- **40 share measures** (v0.3.3): registry/shares.json, cells stored with their
+  Census labels; label, partition and data.census.gov tests.
+- **Inventory + data dictionary + all 28,626 variables**: artifact
+  https://claude.ai/artifact/FNVuXtUHNq3koLKJeJ9WKJ ; docs/DATA-DICTIONARY.md
+  generated from the registries (test fails if stale).
+- **Label gate**: registry/published_equivalents.json maps 39 measures to
+  Census's own published Data Profile figures (186 measure-period pairs);
+  tests/test_published_equivalents.py compares served values with them
+  (2016-20 and 2006-10: 1,493 checks, 0 failures). It caught one trap in the
+  registry: DP05_0029PE has the 65+ label but is a heading row whose "percent"
+  is a count. tests/browser/labels.mjs checks the on-screen label and value.
+- **Five periods** (v0.3.5): 2011-15, 2015-19, 2020-24 added. etl/onboard.py
+  resolves every recipe by Census label; 5 documented synonyms
+  (registry/label_synonyms.json). Connecticut 2020-24 tracts re-keyed to 2020
+  codes by identical boundaries (etl/ct_tracts.py). App: One period / Change,
+  with From/To over every valid pair.
+- **Methods audit** (independent): 9 findings; outcomes in spec 05. Fixed:
+  zero-estimate MOE rule, P=1, published aggregate home value, pooled-price
+  deflation for pre-2018-22 home value, per-universe crosswalk weights,
+  B23025, comparability cautions, wording, Esri tiers, opt-in BH-FDR.
+  Declined with reasons: source-year block weights (STRATA uses target-density
+  weighting, NHGIS's method). Open: symmetric reliability rule for percents.
+- Full rebuild at registry v8 into build-v8 (etl/rebuild_all.sh); v6 build/
+  stays live until v8 passes the tests and the label gate.
+
+## 2026-11-17 (cont.) — memory, rebuild resumed, index builder
+
+- Memory: two leaked `ibus-daemon` processes (~5.5 GB each) belonged to another
+  Claude Code session's off-screen display, not to STRATA or the desktop. They
+  were gone when checked again; 10 GB free. Downloads for all five periods
+  finished with no failures; `OUT=build-v8 JOBS=2 etl/rebuild_all.sh` restarted.
+- **Index builder** (v0.3.6, reserved before building): "Build an index"
+  in the panel. Rows per measure (direction, weight, transform, scale),
+  aggregate, presets (Philadelphia study; the current measure). The whole spec
+  rides in `?index=` (app/engine/spec.js; base64url of a canonical JSON, so
+  equal specs give equal links). Works on one period or on change (each
+  measure's change and its SE). Inspector: score ± margin, rank, percentile,
+  each measure's contribution. Table: score, margin, percentile, rank.
+  Sensitivity readout: each weight ±20%, share of areas that change fifth.
+  Engine refusals (differing units, logging a change) show as text.
+- Philadelphia preset uses raw changes, not logs: spec 04's example logs dollar
+  *changes*, which the engine refuses (a change can be negative). Spec updated.
+- Bug found: `renderChangeLegend` declared `c` and `f` twice (from the
+  comparability-caution edit earlier today, never committed). The module failed
+  to parse, so the page could not load at all. `node --check` missed it because
+  it parses .js as CommonJS; use `node --input-type=module --check < file`.
+- Tests: tests/js/spec.test.mjs (link round trip, canonical links, refusals,
+  quintiles, sensitivity); tests/browser/index_builder.mjs (both themes, 18
+  checks). On the v6 build the preset falls back to 2016-20 levels with the
+  fallback stated; the change path gets checked on build-v8.
+
+### v8 rebuild results and fixes (2026-11-17, evening)
+
+Full rebuild at registry v8 (`OUT=build-v8 etl/rebuild_all.sh`): 63 failed
+steps on the first pass, from six causes, none in STRATA's arithmetic:
+
+- **B28002 (broadband) had no weighting base**: every 2015-19 harmonize
+  failed. Added to `hh` (universe: households). Checked: every table in every
+  2010-tract period now resolves a base.
+- **Census tract recodes after 2010** (2011-15, 2015-19 in AK, AZ, CA, NY, SD,
+  VA). `registry/tract_code_changes.json`: 24 recodes, 1 merge of an empty
+  tract (Staten Island 0089.00 into 0097.00), 1 boundary change (Los Angeles
+  9304.01 + part of 8002.04 -> 1370.00; ~2,000 people moved), each paired by
+  boundary (interior point + area ratio), not by code order (Madison Co. NY
+  9407.00 -> 0304.02 is not the next code). `etl/harmonize.tract_changes`
+  re-keys; merges re-normalize through `crosswalk.pair_weights` (shared with
+  the crosswalk build) and must carry zero counts; boundary changes leave the
+  2020 tracts they touch without a value. tests/test_tract_code_changes.py.
+- **Crosswalk housing-unit check** (test added this morning) failed in 40
+  states by 0.5-9 units: the diagnostics counted people in other states' 2010
+  blocks but not housing units. Added `hu_in_foreign_2010_blocks`; rebuilt the
+  51 crosswalks (weights identical to the previous build, checked); the check
+  is now exact, not loosened. Old crosswalks and harmonized cubes archived in
+  build-archive/v8-pre-recode/.
+- **Two "zip" files were Census firewall pages** (247-byte "Request
+  Rejected" HTML): KY 2011-15 seq 3 (all geographies), MA 2015-19 seq 15
+  (tracts). The fetcher now refuses HTML and non-zip content, retries with a
+  pause, and stops if the server never sends the file (tests/test_fetch_content.py).
+  Both URLs are rejected for every client, every time. A percent-encoded form of
+  the URL served the file, but building a fetcher fallback on that was blocked
+  by the permission system as firewall circumvention, and was removed. Census
+  also publishes whole-state bundles (5_year_by_state/*.zip); asked the owner
+  whether to use those for the two files. Until then: no KY 2011-15 county or
+  place cube, no MA 2015-19 tract cube.
+- **NY 2020-24: 14 Suffolk tracts and Brentwood + Wyandanch CDPs** have
+  boundaries but no estimates. Census Errata 148: a 2020 data-collection error;
+  2019-23 and 2020-24 suppressed, caution on 2016-20, 2017-21 and 2018-22.
+  `registry/suppressed_geographies.json`; build_geometry keeps their polygons
+  (named from the boundary file); the app says "Withheld by Census" (2020-24)
+  or shows the caution (2016-20) with the erratum link. STRATA had shown
+  2016-20 there with no warning before.
+- **Connecticut 2020-24 re-keying**: the 1% drawn-area rule failed 46 tracts,
+  because the 2020 and 2024 cartographic files are generalized differently
+  (drawn area moves up to 6% with no boundary change). Mapping is still exact
+  (one-to-one by interior point, identical 6-digit codes); area is now judged on
+  recorded total area (ALAND+AWATER): 5 tracts changed by 1-5% (TIGER boundary
+  corrections) and are emptied for change maps only; >10% would stop the build.
+  tests/test_ct_tracts.py.
+
+Also:
+- **Philadelphia home value**: Table 3 home value stopped matching after the
+  methods audit switched the cube to Census's published aggregate (B25079).
+  The study summed bin midpoints; analysis/philly_table3.py now recomputes the
+  midpoint sum with the cube builder's own functions, so the replication uses
+  the study's measure and the product keeps Census's. 4 of 5 indicators
+  reproduce again (education still open).
+- Stale tests updated to what they protect: per-period schemas, per-base
+  weights, several comparisons, a scope test pointed at an unbuilt period,
+  one MOE tolerance (float32 cancellation in percent MOEs, 5th digit).
+- Results on build-v8: pytest 4,073 passed, 1 xfail (education). Label gate
+  5,553 checks over all five periods against Census's published Data Profile
+  figures, 0 failures (30 skips: broadband before 2013). Index builder browser
+  test 18/18 on real 2010->2020 change (Philadelphia preset; ±20% weight moves
+  at most 7% of PA tracts a fifth). axe: no violations, both themes, phone width.
+- Mistake repeated: `pkill -f` matched this shell and killed it (exit 144), as
+  on 2026-11-12. Use PIDs.
+- **The on-screen label test could not have checked a value.** Its fixture
+  parser split on "\n", but the fixtures (Python csv) end lines in "\r\n", so
+  the header's last column was "value\r" and every published value read as
+  missing; the test then reported "Census suppresses it" for everything (2,220
+  of 2,220 on build-v8). Any earlier on-screen pass was vacuous. The Python
+  label gate (csv.DictReader) was not affected. Fixed (split on /\r?\n/) and
+  rerun over all five periods.
+- 2026-11-18: the on-screen test's first real run found one registry error
+  (2011-15 living alone listed DP02_0011PE twice and summed it: Census 48.4 vs
+  app 24.2; the app was right). Fixed, plus a test that no equivalent repeats a
+  variable. 2011-15 rerun: 444/444 against published numbers. Full run before
+  the fix: 2,208/2,220, the 12 failures all this entry.
+- Swap: build/ (v6) archived to build-archive/v6-live; build-v8 is build/.
+  On build/: pytest 7,433 passed, 30 skipped (broadband pre-2013), 1 xfail
+  (Philadelphia education); JS 32/32. Committed as v0.3.3-v0.3.6.

@@ -1,0 +1,1847 @@
+{
+ "note": "Each STRATA measure's independently published Census equivalent, with Census's own label for it (api.census.gov variables.json for the acs5/profile dataset; validation only). tests/test_published_equivalents.py checks that the label still reads this way and that the published value equals the value STRATA serves, for sampled tracts. Measures with no published equivalent are listed under no_equivalent with how they are checked instead.",
+ "equivalents": {
+  "pct_bachelors_plus": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP02_0067PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Percent bachelor's degree or higher"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP02_0068PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Bachelor's degree or higher"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP02_0068PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Bachelor's degree or higher"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP02_0068PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Bachelor's degree or higher"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0067PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Percent bachelor's degree or higher"
+    ],
+    "resolved_from": "2006-2010"
+   }
+  },
+  "pct_hispanic": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0066PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Hispanic or Latino (of any race)"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0071PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Hispanic or Latino (of any race)"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0066PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Hispanic or Latino (of any race)"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0071PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Hispanic or Latino (of any race)"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0090PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Hispanic or Latino (of any race)"
+    ]
+   }
+  },
+  "pct_nh_white": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0072PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!White alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0077PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!White alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0072PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!White alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0077PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!White alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0096PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!White alone"
+    ]
+   }
+  },
+  "pct_nh_black": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0073PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!Black or African American alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0078PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Black or African American alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0073PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Black or African American alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0078PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Black or African American alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0097PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Black or African American alone"
+    ]
+   }
+  },
+  "pct_nh_aian": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0074PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!American Indian and Alaska Native alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0079PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!American Indian and Alaska Native alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0074PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!American Indian and Alaska Native alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0079PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!American Indian and Alaska Native alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0098PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!American Indian and Alaska Native alone"
+    ]
+   }
+  },
+  "pct_nh_asian": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0075PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!Asian alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0080PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Asian alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0075PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Asian alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0080PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Asian alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0099PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Asian alone"
+    ]
+   }
+  },
+  "pct_nh_nhpi": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0076PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!Native Hawaiian and Other Pacific Islander alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0081PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Native Hawaiian and Other Pacific Islander alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0076PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Native Hawaiian and Other Pacific Islander alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0081PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Native Hawaiian and Other Pacific Islander alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0100PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Native Hawaiian and Other Pacific Islander alone"
+    ]
+   }
+  },
+  "pct_nh_other": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0077PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!Some other race alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0082PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Some other race alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0077PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Some other race alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0082PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Some other race alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0101PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Some Other Race alone"
+    ]
+   }
+  },
+  "pct_nh_multi": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0078PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Not Hispanic or Latino!!Two or more races"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0083PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Two or more races"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0078PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Two or more races"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0083PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Two or more races"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0102PE"
+    ],
+    "labels": [
+     "Percent!!HISPANIC OR LATINO AND RACE!!Total population!!Not Hispanic or Latino!!Two or More Races"
+    ]
+   }
+  },
+  "pct_under_5": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0004PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Under 5 years"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0005PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Under 5 years"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0004PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Under 5 years"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0005PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Under 5 years"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0005PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Under 5 years"
+    ]
+   }
+  },
+  "pct_under_18": {
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0019PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Under 18 years"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0019PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Under 18 years"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0019PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Under 18 years"
+    ]
+   }
+  },
+  "pct_25_34": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0009PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!25 to 34 years"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0010PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!25 to 34 years"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0009PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!25 to 34 years"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0010PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!25 to 34 years"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0010PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!25 to 34 years"
+    ]
+   }
+  },
+  "pct_35_44": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0010PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!35 to 44 years"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0011PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!35 to 44 years"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0010PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!35 to 44 years"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0011PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!35 to 44 years"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0011PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!35 to 44 years"
+    ]
+   }
+  },
+  "pct_65_plus": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0021PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!65 years and over"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0024PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!65 years and over"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0021PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!65 years and over"
+    ],
+    "resolved_from": "same row as the verified reference period; the duplicate-labelled heading row is the known trap"
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0024PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!65 years and over"
+    ],
+    "resolved_from": "same row as the verified reference period; the duplicate-labelled heading row is the known trap"
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0024PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!65 years and over"
+    ],
+    "resolved_from": "same row as the verified reference period; the duplicate-labelled heading row is the known trap"
+   }
+  },
+  "pct_female": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0003PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Female"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0003PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Female"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0003PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Female"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0003PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Female"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0003PE"
+    ],
+    "labels": [
+     "Percent!!SEX AND AGE!!Total population!!Female"
+    ],
+    "resolved_from": "2016-2020"
+   }
+  },
+  "pct_family_households": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP02_0002PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Family households (families)"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0002PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Family households (families)"
+    ]
+   }
+  },
+  "pct_living_alone": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP02_0011PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Nonfamily households!!Householder living alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "sum",
+    "variables": [
+     "DP02_0008PE",
+     "DP02_0012PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Male householder, no spouse/partner present!!Householder living alone",
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Female householder, no spouse/partner present!!Householder living alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0011PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Nonfamily households!!Householder living alone"
+    ],
+    "note": "Census publishes one 'Householder living alone' cell for this period (later periods split it by sex and are summed). Was listed twice and summed, caught by the on-screen label test 2026-11-17."
+   },
+   "2015-2019": {
+    "op": "sum",
+    "variables": [
+     "DP02_0008PE",
+     "DP02_0012PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Male householder, no spouse/partner present!!Householder living alone",
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Female householder, no spouse/partner present!!Householder living alone"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2020-2024": {
+    "op": "sum",
+    "variables": [
+     "DP02_0008PE",
+     "DP02_0012PE"
+    ],
+    "labels": [
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Male householder, no spouse/partner present!!Householder living alone",
+     "Percent!!HOUSEHOLDS BY TYPE!!Total households!!Female householder, no spouse/partner present!!Householder living alone"
+    ],
+    "resolved_from": "2016-2020"
+   }
+  },
+  "pct_renter": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP04_0046PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING TENURE!!Renter-occupied"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP04_0047PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING TENURE!!Occupied housing units!!Renter-occupied"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP04_0047PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING TENURE!!Occupied housing units!!Renter-occupied"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP04_0047PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING TENURE!!Occupied housing units!!Renter-occupied"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP04_0047PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING TENURE!!Occupied housing units!!Renter-occupied"
+    ]
+   }
+  },
+  "pct_no_vehicle": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP04_0057PE"
+    ],
+    "labels": [
+     "Percent!!VEHICLES AVAILABLE!!No vehicles available"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP04_0058PE"
+    ],
+    "labels": [
+     "Percent!!VEHICLES AVAILABLE!!Occupied housing units!!No vehicles available"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP04_0058PE"
+    ],
+    "labels": [
+     "Percent!!VEHICLES AVAILABLE!!Occupied housing units!!No vehicles available"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP04_0058PE"
+    ],
+    "labels": [
+     "Percent!!VEHICLES AVAILABLE!!Occupied housing units!!No vehicles available"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP04_0058PE"
+    ],
+    "labels": [
+     "Percent!!VEHICLES AVAILABLE!!Occupied housing units!!No vehicles available"
+    ]
+   }
+  },
+  "pct_crowded": {
+   "2006-2010": {
+    "op": "sum",
+    "variables": [
+     "DP04_0077PE",
+     "DP04_0078PE"
+    ],
+    "labels": [
+     "Percent!!OCCUPANTS PER ROOM!!1.01 to 1.50",
+     "Percent!!OCCUPANTS PER ROOM!!1.51 or more"
+    ]
+   },
+   "2016-2020": {
+    "op": "sum",
+    "variables": [
+     "DP04_0078PE",
+     "DP04_0079PE"
+    ],
+    "labels": [
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.01 to 1.50",
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.51 or more"
+    ]
+   },
+   "2011-2015": {
+    "op": "sum",
+    "variables": [
+     "DP04_0078PE",
+     "DP04_0079PE"
+    ],
+    "labels": [
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.01 to 1.50",
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.51 or more"
+    ]
+   },
+   "2015-2019": {
+    "op": "sum",
+    "variables": [
+     "DP04_0078PE",
+     "DP04_0079PE"
+    ],
+    "labels": [
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.01 to 1.50",
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.51 or more"
+    ]
+   },
+   "2020-2024": {
+    "op": "sum",
+    "variables": [
+     "DP04_0078PE",
+     "DP04_0079PE"
+    ],
+    "labels": [
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.01 to 1.50",
+     "Percent!!OCCUPANTS PER ROOM!!Occupied housing units!!1.51 or more"
+    ]
+   }
+  },
+  "pct_poverty": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP03_0128PE"
+    ],
+    "labels": [
+     "Percent!!PERCENTAGE OF FAMILIES AND PEOPLE WHOSE INCOME IN THE PAST 12 MONTHS IS BELOW THE POVERTY LEVEL!!All people"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0128PE"
+    ],
+    "labels": [
+     "Percent!!PERCENTAGE OF FAMILIES AND PEOPLE WHOSE INCOME IN THE PAST 12 MONTHS IS BELOW THE POVERTY LEVEL!!All people"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0128PE"
+    ],
+    "labels": [
+     "Percent!!PERCENTAGE OF FAMILIES AND PEOPLE WHOSE INCOME IN THE PAST 12 MONTHS IS BELOW THE POVERTY LEVEL!!All people"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0128PE"
+    ],
+    "labels": [
+     "Percent!!PERCENTAGE OF FAMILIES AND PEOPLE WHOSE INCOME IN THE PAST 12 MONTHS IS BELOW THE POVERTY LEVEL!!All people"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0128PE"
+    ],
+    "labels": [
+     "Percent!!PERCENTAGE OF FAMILIES AND PEOPLE WHOSE INCOME IN THE PAST 12 MONTHS IS BELOW THE POVERTY LEVEL!!All people"
+    ]
+   }
+  },
+  "unemployment_rate": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP03_0009PE"
+    ],
+    "labels": [
+     "Percent!!EMPLOYMENT STATUS!!Percent Unemployed"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0009PE"
+    ],
+    "labels": [
+     "Percent!!EMPLOYMENT STATUS!!Civilian labor force!!Unemployment Rate"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0009PE"
+    ],
+    "labels": [
+     "Percent!!EMPLOYMENT STATUS!!Civilian labor force!!Unemployment Rate"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0009PE"
+    ],
+    "labels": [
+     "Percent!!EMPLOYMENT STATUS!!Civilian labor force!!Unemployment Rate"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0009PE"
+    ],
+    "labels": [
+     "Percent!!EMPLOYMENT STATUS!!Civilian labor force!!Unemployment Rate"
+    ]
+   }
+  },
+  "pct_no_hs_diploma": {
+   "2006-2010": {
+    "op": "sum",
+    "variables": [
+     "DP02_0059PE",
+     "DP02_0060PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Less than 9th grade",
+     "Percent!!EDUCATIONAL ATTAINMENT!!9th to 12th grade, no diploma"
+    ]
+   },
+   "2016-2020": {
+    "op": "sum",
+    "variables": [
+     "DP02_0060PE",
+     "DP02_0061PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Less than 9th grade",
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!9th to 12th grade, no diploma"
+    ]
+   },
+   "2011-2015": {
+    "op": "sum",
+    "variables": [
+     "DP02_0059PE",
+     "DP02_0060PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Less than 9th grade",
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!9th to 12th grade, no diploma"
+    ]
+   },
+   "2015-2019": {
+    "op": "sum",
+    "variables": [
+     "DP02_0060PE",
+     "DP02_0061PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Less than 9th grade",
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!9th to 12th grade, no diploma"
+    ]
+   },
+   "2020-2024": {
+    "op": "sum",
+    "variables": [
+     "DP02_0060PE",
+     "DP02_0061PE"
+    ],
+    "labels": [
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!Less than 9th grade",
+     "Percent!!EDUCATIONAL ATTAINMENT!!Population 25 years and over!!9th to 12th grade, no diploma"
+    ]
+   }
+  },
+  "pct_vacant": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP04_0003PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING OCCUPANCY!!Vacant housing units"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP04_0003PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING OCCUPANCY!!Total housing units!!Vacant housing units"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP04_0003PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING OCCUPANCY!!Total housing units!!Vacant housing units"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP04_0003PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING OCCUPANCY!!Total housing units!!Vacant housing units"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP04_0003PE"
+    ],
+    "labels": [
+     "Percent!!HOUSING OCCUPANCY!!Total housing units!!Vacant housing units"
+    ]
+   }
+  },
+  "pct_rent_burdened": {
+   "2006-2010": {
+    "op": "sum",
+    "variables": [
+     "DP04_0139PE",
+     "DP04_0140PE"
+    ],
+    "labels": [
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!30.0 to 34.9 percent",
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!35.0 percent or more"
+    ]
+   },
+   "2016-2020": {
+    "op": "sum",
+    "variables": [
+     "DP04_0141PE",
+     "DP04_0142PE"
+    ],
+    "labels": [
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!30.0 to 34.9 percent",
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!35.0 percent or more"
+    ]
+   },
+   "2011-2015": {
+    "op": "sum",
+    "variables": [
+     "DP04_0141PE",
+     "DP04_0142PE"
+    ],
+    "labels": [
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!30.0 to 34.9 percent",
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!35.0 percent or more"
+    ]
+   },
+   "2015-2019": {
+    "op": "sum",
+    "variables": [
+     "DP04_0141PE",
+     "DP04_0142PE"
+    ],
+    "labels": [
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!30.0 to 34.9 percent",
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!35.0 percent or more"
+    ]
+   },
+   "2020-2024": {
+    "op": "sum",
+    "variables": [
+     "DP04_0141PE",
+     "DP04_0142PE"
+    ],
+    "labels": [
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!30.0 to 34.9 percent",
+     "Percent!!GROSS RENT AS A PERCENTAGE OF HOUSEHOLD INCOME (GRAPI)!!Occupied units paying rent (excluding units where GRAPI cannot be computed)!!35.0 percent or more"
+    ]
+   }
+  },
+  "pct_single_family_detached": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP04_0007PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!1-unit, detached"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP04_0007PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!1-unit, detached"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP04_0007PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!1-unit, detached"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP04_0007PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!1-unit, detached"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP04_0007PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!1-unit, detached"
+    ]
+   }
+  },
+  "pct_large_multifamily": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP04_0013PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!20 or more units"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP04_0013PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!20 or more units"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP04_0013PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!20 or more units"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP04_0013PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!20 or more units"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP04_0013PE"
+    ],
+    "labels": [
+     "Percent!!UNITS IN STRUCTURE!!Total housing units!!20 or more units"
+    ]
+   }
+  },
+  "pct_built_before_1940": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP04_0025PE"
+    ],
+    "labels": [
+     "Percent!!YEAR STRUCTURE BUILT!!Built 1939 or earlier"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP04_0026PE"
+    ],
+    "labels": [
+     "Percent!!YEAR STRUCTURE BUILT!!Total housing units!!Built 1939 or earlier"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP04_0026PE"
+    ],
+    "labels": [
+     "Percent!!YEAR STRUCTURE BUILT!!Total housing units!!Built 1939 or earlier"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP04_0026PE"
+    ],
+    "labels": [
+     "Percent!!YEAR STRUCTURE BUILT!!Total housing units!!Built 1939 or earlier"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP04_0026PE"
+    ],
+    "labels": [
+     "Percent!!YEAR STRUCTURE BUILT!!Total housing units!!Built 1939 or earlier"
+    ]
+   }
+  },
+  "pct_foreign_born": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP02_0092PE"
+    ],
+    "labels": [
+     "Percent!!PLACE OF BIRTH!!Foreign born"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP02_0094PE"
+    ],
+    "labels": [
+     "Percent!!PLACE OF BIRTH!!Total population!!Foreign born"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0092PE"
+    ],
+    "labels": [
+     "Percent!!PLACE OF BIRTH!!Total population!!Foreign born"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP02_0093PE"
+    ],
+    "labels": [
+     "Percent!!PLACE OF BIRTH!!Total population!!Foreign born"
+    ]
+   }
+  },
+  "pct_moved_past_year": {
+   "2006-2010": {
+    "op": "100-minus",
+    "variables": [
+     "DP02_0079PE"
+    ],
+    "labels": [
+     "Percent!!RESIDENCE 1 YEAR AGO!!Same house"
+    ]
+   },
+   "2016-2020": {
+    "op": "100-minus",
+    "variables": [
+     "DP02_0080PE"
+    ],
+    "labels": [
+     "Percent!!RESIDENCE 1 YEAR AGO!!Population 1 year and over!!Same house"
+    ]
+   },
+   "2011-2015": {
+    "op": "100-minus",
+    "variables": [
+     "DP02_0079PE"
+    ],
+    "labels": [
+     "Percent!!RESIDENCE 1 YEAR AGO!!Population 1 year and over!!Same house"
+    ]
+   },
+   "2015-2019": {
+    "op": "100-minus",
+    "variables": [
+     "DP02_0080PE"
+    ],
+    "labels": [
+     "Percent!!RESIDENCE 1 YEAR AGO!!Population 1 year and over!!Same house"
+    ]
+   },
+   "2020-2024": {
+    "op": "100-minus",
+    "variables": [
+     "DP02_0080PE"
+    ],
+    "labels": [
+     "Percent!!RESIDENCE 1 YEAR AGO!!Population 1 year and over!!Same house"
+    ]
+   }
+  },
+  "pct_transit": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP03_0021PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Public transportation (excluding taxicab)"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0021PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Public transportation (excluding taxicab)"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0021PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Public transportation (excluding taxicab)"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0021PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Public transportation (excluding taxicab)"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0021PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Public transportation"
+    ],
+    "resolved_from": "label synonym 'Public transportation (excluding taxicab)' -> 'Public transportation' (registry/label_synonyms.json)"
+   }
+  },
+  "pct_work_from_home": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP03_0024PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Worked at home"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0024PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Worked from home"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0024PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Worked from home"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0024PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Worked from home"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0024PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Worked at home"
+    ],
+    "resolved_from": "2006-2010"
+   }
+  },
+  "pct_drove_alone": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP03_0019PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Car, truck, or van -- drove alone"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0019PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Car, truck, or van -- drove alone"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0019PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Car, truck, or van -- drove alone"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0019PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Car, truck, or van -- drove alone"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0019PE"
+    ],
+    "labels": [
+     "Percent!!COMMUTING TO WORK!!Workers 16 years and over!!Car, truck, or van -- drove alone"
+    ]
+   }
+  },
+  "pct_uninsured": {
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0099PE"
+    ],
+    "labels": [
+     "Percent!!HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population!!No health insurance coverage"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0099PE"
+    ],
+    "labels": [
+     "Percent!!HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population!!No health insurance coverage"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0099PE"
+    ],
+    "labels": [
+     "Percent!!HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population!!No health insurance coverage"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0099PE"
+    ],
+    "labels": [
+     "Percent!!HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population!!No health insurance coverage"
+    ],
+    "resolved_from": "2016-2020"
+   }
+  },
+  "pct_disability": {
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP02_0072PE"
+    ],
+    "labels": [
+     "Percent!!DISABILITY STATUS OF THE CIVILIAN NONINSTITUTIONALIZED POPULATION!!Total Civilian Noninstitutionalized Population!!With a disability"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0071PE"
+    ],
+    "labels": [
+     "Percent!!DISABILITY STATUS OF THE CIVILIAN NONINSTITUTIONALIZED POPULATION!!Total Civilian Noninstitutionalized Population!!With a disability"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP02_0072PE"
+    ],
+    "labels": [
+     "Percent!!DISABILITY STATUS OF THE CIVILIAN NONINSTITUTIONALIZED POPULATION!!Total Civilian Noninstitutionalized Population!!With a disability"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP02_0072PE"
+    ],
+    "labels": [
+     "Percent!!DISABILITY STATUS OF THE CIVILIAN NONINSTITUTIONALIZED POPULATION!!Total Civilian Noninstitutionalized Population!!With a disability"
+    ],
+    "resolved_from": "2016-2020"
+   }
+  },
+  "pct_broadband": {
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP02_0154PE"
+    ],
+    "labels": [
+     "Percent!!COMPUTERS AND INTERNET USE!!Total households!!With a broadband Internet subscription"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0152PE"
+    ],
+    "labels": [
+     "Percent!!COMPUTERS AND INTERNET USE!!Total households!!With a broadband Internet subscription"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP02_0153PE"
+    ],
+    "labels": [
+     "Percent!!COMPUTERS AND INTERNET USE!!Total households!!With a broadband Internet subscription"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP02_0154PE"
+    ],
+    "labels": [
+     "Percent!!COMPUTERS AND INTERNET USE!!Total households!!With a broadband Internet subscription"
+    ]
+   }
+  },
+  "mean_household_income": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP03_0063E"
+    ],
+    "labels": [
+     "Estimate!!INCOME AND BENEFITS (IN 2010 INFLATION-ADJUSTED DOLLARS)!!Mean household income (dollars)"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP03_0063E"
+    ],
+    "labels": [
+     "Estimate!!INCOME AND BENEFITS (IN 2020 INFLATION-ADJUSTED DOLLARS)!!Total households!!Mean household income (dollars)"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP03_0063E"
+    ],
+    "labels": [
+     "Estimate!!INCOME AND BENEFITS (IN 2015 INFLATION-ADJUSTED DOLLARS)!!Total households!!Mean household income (dollars)"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP03_0063E"
+    ],
+    "labels": [
+     "Estimate!!INCOME AND BENEFITS (IN 2019 INFLATION-ADJUSTED DOLLARS)!!Total households!!Mean household income (dollars)"
+    ],
+    "resolved_from": "2016-2020"
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP03_0063E"
+    ],
+    "labels": [
+     "Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!Mean household income (dollars)"
+    ],
+    "resolved_from": "2016-2020"
+   }
+  },
+  "total_population": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP05_0001E"
+    ],
+    "labels": [
+     "Estimate!!SEX AND AGE!!Total population"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP05_0001E"
+    ],
+    "labels": [
+     "Estimate!!SEX AND AGE!!Total population"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP05_0001E"
+    ],
+    "labels": [
+     "Estimate!!SEX AND AGE!!Total population"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP05_0001E"
+    ],
+    "labels": [
+     "Estimate!!SEX AND AGE!!Total population"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP05_0001E"
+    ],
+    "labels": [
+     "Estimate!!SEX AND AGE!!Total population"
+    ]
+   }
+  },
+  "households": {
+   "2006-2010": {
+    "op": "each",
+    "variables": [
+     "DP02_0001E"
+    ],
+    "labels": [
+     "Estimate!!HOUSEHOLDS BY TYPE!!Total households"
+    ]
+   },
+   "2016-2020": {
+    "op": "each",
+    "variables": [
+     "DP02_0001E"
+    ],
+    "labels": [
+     "Estimate!!HOUSEHOLDS BY TYPE!!Total households"
+    ]
+   },
+   "2011-2015": {
+    "op": "each",
+    "variables": [
+     "DP02_0001E"
+    ],
+    "labels": [
+     "Estimate!!HOUSEHOLDS BY TYPE!!Total households"
+    ]
+   },
+   "2015-2019": {
+    "op": "each",
+    "variables": [
+     "DP02_0001E"
+    ],
+    "labels": [
+     "Estimate!!HOUSEHOLDS BY TYPE!!Total households"
+    ]
+   },
+   "2020-2024": {
+    "op": "each",
+    "variables": [
+     "DP02_0001E"
+    ],
+    "labels": [
+     "Estimate!!HOUSEHOLDS BY TYPE!!Total households"
+    ]
+   }
+  }
+ },
+ "no_equivalent": {
+  "pct_18_24": "Data Profile groups 15-19 and 20-24; no 18-24 row. Cells checked by label (B01001) and by value (share spot-check).",
+  "pct_45_64": "Data Profile has 45-54, 55-59, 60-64 with rounding on each; checked by label and value instead.",
+  "pct_under_18": "2006-2010 Data Profile has no 'Under 18' percent row (2016-2020 is checked).",
+  "pct_family_households": "2016-2020 Data Profile replaced 'Family households' with married/cohabiting/no-spouse types (2006-2010 is checked).",
+  "pct_below_200pct_poverty": "Not in the Data Profile; C17002 cells checked by label and value.",
+  "pct_walk_bike": "Data Profile folds bicycle into 'Other means'; checked by label and value.",
+  "pct_limited_english": "Data Profile counts people who speak English less than very well, not limited-English households; checked by label and value.",
+  "pct_no_internet": "Not in the Data Profile; B28002 checked by label and value.",
+  "mean_gross_rent": "Census publishes no mean rent; aggregate rent (B25065) and cash renters (B25063_002) are each checked against data.census.gov.",
+  "mean_home_value": "Census publishes no mean value; computed from B25075 bin midpoints (a modeling choice, documented). Bins are checked against the table shells."
+ },
+ "traps": [
+  {
+   "variables": [
+    "DP05_0029PE (2016-2020)",
+    "DP05_0025PE (2006-2010)"
+   ],
+   "what": "Same label as the 65+ percent ('Percent!!SEX AND AGE!!Total population!!65 years and over') but it is the heading row of the 65+ sex breakdown; Census fills its percent column with the count. Caught by this gate on 2026-11-17 (STRATA 10.3% vs '15564')."
+  }
+ ],
+ "period_gaps": {
+  "pct_under_18": {
+   "2011-2015": "The 2011-2015 Data Profile has no 'Under 18 years' percent row."
+  },
+  "pct_family_households": {
+   "2015-2019": "From 2019 the Data Profile replaced 'Family households' with married-couple / cohabiting / no-spouse types.",
+   "2020-2024": "As 2015-2019."
+  },
+  "pct_foreign_born": {
+   "2020-2024": "No 'Foreign born' percent row under PLACE OF BIRTH in the 2024 Data Profile labels."
+  }
+ }
+}

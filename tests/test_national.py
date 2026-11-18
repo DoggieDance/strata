@@ -17,8 +17,15 @@ HARM = sorted((BUILD / "harmonized/2006-2010/tract-2020").glob("[0-9][0-9].parqu
 def test_crosswalk_conserves_2020_population(path):
     d = json.loads(pq.ParquetFile(path).schema_arrow.metadata[b"strata"])["diagnostics"]
     assert d["pop_assigned"] + d["pop_in_foreign_2010_blocks"] == pytest.approx(d["pop_2020_state"], abs=1e-6)
+    if "hu_assigned" in d:  # per-universe crosswalks (registry v8)
+        # Housing units in 2010 blocks of another state leave with them, as people do.
+        assert "hu_in_foreign_2010_blocks" in d, "crosswalk predates the housing-unit diagnostic; rebuild it"
+        assert d["hu_assigned"] + d["hu_in_foreign_2010_blocks"] == pytest.approx(d["hu_2020_state"], abs=1e-6)
     xw = pq.read_table(path).to_pandas()
     assert np.allclose(xw.groupby("source").weight.sum(), 1.0)
+    for b in ("pop", "hhpop", "hh", "hu"):
+        if f"weight_{b}" in xw:
+            assert np.allclose(xw.groupby("source")[f"weight_{b}"].sum(), 1.0), b
     assert xw.source.str[:2].eq(path.stem).all()
 
 

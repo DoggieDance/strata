@@ -48,3 +48,25 @@ test("classes split significant changes at the median magnitude", () => {
   assert.equal(b, 3);
   assert.deepEqual(cs.map((c) => changeClass(c, b)), [1, 1, -2, 0]);
 });
+
+import { pValue, bhThreshold } from "../../app/engine/change.js";
+
+test("pValue matches the normal distribution", () => {
+  assert.ok(Math.abs(pValue(1.645) - 0.1) < 1e-4);
+  assert.ok(Math.abs(pValue(1.96) - 0.05) < 1e-4);
+  assert.ok(Math.abs(pValue(2.576) - 0.01) < 1e-4);
+  assert.equal(pValue(Infinity), 0);
+});
+
+test("Benjamini-Hochberg: textbook example", () => {
+  // p = .001 .008 .039 .041 .042 .060 .074 .205; q = .05 -> reject the first two
+  // (k = 2: .008 <= 2/8*.05 = .0125; .039 > 3/8*.05).
+  const ps = [0.001, 0.008, 0.039, 0.041, 0.042, 0.06, 0.074, 0.205];
+  const z = (p) => { let lo = 0, hi = 40; for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; if (pValue(m) > p) lo = m; else hi = m; } return hi; };
+  const t = bhThreshold(ps.map(z), 0.05);
+  assert.ok(z(0.008) >= t - 1e-6 && z(0.039) < t);
+});
+
+test("Benjamini-Hochberg: no signal -> nothing significant", () => {
+  assert.equal(bhThreshold([0.1, 0.2, 0.5], 0.1), Infinity);
+});

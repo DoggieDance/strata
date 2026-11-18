@@ -65,21 +65,44 @@ def fetch_inputs(state: str) -> dict[str, Path]:
     return out
 
 
-def block_population(pl_zip: Path, stusab: str) -> pd.Series:
-    """2020 block GEOID (15 chars) -> P1_001 total population."""
+# Counts per 2020 block from the PL 94-171 file, each a weighting base:
+#   pop    P1_001 total population                     (segment 1, field 5)
+#   gq     P5_001 group-quarters population            (segment 3, field 5)
+#   hu     H1_001 housing units                        (segment 2, field 149)
+#   hh     H1_002 occupied housing units = households  (segment 2, field 150)
+# Field positions are 0-based after the 5 header fields (FILEID, STUSAB,
+# CHARITER, CIFSN, LOGRECNO); segment 2 holds P3 (71 cells) and P4 (73) before H1.
+PL_FIELDS = {"pop": (1, 5), "gq": (3, 5), "hu": (2, 149), "hh": (2, 150), "vacant": (2, 151)}
+BASES = ("pop", "hhpop", "hh", "hu")
+
+
+def block_counts(pl_zip: Path, stusab: str) -> pd.DataFrame:
+    """2020 block GEOID (15 chars) -> pop, gq, hu, hh, hhpop."""
     with zipfile.ZipFile(pl_zip) as z:
         with z.open(f"{stusab}geo2020.pl") as f:
             geo = pd.read_csv(io.TextIOWrapper(f, encoding="latin-1"), sep="|", header=None,
-                              usecols=[2, 7, 9], names=["SUMLEV", "LOGRECNO", "GEOCODE"], dtype=str)
-        with z.open(f"{stusab}000012020.pl") as f:
-            seg = pd.read_csv(f, sep="|", header=None, usecols=[4, 5], names=["LOGRECNO", "P1_001"],
-                              dtype={"LOGRECNO": str, "P1_001": "int64"})
-    blocks = geo[geo.SUMLEV == "750"].merge(seg, on="LOGRECNO", how="left", validate="one_to_one")
-    if blocks.P1_001.isna().any():
-        raise ValueError("PL file: a block has no P1 row")
+                              usecols=[2, 7, 9], names=["SUMLEVEL", "LOGRECNO", "GEOCODE"], dtype=str)
+        blocks = geo[geo.SUMLEVEL == "750"].set_index("LOGRECNO")
+        for name, (seg, col) in PL_FIELDS.items():
+            with z.open(f"{stusab}0000{seg}2020.pl") as f:
+                part = pd.read_csv(f, sep="|", header=None, usecols=[4, col], names=["LOGRECNO", name],
+                                   dtype={"LOGRECNO": str, name: "int64"}).set_index("LOGRECNO")
+            blocks = blocks.join(part, how="left", validate="one_to_one")
+    if blocks[list(PL_FIELDS)].isna().any().any():
+        raise ValueError("PL file: a block is missing a count")
+    if not (blocks.hu == blocks.hh + blocks.vacant).all():
+        raise ValueError("PL file: H1_001 != H1_002 + H1_003; field positions are wrong")
+    if not ((blocks.gq >= 0) & (blocks.gq <= blocks["pop"])).all():
+        raise ValueError("PL file: P5_001 outside [0, P1_001]; field positions are wrong")
     if not (blocks.GEOCODE.str.len() == 15).all() or not blocks.GEOCODE.is_unique:
         raise ValueError("PL file: block GEOCODEs are not unique 15-character codes")
-    return blocks.set_index("GEOCODE").P1_001
+    blocks["hhpop"] = blocks["pop"] - blocks.gq
+    return blocks.set_index("GEOCODE")[["pop", "gq", "hu", "hh", "hhpop"]]
+
+
+def block_population(pl_zip: Path, stusab: str) -> pd.Series:
+    """2020 block GEOID -> P1_001 total population (kept for the tests)."""
+    return block_counts(pl_zip, stusab)["pop"]
 
 
 def intersections(rel_zip: Path) -> pd.DataFrame:
@@ -95,51 +118,74 @@ def intersections(rel_zip: Path) -> pd.DataFrame:
     return rel[["source", "target", "block20", "land", "water"]]
 
 
-def weights(rel: pd.DataFrame, pop20: pd.Series, state: str) -> tuple[pd.DataFrame, dict]:
-    """Tract-to-tract weights. Returns (frame, diagnostics)."""
+def pair_weights(pairs: pd.DataFrame) -> pd.DataFrame:
+    """(source, target) rows with base counts and land -> per-base weights,
+    normalized per source tract, with the land-then-even fallback recorded.
+    Shared by weights() and by etl/harmonize.py, which re-keys and pools rows
+    when Census recoded a 2010 tract (registry/tract_code_changes.json)."""
+    pairs = pairs.groupby(["source", "target"], as_index=False)[[*BASES, "land"]].sum()
+    cnt = pairs.groupby("source").target.transform("size")
+    land_by_src = pairs.groupby("source").land.transform("sum")
+    for b in BASES:
+        by_src = pairs.groupby("source")[b].transform("sum")
+        with np.errstate(invalid="ignore", divide="ignore"):
+            w = np.where(by_src > 0, pairs[b] / by_src,
+                         np.where(land_by_src > 0, pairs.land / land_by_src, 1 / cnt))
+        pairs[f"weight_{b}"] = w
+        pairs[f"basis_{b}"] = np.where(by_src > 0, b, np.where(land_by_src > 0, "land", "even"))
+    # "weight" (total population) is kept for older readers.
+    pairs["weight"], pairs["basis"] = pairs["weight_pop"], pairs["basis_pop"]
+    keep = pairs[[f"weight_{b}" for b in BASES]].max(axis=1) > 0
+    return pairs[keep].sort_values(["source", "target"]).reset_index(drop=True)
+
+
+def weights(rel: pd.DataFrame, counts: pd.DataFrame, state: str) -> tuple[pd.DataFrame, dict]:
+    """Tract-to-tract weights, one per base (BASES). Returns (frame, diagnostics).
+
+    Each 2020 block's count is split across its 2010-block intersections by
+    intersecting land (then water, then evenly), summed to (2010 tract, 2020
+    tract) pairs and normalized per 2010 tract. This is target-density weighting
+    (Schroeder 2007; the NHGIS 2010-2020 crosswalks): 2010 counts are spread by
+    where the 2020 counts sit. A source tract with none of a base falls back to
+    land area, then to even shares; the fallback is recorded per base.
+    """
+    if isinstance(counts, pd.Series):  # older callers pass total population only
+        counts = pd.DataFrame({b: counts for b in BASES})
     rel = rel.copy()
-    rel["block_pop"] = rel.block20.map(pop20)
-    missing = rel.block_pop.isna() & rel.block20.str.startswith(state)
+    known = rel.block20.isin(counts.index)
+    missing = ~known & rel.block20.str.startswith(state)
     if missing.any():
         raise ValueError(f"{int(missing.sum())} 2020 {state} blocks in the relationship file have no PL row")
-    rel["block_pop"] = rel.block_pop.fillna(0)
 
-    # Split each 2020 block's people by its share of intersecting land; a block
-    # with no land in any intersection (water only) splits by water, then evenly.
     g = rel.groupby("block20")
     land_tot = g.land.transform("sum")
     water_tot = g.water.transform("sum")
     n = g.land.transform("size")
     share = np.where(land_tot > 0, rel.land / land_tot.where(land_tot > 0, 1),
                      np.where(water_tot > 0, rel.water / water_tot.where(water_tot > 0, 1), 1 / n))
-    rel["pop"] = rel.block_pop * share
+    for b in BASES:
+        rel[b] = rel.block20.map(counts[b]).fillna(0).to_numpy() * share
 
     # 2010 blocks from other states (boundary corrections) belong to those
     # states' 2010 tracts, not ours. Their people are counted and reported.
     foreign = ~rel.source.str.startswith(state)
     diag = {"pop_in_foreign_2010_blocks": float(rel.loc[foreign, "pop"].sum()),
-            "pop_2020_state": int(pop20[pop20.index.str.startswith(state)].sum())}
+            "hu_in_foreign_2010_blocks": float(rel.loc[foreign, "hu"].sum()),
+            "pop_2020_state": int(counts.loc[counts.index.str.startswith(state), "pop"].sum()),
+            "hu_2020_state": int(counts.loc[counts.index.str.startswith(state), "hu"].sum())}
     rel = rel[~foreign]
 
-    pairs = rel.groupby(["source", "target"], as_index=False)[["pop", "land"]].sum()
-    by_src = pairs.groupby("source")[["pop", "land"]].transform("sum")
-    pairs["basis"] = np.where(by_src["pop"] > 0, "population", "land")
-    with np.errstate(invalid="ignore", divide="ignore"):
-        pairs["weight"] = np.where(by_src["pop"] > 0, pairs["pop"] / by_src["pop"],
-                                   pairs["land"] / by_src["land"])
-    # A source with neither people nor land (pure water) gets equal weights.
-    nan = pairs.weight.isna()
-    if nan.any():
-        cnt = pairs.groupby("source").target.transform("size")
-        pairs.loc[nan, "weight"] = 1 / cnt[nan]
-        pairs.loc[nan, "basis"] = "even"
-    pairs = pairs[pairs.weight > 0].sort_values(["source", "target"]).reset_index(drop=True)
+    pairs = rel.groupby(["source", "target"], as_index=False)[[*BASES, "land"]].sum()
+    pairs = pair_weights(pairs)
+    diag["basis_counts"] = {b: pairs.groupby("source")[f"basis_{b}"].first().value_counts().to_dict() for b in BASES}
     diag["pop_assigned"] = float(pairs["pop"].sum())
+    diag["hu_assigned"] = float(pairs["hu"].sum())
     diag["sources"] = int(pairs.source.nunique())
     diag["targets"] = int(pairs.target.nunique())
     diag["pairs"] = len(pairs)
-    diag["basis_counts"] = pairs.drop_duplicates("source").basis.value_counts().to_dict()
-    return pairs[["source", "target", "weight", "pop", "land", "basis"]], diag
+    cols = ["source", "target", "weight", "basis", "pop", "land", *[f"weight_{b}" for b in BASES],
+            *[f"basis_{b}" for b in BASES], *BASES[1:]]
+    return pairs[list(dict.fromkeys(cols))], diag
 
 
 def build(state: str, out: Path) -> Path:
@@ -149,8 +195,8 @@ def build(state: str, out: Path) -> Path:
         raise FileExistsError(f"{dest} exists; delete it deliberately to rebuild.")
     cfg = state_urls(state)
     paths = fetch_inputs(state)
-    pop20 = block_population(paths["population"], cfg["stusab"])
-    frame, diag = weights(intersections(paths["blocks"]), pop20, state)
+    counts = block_counts(paths["population"], cfg["stusab"])
+    frame, diag = weights(intersections(paths["blocks"]), counts, state)
     meta = {"from": "2010 tracts", "to": "2020 tracts", "state": state,
             "method": registry()["2010-2020"]["method"],
             "built": datetime.now(timezone.utc).isoformat(timespec="seconds"),

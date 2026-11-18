@@ -51,13 +51,33 @@ VINTAGES = {
 }
 
 
+def share_variables(vintage: str) -> dict[str, str]:
+    """Published variable -> cube count column, for every share count that is a
+    single published cell (registry/shares.json). Estimates and MOEs."""
+    from etl.common import load_shares
+    out = {}
+    for sh in load_shares():
+        src = sh["sources"].get(vintage)
+        if not src:
+            continue
+        for cid, key in ((sh["count_numerator"], "numerator_cells"), (sh["count_denominator"], "denominator_cells")):
+            if len(src[key]) == 1:
+                for kind in ("E", "M"):
+                    out[f"{src['table']}_{src[key][0]}{kind}"] = f"{cid}_{kind.lower()}"
+    return out
+
+
 # data.census.gov GEO_ID prefix per level.
 GEO_PREFIX = {"tract": "1400000US", "county": "0500000US", "place": "1600000US", "zcta": "8600000US"}
 
 
-def fixture_path(vintage, level="tract", state="51"):
+def fixture_path(vintage, level="tract", state="51", variable_set="core"):
     """Virginia keeps its original gate names; every other state is
-    {stusab}_{level}_spotcheck_{vintage}.csv."""
+    {stusab}_{level}_spotcheck_{vintage}.csv. The share set (v0.3.3) is
+    {stusab}_{level}_shares_spotcheck_{vintage}.csv for every state."""
+    ab = state_info(state)["stusab"]
+    if variable_set == "shares":
+        return ROOT / "tests" / "fixtures" / f"{ab}_{level}_shares_spotcheck_{vintage}.csv"
     if state == "51" and level == "tract":
         return ROOT / "tests" / "fixtures" / VINTAGES[vintage]["fixture"]
     ab = state_info(state)["stusab"]
@@ -72,6 +92,38 @@ def table_id(variable, endyear):
     table = variable.split("_")[0]
     kind = "ST" if table.startswith("S") else "DT"
     return f"ACS{kind}5Y{endyear}.{table}"
+
+
+def fetch_row(table, ucgid):
+    """One published table for one geography, as {column: value}; None if
+    data.census.gov answers 204 (not published) five times running."""
+    q = urllib.parse.urlencode({"id": table, "g": ucgid})
+    req = urllib.request.Request(f"{ENDPOINT}?{q}", headers={"User-Agent": "strata-spotcheck"})
+    no_content = 0
+    for attempt in range(8):
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                if r.status == 204:
+                    no_content += 1
+                    if no_content == 5:
+                        return None
+                    time.sleep(8 * no_content)
+                    continue
+                body = json.load(r)
+            break
+        except (json.JSONDecodeError, OSError) as e:
+            if attempt == 7:
+                raise RuntimeError(f"{table} {ucgid}: {e}") from e
+            time.sleep(5 * 2 ** min(attempt, 4))
+    else:
+        raise RuntimeError(f"{table} {ucgid}: no usable response")
+    header, *data = body["response"]["data"]
+    if len(data) != 1:
+        raise RuntimeError(f"{table} {ucgid}: expected 1 row, got {len(data)}")
+    row = dict(zip(header, data[0]))
+    if row["GEO_ID"] != ucgid:
+        raise RuntimeError(f"{table} {ucgid}: got {row['GEO_ID']}")
+    return row
 
 
 def fetch(variable, geoid, endyear, level="tract"):
@@ -113,9 +165,9 @@ def fetch(variable, geoid, endyear, level="tract"):
     return "" if row[variable] is None else row[variable]
 
 
-def sample(vintage, level="tract", state="51"):
+def sample(vintage, level="tract", state="51", variable_set="core"):
     geoids = pq.read_table(cube_path(vintage, level, state), columns=["GEOID"]).column("GEOID").to_pylist()
-    variables = VINTAGES[vintage]["variables"]
+    variables = VINTAGES[vintage]["variables"] if variable_set == "core" else sorted(share_variables(vintage))
     # Seed = the state's FIPS number (Virginia's 51 was the original seed).
     rng = random.Random(SEED if state == "51" else int(state))
     pairs = set()
@@ -129,12 +181,13 @@ def main(argv=None):
     ap.add_argument("--vintage", choices=sorted(VINTAGES), required=True)
     ap.add_argument("--level", default="tract", choices=sorted(GEO_PREFIX))
     ap.add_argument("--state", default="51", help="FIPS or postal code")
+    ap.add_argument("--set", dest="variable_set", choices=["core", "shares"], default="core")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
     (state,) = parse_states(args.state)
-    pairs = sample(args.vintage, args.level, state)
+    pairs = sample(args.vintage, args.level, state, args.variable_set)
     endyear = VINTAGES[args.vintage]["endyear"]
-    fixture = fixture_path(args.vintage, args.level, state)
+    fixture = fixture_path(args.vintage, args.level, state, args.variable_set)
     if args.dry_run:
         for p in pairs:
             print(*p)

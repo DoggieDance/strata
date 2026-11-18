@@ -38,6 +38,18 @@ A JSON object. It lives in the URL. **An index is a link.**
 That spec is the Philadelphia study, with `transform: "log"` added on the three
 dollar measures — the one change the study itself suggested it needed.
 
+*Correction (2026-11-17):* in `change` mode the engine refuses `log` (log1p is
+undefined below −1, and a change in dollars is often negative), so the log
+variant applies to single-period indices only. The app's Philadelphia preset
+uses `transform: "none"` on raw changes, which is what the study did. A
+log-scale change (log x₂ − log x₁) would be a separate derived measure, not a
+transform, and is not built yet.
+
+In the app the spec travels as `?index=<base64url(JSON)>`
+(`app/engine/spec.js`), with `level`, `mode` and `vintages` beside the
+measures. The extent is the scope on screen (a state, or the states loaded),
+and the legend says so, because scores are relative to it.
+
 ## Pipeline
 
 ```

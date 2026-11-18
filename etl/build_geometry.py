@@ -74,6 +74,11 @@ def balance_polygons(gdf, cube_ids: set, names) -> "gpd.GeoDataFrame":
     return gdf
 
 
+def withheld(vintage: str, level: str) -> set[str]:
+    reg = json.loads((ROOT / "registry" / "suppressed_geographies.json").read_text())
+    return {g for e in reg["errata"] for g in e.get("withheld", {}).get(vintage, {}).get(level, [])}
+
+
 def build(state: str, vintage: str, level: str, out: Path) -> Path:
     check_scope([state], [vintage], level)
     level_cfg(vintage, level)  # raises LevelUnavailable where Census published nothing
@@ -91,12 +96,17 @@ def build(state: str, vintage: str, level: str, out: Path) -> Path:
     gdf["GEOID"] = gdf[key] if isinstance(key, str) else gdf[key].astype(str).agg("".join, axis=1)
     if level in NATIONAL:
         gdf = gdf[gdf.GEOID.isin(cube_ids)]
+    # Names for areas Census withheld come from the boundary file: the ACS
+    # geography list, where every other name comes from, leaves them out.
+    cb_names = dict(zip(gdf.GEOID, gdf["NAMELSAD"])) if "NAMELSAD" in gdf else {}
     gdf = gdf[["GEOID", "geometry"]].to_crs(4326).sort_values("GEOID")
     if level == "place":
         gdf = balance_polygons(gdf, cube_ids, geo_names(vintage, state, level))
     if gdf.empty or not gdf.GEOID.is_unique:
         raise ValueError(f"{raw.name}: GEOIDs are empty or not unique")
-    extra = set(gdf.GEOID) - cube_ids
+    # Areas Census withheld (registry/suppressed_geographies.json) keep their
+    # polygons: the map says "withheld by Census" there instead of a hole.
+    extra = set(gdf.GEOID) - cube_ids - withheld(vintage, level)
     if extra:
         raise ValueError(f"{len(extra)} {level} polygons are not in the {vintage} cube, e.g. {sorted(extra)[:3]}")
     missing = sorted(cube_ids - set(gdf.GEOID))
@@ -109,6 +119,7 @@ def build(state: str, vintage: str, level: str, out: Path) -> Path:
 
     # Names ride beside the geometry, not in it: the tile contract stays GEOID-only.
     names = {g: display_name(level, n, state_info(state)["name"]) for g, n in geo_names(vintage, state, level).items() if g in cube_ids}
+    names.update({g: cb_names[g] for g in withheld(vintage, level) & set(gdf.GEOID) if g in cb_names})
     dest.with_name(f"{state}.names.json").write_text(json.dumps(dict(sorted(names.items())), separators=(",", ":")))
 
     meta = {"vintage": vintage, "level": level, "state": state, "source": url, "features": len(gdf),

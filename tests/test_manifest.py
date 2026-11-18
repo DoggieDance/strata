@@ -43,8 +43,11 @@ def test_only_non_overlapping_periods_compare():
 
 
 def test_comparisons_and_deflators(manifest):
-    (c,) = manifest["comparisons"]
-    assert c == {"from": "2006-2010", "to": "2016-2020", "valid": True, "why": "non-overlapping periods"}
+    pairs = {(c["from"], c["to"]): c for c in manifest["comparisons"]}
+    c = pairs[("2006-2010", "2016-2020")]
+    assert c["valid"] and c["why"] == "non-overlapping periods"
+    for (a, b), c in pairs.items():  # overlapping periods are listed and refused (spec 05)
+        assert c["valid"] == (not overlaps(a, b)), (a, b)
     a = manifest["deflators"]["annual"]
     assert a["2020"] / a["2010"] == pytest.approx(1.1906, abs=1e-4)
 

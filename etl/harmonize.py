@@ -36,13 +36,29 @@ import pyarrow.parquet as pq
 
 from etl.build_cube import to_table
 from etl.clean import ratio
-from etl.common import parse_states, check_scope, load_measures
+from etl.common import REGISTRY_DIR as REGISTRY, parse_states, check_scope, load_measures, load_shares, load_summary_files, resolve_vintage
 
 EXTENSIVE = {"count", "aggregate"}
 
 
 class MedianApportionError(ValueError):
     """A median cannot be apportioned. Recompute it from bins, or refuse."""
+
+
+def basis_of_columns(notes: dict) -> dict[str, str]:
+    """count/aggregate column -> weighting base, from the table it was built from."""
+    import re
+    reg = json.loads((Path(__file__).resolve().parent.parent / "registry" / "apportion_basis.json").read_text())["bases"]
+    by_table = {t: b for b, d in reg.items() for t in d["tables"]}
+    out = {}
+    for name, n in notes.items():
+        if n["kind"] not in EXTENSIVE:
+            continue
+        m = re.match(r"([BC]\d{5}[A-Z]?)_", n.get("source", ""))
+        if not m or m.group(1) not in by_table:
+            raise ValueError(f"{name}: no weighting base for source {n.get('source')!r} (registry/apportion_basis.json)")
+        out[name] = by_table[m.group(1)]
+    return out
 
 
 def column_kinds(notes: dict) -> dict[str, str]:
@@ -72,7 +88,49 @@ def intensive_recipes() -> dict[str, tuple[str, str, bool]]:
             out[leg["id"]] = (m["id"], leg["denominator"], False)
         if m["kind"] in ("percent", "ratio"):
             out[m["id"]] = (m["count_numerator"], m["count_denominator"], True)
+    for sh in load_shares():
+        out[sh["id"]] = (sh["count_numerator"], sh["count_denominator"], True)
     return out
+
+
+def tract_changes(xw: pd.DataFrame, state: str, vintage: str, changes: list[dict] | None = None) -> tuple[pd.DataFrame, list[str], list[dict]]:
+    """Re-key the 2010->2020 crosswalk to the tract codes a later period uses
+    (registry/tract_code_changes.json). Returns (crosswalk, 2020 tracts to
+    leave without a value, changes applied).
+
+    recode: rename the source. merge: rename onto the absorbing tract and
+    re-normalize its weights (the absorbed tract had no 2010 people, households
+    or housing units, so no weight moves; checked here). boundary: drop the
+    affected sources; every target they touched is returned to be nulled.
+    """
+    from etl.crosswalk import BASES, pair_weights
+    reg = json.loads((REGISTRY / "tract_code_changes.json").read_text())
+    if vintage not in reg["applies_to"]:
+        return xw, [], []
+    mine = [c for c in (reg["changes"] if changes is None else changes) if c["old"][:2] == state]
+    if not mine:
+        return xw, [], []
+    xw = xw.copy()
+    applied, null_targets = [], set()
+    for c in mine:
+        rows = xw.source == c["old"]
+        if not rows.any():
+            raise ValueError(f"{c['old']}: in tract_code_changes.json but not in the {state} crosswalk")
+        if c["kind"] in ("recode", "merge"):
+            if c["kind"] == "recode" and (xw.source == c["new"]).any():
+                raise ValueError(f"{c['old']} -> {c['new']}: a recode onto a tract the crosswalk already has; that is a merge")
+            if c["kind"] == "merge" and xw.loc[rows, list(BASES)].to_numpy().sum() != 0:
+                raise ValueError(f"{c['old']}: registered as a merge of an empty tract, but it has 2010 counts")
+            xw.loc[rows, "source"] = c["new"]
+        elif c["kind"] == "boundary":
+            gone = xw.source.isin([c["old"], *c.get("also", [])])
+            null_targets |= set(xw.loc[gone, "target"])
+            xw = xw[~gone]
+        else:
+            raise ValueError(f"{c['old']}: unknown change kind {c['kind']!r}")
+        applied.append(c)
+    xw = pair_weights(xw[["source", "target", *BASES, "land"]])
+    return xw, sorted(null_targets), applied
 
 
 def apportion(source: pd.DataFrame, notes: dict, xw: pd.DataFrame, targets: pd.Index) -> pd.DataFrame:
@@ -86,12 +144,16 @@ def apportion(source: pd.DataFrame, notes: dict, xw: pd.DataFrame, targets: pd.I
     if stray:
         raise ValueError(f"crosswalk targets {len(stray)} tracts outside the target universe, e.g. {sorted(stray)[:3]}")
 
-    w = xw.weight.to_numpy()
     universes = aggregate_universes()
+    basis = basis_of_columns(notes)
     out = {}
     for name, kind in kinds.items():
         if kind not in EXTENSIVE:
             continue
+        # The weight matched to this count's universe (registry/apportion_basis.json);
+        # crosswalks from before the per-base weights carry only "weight".
+        wcol = f"weight_{basis[name]}"
+        w = (xw[wcol] if wcol in xw else xw.weight).to_numpy()
         se = source[f"{name}_e"].reindex(xw.source).to_numpy(dtype="float64")
         sm = source[f"{name}_m"].reindex(xw.source).to_numpy(dtype="float64")
         # An aggregate over an empty universe (0 households, 0 cash renters) is
@@ -104,13 +166,17 @@ def apportion(source: pd.DataFrame, notes: dict, xw: pd.DataFrame, targets: pd.I
             se = np.where(fill, 0.0, se)
             sm = np.where(fill, 0.0, sm)
         e = se * w
-        m = (sm * w) ** 2
-        # A null piece makes the target null (sum with min_count) rather than a
-        # silent undercount.
-        parts = pd.DataFrame({"t": xw.target.to_numpy(), "e": e, "m": m})
+        wm = np.abs(sm * w)
+        # Census zero-estimate rule (as in clean.sum_moe): nonzero pieces add in
+        # quadrature; of the zero-estimate pieces only the largest MOE counts, once.
+        zero = e == 0
+        parts = pd.DataFrame({"t": xw.target.to_numpy(), "e": e, "m": wm,
+                              "nz2": np.where(zero, 0.0, wm ** 2), "z": np.where(zero, wm, 0.0)})
         g = parts.groupby("t")
-        est = g.e.sum(min_count=1).where(g.e.count() == g.size())
-        moe = np.sqrt(g.m.sum(min_count=1).where(g.m.count() == g.size()))
+        # A null piece makes the target null rather than a silent undercount.
+        complete = (g.e.count() == g.size()) & (g.m.count() == g.size())
+        est = g.e.sum(min_count=1).where(complete)
+        moe = np.sqrt(g.nz2.sum() + g.z.max() ** 2).where(complete)
         out[f"{name}_e"], out[f"{name}_m"] = est.reindex(targets), moe.reindex(targets)
 
     frame = pd.DataFrame(out, index=targets)
@@ -143,14 +209,21 @@ def build(state: str, out: Path, source_vintage="2006-2010", target_vintage="201
     targets = pd.Index(pq.read_table(tgt_path, columns=["GEOID"]).column("GEOID").to_pylist(), name="GEOID")
     xw = pq.read_table(xw_path).to_pandas()
 
+    xw, null_targets, applied = tract_changes(xw, state, source_vintage)
+    # Sources whose boundaries Census redrew are left out above; they stay in the
+    # cube unused, and the 2020 tracts they fed are left without a value.
     frame = apportion(source, notes, xw, targets)
+    if null_targets:
+        frame.loc[frame.index.isin(null_targets), :] = np.nan
     table = to_table(frame, notes)
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
     meta = {"vintage": source_vintage, "level": "tract", "geography": "2020 tracts", "state": state,
             "harmonized": True, "method": "population-weighted apportionment (etl/harmonize.py)",
             "built": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "registry_version": load_measures()["registry_version"], "measures": notes,
-            "inputs": {"source_cube": sha(src_path), "crosswalk": sha(xw_path)}}
+            "inputs": {"source_cube": sha(src_path), "crosswalk": sha(xw_path)},
+            "tract_code_changes": [{k: c[k] for k in ("old", "new", "kind")} for c in applied],
+            "not_comparable_targets": null_targets}
     table = table.replace_schema_metadata({"strata": json.dumps(meta)})
     dest.parent.mkdir(parents=True, exist_ok=True)
     pq.write_table(table, dest, compression="zstd", row_group_size=8000, write_statistics=True)
@@ -160,13 +233,22 @@ def build(state: str, out: Path, source_vintage="2006-2010", target_vintage="201
     return dest
 
 
+def on_2010_tracts() -> list[str]:
+    """Vintages tabulated on 2010 tracts: the ones the 2010-2020 crosswalk moves."""
+    return sorted(v for v, c in load_summary_files()["vintages"].items() if c.get("tract_geography") == "2010")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--states", default="51", help="FIPS or postal codes, comma-separated, or 'all'")
     ap.add_argument("--out", type=Path, default=Path("build"))
+    ap.add_argument("--vintages", default="2006-2010",
+                    help="source vintages on 2010 tract lines, comma-separated, or 'all'")
     args = ap.parse_args(argv)
-    for s in parse_states(args.states):
-        build(s.strip(), args.out)
+    vintages = on_2010_tracts() if args.vintages == "all" else [resolve_vintage(v) for v in args.vintages.split(",")]
+    for v in vintages:
+        for s in parse_states(args.states):
+            build(s.strip(), args.out, source_vintage=v)
     return 0
 
 

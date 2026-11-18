@@ -1,0 +1,4520 @@
+{
+ "note": "Share measures (count over its universe, as a percent), added 2026-11-12 after the full-table inventory (registry/acs_inventory.json). Cell numbers are stored with the Census labels they resolve to; tests/test_shares.py re-reads the label files and fails if any drifts. A share missing a vintage is not published for it.",
+ "shares": [
+  {
+   "id": "pct_hispanic",
+   "label": "Hispanic or Latino",
+   "topic": "Race & ethnicity",
+   "count_numerator": "hispanic",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "012"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Hispanic or Latino:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "012"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Hispanic or Latino:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "012"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Hispanic or Latino:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "012"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Hispanic or Latino:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "012"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Hispanic or Latino:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_nh_black",
+   "label": "Black, non-Hispanic",
+   "topic": "Race & ethnicity",
+   "count_numerator": "nh_black",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Black or African American alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Black or African American alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Black or African American alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Black or African American alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Black or African American alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_nh_asian",
+   "label": "Asian, non-Hispanic",
+   "topic": "Race & ethnicity",
+   "count_numerator": "nh_asian",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "006"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Asian alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "006"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Asian alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "006"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Asian alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "006"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Asian alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "006"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Asian alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_nh_aian",
+   "label": "American Indian & Alaska Native, non-Hispanic",
+   "topic": "Race & ethnicity",
+   "count_numerator": "nh_aian",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "American Indian and Alaska Native alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "American Indian and Alaska Native alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "American Indian and Alaska Native alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "American Indian and Alaska Native alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "American Indian and Alaska Native alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_nh_nhpi",
+   "label": "Native Hawaiian & Pacific Islander, non-Hispanic",
+   "topic": "Race & ethnicity",
+   "count_numerator": "nh_nhpi",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Native Hawaiian and Other Pacific Islander alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Native Hawaiian and Other Pacific Islander alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Native Hawaiian and Other Pacific Islander alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Native Hawaiian and Other Pacific Islander alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Native Hawaiian and Other Pacific Islander alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_nh_other",
+   "label": "Some other race, non-Hispanic",
+   "topic": "Race & ethnicity",
+   "count_numerator": "nh_other",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Some other race alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Some other race alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Some other race alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Some other race alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Some other race alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_nh_multi",
+   "label": "Two or more races, non-Hispanic",
+   "topic": "Race & ethnicity",
+   "count_numerator": "nh_multi",
+   "count_denominator": "race_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B03002",
+     "numerator_cells": [
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Two or more races:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B03002",
+     "numerator_cells": [
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Two or more races:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B03002",
+     "numerator_cells": [
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Two or more races:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B03002",
+     "numerator_cells": [
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Two or more races:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B03002",
+     "numerator_cells": [
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Two or more races:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_under_5",
+   "label": "Under 5",
+   "topic": "Age & sex",
+   "count_numerator": "age_under_5",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "027"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "Under 5 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "027"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "Under 5 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "027"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "Under 5 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "027"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "Under 5 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "027"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "Under 5 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_under_18",
+   "label": "Under 18",
+   "topic": "Age & sex",
+   "count_numerator": "age_under_18",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "004",
+      "005",
+      "006",
+      "027",
+      "028",
+      "029",
+      "030"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years",
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "004",
+      "005",
+      "006",
+      "027",
+      "028",
+      "029",
+      "030"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years",
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "004",
+      "005",
+      "006",
+      "027",
+      "028",
+      "029",
+      "030"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years",
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "004",
+      "005",
+      "006",
+      "027",
+      "028",
+      "029",
+      "030"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years",
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "003",
+      "004",
+      "005",
+      "006",
+      "027",
+      "028",
+      "029",
+      "030"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years",
+      "Under 5 years",
+      "5 to 9 years",
+      "10 to 14 years",
+      "15 to 17 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_18_24",
+   "label": "Age 18 to 24",
+   "topic": "Age & sex",
+   "count_numerator": "age_18_24",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010",
+      "031",
+      "032",
+      "033",
+      "034"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years",
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010",
+      "031",
+      "032",
+      "033",
+      "034"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years",
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010",
+      "031",
+      "032",
+      "033",
+      "034"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years",
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010",
+      "031",
+      "032",
+      "033",
+      "034"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years",
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010",
+      "031",
+      "032",
+      "033",
+      "034"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years",
+      "18 and 19 years",
+      "20 years",
+      "21 years",
+      "22 to 24 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_25_34",
+   "label": "Age 25 to 34",
+   "topic": "Age & sex",
+   "count_numerator": "age_25_34",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "011",
+      "012",
+      "035",
+      "036"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "25 to 29 years",
+      "30 to 34 years",
+      "25 to 29 years",
+      "30 to 34 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "011",
+      "012",
+      "035",
+      "036"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "25 to 29 years",
+      "30 to 34 years",
+      "25 to 29 years",
+      "30 to 34 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "011",
+      "012",
+      "035",
+      "036"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "25 to 29 years",
+      "30 to 34 years",
+      "25 to 29 years",
+      "30 to 34 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "011",
+      "012",
+      "035",
+      "036"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "25 to 29 years",
+      "30 to 34 years",
+      "25 to 29 years",
+      "30 to 34 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "011",
+      "012",
+      "035",
+      "036"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "25 to 29 years",
+      "30 to 34 years",
+      "25 to 29 years",
+      "30 to 34 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_35_44",
+   "label": "Age 35 to 44",
+   "topic": "Age & sex",
+   "count_numerator": "age_35_44",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "013",
+      "014",
+      "037",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "35 to 39 years",
+      "40 to 44 years",
+      "35 to 39 years",
+      "40 to 44 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "013",
+      "014",
+      "037",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "35 to 39 years",
+      "40 to 44 years",
+      "35 to 39 years",
+      "40 to 44 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "013",
+      "014",
+      "037",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "35 to 39 years",
+      "40 to 44 years",
+      "35 to 39 years",
+      "40 to 44 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "013",
+      "014",
+      "037",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "35 to 39 years",
+      "40 to 44 years",
+      "35 to 39 years",
+      "40 to 44 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "013",
+      "014",
+      "037",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "35 to 39 years",
+      "40 to 44 years",
+      "35 to 39 years",
+      "40 to 44 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_45_64",
+   "label": "Age 45 to 64",
+   "topic": "Age & sex",
+   "count_numerator": "age_45_64",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "015",
+      "016",
+      "017",
+      "018",
+      "019",
+      "039",
+      "040",
+      "041",
+      "042",
+      "043"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years",
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "015",
+      "016",
+      "017",
+      "018",
+      "019",
+      "039",
+      "040",
+      "041",
+      "042",
+      "043"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years",
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "015",
+      "016",
+      "017",
+      "018",
+      "019",
+      "039",
+      "040",
+      "041",
+      "042",
+      "043"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years",
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "015",
+      "016",
+      "017",
+      "018",
+      "019",
+      "039",
+      "040",
+      "041",
+      "042",
+      "043"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years",
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "015",
+      "016",
+      "017",
+      "018",
+      "019",
+      "039",
+      "040",
+      "041",
+      "042",
+      "043"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years",
+      "45 to 49 years",
+      "50 to 54 years",
+      "55 to 59 years",
+      "60 and 61 years",
+      "62 to 64 years"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_65_plus",
+   "label": "Age 65 and over",
+   "topic": "Age & sex",
+   "count_numerator": "age_65_plus",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "044",
+      "045",
+      "046",
+      "047",
+      "048",
+      "049"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over",
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "044",
+      "045",
+      "046",
+      "047",
+      "048",
+      "049"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over",
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "044",
+      "045",
+      "046",
+      "047",
+      "048",
+      "049"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over",
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "044",
+      "045",
+      "046",
+      "047",
+      "048",
+      "049"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over",
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "044",
+      "045",
+      "046",
+      "047",
+      "048",
+      "049"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over",
+      "65 and 66 years",
+      "67 to 69 years",
+      "70 to 74 years",
+      "75 to 79 years",
+      "80 to 84 years",
+      "85 years and over"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_female",
+   "label": "Female",
+   "topic": "Age & sex",
+   "count_numerator": "female",
+   "count_denominator": "age_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B01001",
+     "numerator_cells": [
+      "026"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Female:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B01001",
+     "numerator_cells": [
+      "026"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Female:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B01001",
+     "numerator_cells": [
+      "026"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Female:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B01001",
+     "numerator_cells": [
+      "026"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Female:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B01001",
+     "numerator_cells": [
+      "026"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Female:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_family_households",
+   "label": "Family households",
+   "topic": "Households",
+   "count_numerator": "family_households",
+   "count_denominator": "household_type_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B11001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Family households:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B11001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Family households:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B11001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Family households:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B11001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Family households:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B11001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Family households:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_living_alone",
+   "label": "Householder living alone",
+   "topic": "Households",
+   "count_numerator": "living_alone",
+   "count_denominator": "household_type_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B11001",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Householder living alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B11001",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Householder living alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B11001",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Householder living alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B11001",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Householder living alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B11001",
+     "numerator_cells": [
+      "008"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Householder living alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_renter",
+   "label": "Renter-occupied households",
+   "topic": "Households",
+   "count_numerator": "renters_b25003",
+   "count_denominator": "tenure_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25003",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Renter occupied"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25003",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Renter occupied"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25003",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Renter occupied"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25003",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Renter occupied"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25003",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Renter occupied"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_no_vehicle",
+   "label": "Households with no vehicle",
+   "topic": "Households",
+   "count_numerator": "no_vehicle",
+   "count_denominator": "vehicle_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25044",
+     "numerator_cells": [
+      "003",
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No vehicle available",
+      "No vehicle available"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25044",
+     "numerator_cells": [
+      "003",
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No vehicle available",
+      "No vehicle available"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25044",
+     "numerator_cells": [
+      "003",
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No vehicle available",
+      "No vehicle available"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25044",
+     "numerator_cells": [
+      "003",
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No vehicle available",
+      "No vehicle available"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25044",
+     "numerator_cells": [
+      "003",
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No vehicle available",
+      "No vehicle available"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_crowded",
+   "label": "Crowded (more than 1 person per room)",
+   "topic": "Households",
+   "count_numerator": "crowded",
+   "count_denominator": "crowding_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25014",
+     "numerator_cells": [
+      "005",
+      "006",
+      "007",
+      "011",
+      "012",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room",
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25014",
+     "numerator_cells": [
+      "005",
+      "006",
+      "007",
+      "011",
+      "012",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room",
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25014",
+     "numerator_cells": [
+      "005",
+      "006",
+      "007",
+      "011",
+      "012",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room",
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25014",
+     "numerator_cells": [
+      "005",
+      "006",
+      "007",
+      "011",
+      "012",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room",
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25014",
+     "numerator_cells": [
+      "005",
+      "006",
+      "007",
+      "011",
+      "012",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room",
+      "1.01 to 1.50 occupants per room",
+      "1.51 to 2.00 occupants per room",
+      "2.01 or more occupants per room"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_poverty",
+   "label": "Below the poverty line",
+   "topic": "Economic",
+   "count_numerator": "in_poverty",
+   "count_denominator": "poverty_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B17001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Income in the past 12 months below poverty level:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B17001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Income in the past 12 months below poverty level:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B17001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Income in the past 12 months below poverty level:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B17001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Income in the past 12 months below poverty level:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B17001",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Income in the past 12 months below poverty level:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Universe: people whose poverty status is determined (excludes institutionalized people, college dorms, military barracks, and unrelated children under 15)."
+  },
+  {
+   "id": "pct_below_200pct_poverty",
+   "label": "Below 200% of the poverty line",
+   "topic": "Economic",
+   "count_numerator": "below_200pct_poverty",
+   "count_denominator": "poverty_ratio_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "C17002",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under .50",
+      ".50 to .99",
+      "1.00 to 1.24",
+      "1.25 to 1.49",
+      "1.50 to 1.84",
+      "1.85 to 1.99"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "C17002",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under .50",
+      ".50 to .99",
+      "1.00 to 1.24",
+      "1.25 to 1.49",
+      "1.50 to 1.84",
+      "1.85 to 1.99"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "C17002",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under .50",
+      ".50 to .99",
+      "1.00 to 1.24",
+      "1.25 to 1.49",
+      "1.50 to 1.84",
+      "1.85 to 1.99"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "C17002",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under .50",
+      ".50 to .99",
+      "1.00 to 1.24",
+      "1.25 to 1.49",
+      "1.50 to 1.84",
+      "1.85 to 1.99"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "C17002",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Under .50",
+      ".50 to .99",
+      "1.00 to 1.24",
+      "1.25 to 1.49",
+      "1.50 to 1.84",
+      "1.85 to 1.99"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "unemployment_rate",
+   "label": "Unemployment rate",
+   "topic": "Economic",
+   "count_numerator": "unemployed",
+   "count_denominator": "civilian_labor_force",
+   "sources": {
+    "2006-2010": {
+     "table": "B23001",
+     "numerator_cells": [
+      "008",
+      "015",
+      "022",
+      "029",
+      "036",
+      "043",
+      "050",
+      "057",
+      "064",
+      "071",
+      "076",
+      "081",
+      "086",
+      "094",
+      "101",
+      "108",
+      "115",
+      "122",
+      "129",
+      "136",
+      "143",
+      "150",
+      "157",
+      "162",
+      "167",
+      "172"
+     ],
+     "denominator_cells": [
+      "007",
+      "008",
+      "014",
+      "015",
+      "021",
+      "022",
+      "028",
+      "029",
+      "035",
+      "036",
+      "042",
+      "043",
+      "049",
+      "050",
+      "056",
+      "057",
+      "063",
+      "064",
+      "070",
+      "071",
+      "075",
+      "076",
+      "080",
+      "081",
+      "085",
+      "086",
+      "093",
+      "094",
+      "100",
+      "101",
+      "107",
+      "108",
+      "114",
+      "115",
+      "121",
+      "122",
+      "128",
+      "129",
+      "135",
+      "136",
+      "142",
+      "143",
+      "149",
+      "150",
+      "156",
+      "157",
+      "161",
+      "162",
+      "166",
+      "167",
+      "171",
+      "172"
+     ],
+     "numerator_labels": [
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed",
+      "Unemployed"
+     ],
+     "denominator_labels": [
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed",
+      "Employed",
+      "Unemployed"
+     ]
+    },
+    "2016-2020": {
+     "table": "B23025",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "003"
+     ],
+     "numerator_labels": [
+      "Unemployed"
+     ],
+     "denominator_labels": [
+      "Civilian labor force:"
+     ],
+     "resolved_from": "methods audit 2026-11-17: use the collapsed table where Census publishes it"
+    },
+    "2011-2015": {
+     "table": "B23025",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "003"
+     ],
+     "numerator_labels": [
+      "Unemployed"
+     ],
+     "denominator_labels": [
+      "Civilian labor force:"
+     ],
+     "resolved_from": "methods audit 2026-11-17: use the collapsed table where Census publishes it"
+    },
+    "2015-2019": {
+     "table": "B23025",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "003"
+     ],
+     "numerator_labels": [
+      "Unemployed"
+     ],
+     "denominator_labels": [
+      "Civilian labor force:"
+     ],
+     "resolved_from": "methods audit 2026-11-17: use the collapsed table where Census publishes it"
+    },
+    "2020-2024": {
+     "table": "B23025",
+     "numerator_cells": [
+      "005"
+     ],
+     "denominator_cells": [
+      "003"
+     ],
+     "numerator_labels": [
+      "Unemployed"
+     ],
+     "denominator_labels": [
+      "Civilian labor force:"
+     ],
+     "resolved_from": "methods audit 2026-11-17: use the collapsed table where Census publishes it"
+    }
+   },
+   "note": "Unemployed over the civilian labor force. 2011-15 on: B23025 (Census's collapsed table, with directly computed MOEs; Handbook ch. 8 advises using the collapsed table when one exists). 2006-2010: B23001 (sex by age by employment status), summed, because B23025 did not exist yet; same definition. Caution: the 2008 ACS changed the labor-force questions, and 2006-2010 includes 2006-2007 responses (Handbook 2020 ch. 4)."
+  },
+  {
+   "id": "pct_no_hs_diploma",
+   "label": "No high school diploma, 25+",
+   "topic": "Economic",
+   "count_numerator": "no_hs_diploma",
+   "count_denominator": "edu_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B15002",
+     "numerator_cells": [
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010",
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "026",
+      "027"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No schooling completed",
+      "Nursery to 4th grade",
+      "5th and 6th grade",
+      "7th and 8th grade",
+      "9th grade",
+      "10th grade",
+      "11th grade",
+      "12th grade, no diploma",
+      "No schooling completed",
+      "Nursery to 4th grade",
+      "5th and 6th grade",
+      "7th and 8th grade",
+      "9th grade",
+      "10th grade",
+      "11th grade",
+      "12th grade, no diploma"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B15003",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010",
+      "011",
+      "012",
+      "013",
+      "014",
+      "015",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No schooling completed",
+      "Nursery school",
+      "Kindergarten",
+      "1st grade",
+      "2nd grade",
+      "3rd grade",
+      "4th grade",
+      "5th grade",
+      "6th grade",
+      "7th grade",
+      "8th grade",
+      "9th grade",
+      "10th grade",
+      "11th grade",
+      "12th grade, no diploma"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B15003",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010",
+      "011",
+      "012",
+      "013",
+      "014",
+      "015",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No schooling completed",
+      "Nursery school",
+      "Kindergarten",
+      "1st grade",
+      "2nd grade",
+      "3rd grade",
+      "4th grade",
+      "5th grade",
+      "6th grade",
+      "7th grade",
+      "8th grade",
+      "9th grade",
+      "10th grade",
+      "11th grade",
+      "12th grade, no diploma"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B15003",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010",
+      "011",
+      "012",
+      "013",
+      "014",
+      "015",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No schooling completed",
+      "Nursery school",
+      "Kindergarten",
+      "1st grade",
+      "2nd grade",
+      "3rd grade",
+      "4th grade",
+      "5th grade",
+      "6th grade",
+      "7th grade",
+      "8th grade",
+      "9th grade",
+      "10th grade",
+      "11th grade",
+      "12th grade, no diploma"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B15003",
+     "numerator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010",
+      "011",
+      "012",
+      "013",
+      "014",
+      "015",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No schooling completed",
+      "Nursery school",
+      "Kindergarten",
+      "1st grade",
+      "2nd grade",
+      "3rd grade",
+      "4th grade",
+      "5th grade",
+      "6th grade",
+      "7th grade",
+      "8th grade",
+      "9th grade",
+      "10th grade",
+      "11th grade",
+      "12th grade, no diploma"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "B15003 does not exist in 2006-2010; B15002 (by sex) gives the same total."
+  },
+  {
+   "id": "pct_vacant",
+   "label": "Vacant housing units",
+   "topic": "Housing",
+   "count_numerator": "vacant_units",
+   "count_denominator": "housing_units",
+   "sources": {
+    "2006-2010": {
+     "table": "B25002",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Vacant"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25002",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Vacant"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25002",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Vacant"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25002",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Vacant"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25002",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Vacant"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_rent_burdened",
+   "label": "Renters paying 30%+ of income on rent",
+   "topic": "Housing",
+   "count_numerator": "rent_burdened",
+   "count_denominator": "rent_burden_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25070",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "denominator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "numerator_labels": [
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "denominator_labels": [
+      "Less than 10.0 percent",
+      "10.0 to 14.9 percent",
+      "15.0 to 19.9 percent",
+      "20.0 to 24.9 percent",
+      "25.0 to 29.9 percent",
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25070",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "denominator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "numerator_labels": [
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "denominator_labels": [
+      "Less than 10.0 percent",
+      "10.0 to 14.9 percent",
+      "15.0 to 19.9 percent",
+      "20.0 to 24.9 percent",
+      "25.0 to 29.9 percent",
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25070",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "denominator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "numerator_labels": [
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "denominator_labels": [
+      "Less than 10.0 percent",
+      "10.0 to 14.9 percent",
+      "15.0 to 19.9 percent",
+      "20.0 to 24.9 percent",
+      "25.0 to 29.9 percent",
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25070",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "denominator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "numerator_labels": [
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "denominator_labels": [
+      "Less than 10.0 percent",
+      "10.0 to 14.9 percent",
+      "15.0 to 19.9 percent",
+      "20.0 to 24.9 percent",
+      "25.0 to 29.9 percent",
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25070",
+     "numerator_cells": [
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "denominator_cells": [
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010"
+     ],
+     "numerator_labels": [
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "denominator_labels": [
+      "Less than 10.0 percent",
+      "10.0 to 14.9 percent",
+      "15.0 to 19.9 percent",
+      "20.0 to 24.9 percent",
+      "25.0 to 29.9 percent",
+      "30.0 to 34.9 percent",
+      "35.0 to 39.9 percent",
+      "40.0 to 49.9 percent",
+      "50.0 percent or more"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Over renters for whom the percentage is computed (B25070_011 'Not computed' excluded), the standard HUD convention."
+  },
+  {
+   "id": "pct_single_family_detached",
+   "label": "Single-family detached homes",
+   "topic": "Housing",
+   "count_numerator": "sf_detached",
+   "count_denominator": "units_in_structure_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25024",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1, detached"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25024",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1, detached"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25024",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1, detached"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25024",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1, detached"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25024",
+     "numerator_cells": [
+      "002"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "1, detached"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_large_multifamily",
+   "label": "Units in buildings of 20+ units",
+   "topic": "Housing",
+   "count_numerator": "large_multifamily",
+   "count_denominator": "units_in_structure_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25024",
+     "numerator_cells": [
+      "008",
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "20 to 49",
+      "50 or more"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25024",
+     "numerator_cells": [
+      "008",
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "20 to 49",
+      "50 or more"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25024",
+     "numerator_cells": [
+      "008",
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "20 to 49",
+      "50 or more"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25024",
+     "numerator_cells": [
+      "008",
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "20 to 49",
+      "50 or more"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25024",
+     "numerator_cells": [
+      "008",
+      "009"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "20 to 49",
+      "50 or more"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_built_before_1940",
+   "label": "Built before 1940",
+   "topic": "Housing",
+   "count_numerator": "built_pre_1940",
+   "count_denominator": "year_built_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B25034",
+     "numerator_cells": [
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Built 1939 or earlier"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B25034",
+     "numerator_cells": [
+      "011"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Built 1939 or earlier"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B25034",
+     "numerator_cells": [
+      "011"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Built 1939 or earlier"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B25034",
+     "numerator_cells": [
+      "011"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Built 1939 or earlier"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B25034",
+     "numerator_cells": [
+      "011"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Built 1939 or earlier"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "B25034 gained a 'Built 2014 or later' row in 2016-2020; 'Built 1939 or earlier' moved from line 10 to 11."
+  },
+  {
+   "id": "pct_foreign_born",
+   "label": "Foreign-born",
+   "topic": "People & movement",
+   "count_numerator": "foreign_born",
+   "count_denominator": "nativity_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B05012",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Foreign-Born"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B05012",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Foreign-Born"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B05012",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Foreign-Born"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B05012",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Foreign-Born"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B05012",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Foreign-born"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_limited_english",
+   "label": "Limited-English households",
+   "topic": "People & movement",
+   "count_numerator": "limited_english_hh",
+   "count_denominator": "language_hh_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B16002",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No one 14 and over speaks English only or speaks English \"very well\"",
+      "No one 14 and over speaks English only or speaks English \"very well\"",
+      "No one 14 and over speaks English only or speaks English \"very well\"",
+      "No one 14 and over speaks English only or speaks English \"very well\""
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "C16002",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B16002",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2006-2010"
+    },
+    "2015-2019": {
+     "table": "C16002",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "C16002",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household",
+      "Limited English speaking household"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Census renamed 'linguistically isolated' (B16002, 2006-2010) to 'limited English speaking household' (C16002) with the same definition: no one 14 or older speaks only English or speaks English 'very well'."
+  },
+  {
+   "id": "pct_moved_past_year",
+   "label": "Moved in the past year",
+   "topic": "People & movement",
+   "count_numerator": "moved_past_year",
+   "count_denominator": "mobility_universe",
+   "sources": {
+    "2006-2010": {
+     "table": "B07003",
+     "numerator_cells": [
+      "007",
+      "010",
+      "013",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Moved within same county:",
+      "Moved from different county within same state:",
+      "Moved from different state:",
+      "Moved from abroad:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B07003",
+     "numerator_cells": [
+      "007",
+      "010",
+      "013",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Moved within same county:",
+      "Moved from different county within same state:",
+      "Moved from different state:",
+      "Moved from abroad:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B07003",
+     "numerator_cells": [
+      "007",
+      "010",
+      "013",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Moved within same county:",
+      "Moved from different county within same state:",
+      "Moved from different state:",
+      "Moved from abroad:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B07003",
+     "numerator_cells": [
+      "007",
+      "010",
+      "013",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Moved within same county:",
+      "Moved from different county within same state:",
+      "Moved from different state:",
+      "Moved from abroad:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B07003",
+     "numerator_cells": [
+      "007",
+      "010",
+      "013",
+      "016"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Moved within same county:",
+      "Moved from different county within same state:",
+      "Moved from different state:",
+      "Moved from abroad:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_transit",
+   "label": "Commute by public transit",
+   "topic": "People & movement",
+   "count_numerator": "commute_transit",
+   "count_denominator": "workers",
+   "sources": {
+    "2006-2010": {
+     "table": "B08301",
+     "numerator_cells": [
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Public transportation (excluding taxicab):"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B08301",
+     "numerator_cells": [
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Public transportation (excluding taxicab):"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B08301",
+     "numerator_cells": [
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Public transportation (excluding taxicab):"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B08301",
+     "numerator_cells": [
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Public transportation (excluding taxicab):"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B08301",
+     "numerator_cells": [
+      "010"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Public transportation:"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_walk_bike",
+   "label": "Commute by walking or bike",
+   "topic": "People & movement",
+   "count_numerator": "commute_walk_bike",
+   "count_denominator": "workers",
+   "sources": {
+    "2006-2010": {
+     "table": "B08301",
+     "numerator_cells": [
+      "018",
+      "019"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Bicycle",
+      "Walked"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B08301",
+     "numerator_cells": [
+      "018",
+      "019"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Bicycle",
+      "Walked"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B08301",
+     "numerator_cells": [
+      "018",
+      "019"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Bicycle",
+      "Walked"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B08301",
+     "numerator_cells": [
+      "018",
+      "019"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Bicycle",
+      "Walked"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B08301",
+     "numerator_cells": [
+      "018",
+      "019"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Bicycle",
+      "Walked"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_work_from_home",
+   "label": "Work from home",
+   "topic": "People & movement",
+   "count_numerator": "work_from_home",
+   "count_denominator": "workers",
+   "sources": {
+    "2006-2010": {
+     "table": "B08301",
+     "numerator_cells": [
+      "021"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Worked at home"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B08301",
+     "numerator_cells": [
+      "021"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Worked from home"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B08301",
+     "numerator_cells": [
+      "021"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Worked at home"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B08301",
+     "numerator_cells": [
+      "021"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Worked from home"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B08301",
+     "numerator_cells": [
+      "021"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Worked from home"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_drove_alone",
+   "label": "Drove alone to work",
+   "topic": "People & movement",
+   "count_numerator": "drove_alone",
+   "count_denominator": "workers",
+   "sources": {
+    "2006-2010": {
+     "table": "B08301",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Drove alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2016-2020": {
+     "table": "B08301",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Drove alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B08301",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Drove alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B08301",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Drove alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B08301",
+     "numerator_cells": [
+      "003"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Drove alone"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   }
+  },
+  {
+   "id": "pct_uninsured",
+   "label": "No health insurance",
+   "topic": "Health & access",
+   "count_numerator": "uninsured",
+   "count_denominator": "insurance_universe",
+   "sources": {
+    "2016-2020": {
+     "table": "B27010",
+     "numerator_cells": [
+      "017",
+      "033",
+      "050",
+      "066"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B27010",
+     "numerator_cells": [
+      "017",
+      "033",
+      "050",
+      "066"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B27010",
+     "numerator_cells": [
+      "017",
+      "033",
+      "050",
+      "066"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B27010",
+     "numerator_cells": [
+      "017",
+      "033",
+      "050",
+      "066"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage",
+      "No health insurance coverage"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Not available for 2006-2010: tract-level health insurance tables begin with the 2008-2012 release."
+  },
+  {
+   "id": "pct_disability",
+   "label": "With a disability",
+   "topic": "Health & access",
+   "count_numerator": "with_disability",
+   "count_denominator": "disability_universe",
+   "sources": {
+    "2016-2020": {
+     "table": "B18101",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013",
+      "016",
+      "019",
+      "023",
+      "026",
+      "029",
+      "032",
+      "035",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2011-2015": {
+     "table": "B18101",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013",
+      "016",
+      "019",
+      "023",
+      "026",
+      "029",
+      "032",
+      "035",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2015-2019": {
+     "table": "B18101",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013",
+      "016",
+      "019",
+      "023",
+      "026",
+      "029",
+      "032",
+      "035",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B18101",
+     "numerator_cells": [
+      "004",
+      "007",
+      "010",
+      "013",
+      "016",
+      "019",
+      "023",
+      "026",
+      "029",
+      "032",
+      "035",
+      "038"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability",
+      "With a disability"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Not available for 2006-2010: disability tables were redesigned in 2008 and reach tracts from 2008-2012."
+  },
+  {
+   "id": "pct_broadband",
+   "label": "Households with broadband",
+   "topic": "Health & access",
+   "count_numerator": "broadband",
+   "count_denominator": "internet_universe",
+   "sources": {
+    "2016-2020": {
+     "table": "B28002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Broadband of any type"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2015-2019": {
+     "table": "B28002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Broadband of any type"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B28002",
+     "numerator_cells": [
+      "004"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "Broadband of any type"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Not available for 2006-2010: computer and internet questions begin in 2013."
+  },
+  {
+   "id": "pct_no_internet",
+   "label": "Households with no internet access",
+   "topic": "Health & access",
+   "count_numerator": "no_internet",
+   "count_denominator": "internet_universe",
+   "sources": {
+    "2016-2020": {
+     "table": "B28002",
+     "numerator_cells": [
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No Internet access"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ]
+    },
+    "2015-2019": {
+     "table": "B28002",
+     "numerator_cells": [
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No Internet access"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    },
+    "2020-2024": {
+     "table": "B28002",
+     "numerator_cells": [
+      "013"
+     ],
+     "denominator_cells": [
+      "001"
+     ],
+     "numerator_labels": [
+      "No Internet access"
+     ],
+     "denominator_labels": [
+      "Total:"
+     ],
+     "resolved_from": "2016-2020"
+    }
+   },
+   "note": "Not available for 2006-2010."
+  }
+ ]
+}

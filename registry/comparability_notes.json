@@ -1,0 +1,32 @@
+{
+  "note": "Census's own cautions about comparing particular measures across particular ACS periods. A note applies to a change map when the measure matches and either period contains one of the listed years. Shown under the change legend; listed in the data dictionary.",
+  "notes": [
+    {"measures": ["unemployment_rate"], "years": [2006, 2007],
+     "text": "The 2008 ACS changed the labor-force questions; Census recommends caution comparing data that include 2006–2007 responses with later data.",
+     "source": "Understanding and Using ACS Data (Census, 2020), ch. 4"},
+    {"measures": ["pct_bachelors_plus", "pct_no_hs_diploma"], "years": [2006, 2007],
+     "text": "The educational-attainment question changed in 2008; Census flags education for caution when comparing 2006–10 with later periods.",
+     "source": "Census, Comparing 2011-2015 ACS 5-year data (caution list)"},
+    {"measures": ["mean_home_value"], "years": [2006, 2007],
+     "text": "The property-value question changed in 2008, which Census says may have caused an inconsistency with earlier values.",
+     "source": "ACS 2020 Subject Definitions, Value"},
+    {"measures": ["mean_home_value"], "years": [2018, 2019, 2020, 2021, 2022],
+     "text": "From the 2018–22 release on, Census reports home values in the final year's dollars; earlier periods are reported values without adjustment. STRATA's factor uses average prices over pooled periods, but changes across that boundary mix the two conventions.",
+     "source": "ACS User Note 2023-07"},
+    {"measures": ["pct_limited_english"], "years": [2006, 2007, 2008, 2009, 2010],
+     "text": "Census flags language for caution in comparisons with 2006–10 (the 'linguistically isolated' table was renamed, with the same definition).",
+     "source": "Census, Comparing 2011-2015 ACS 5-year data"},
+    {"measures": ["pct_hispanic", "pct_nh_white", "pct_nh_black", "pct_nh_asian", "pct_nh_aian", "pct_nh_nhpi", "pct_nh_other", "pct_nh_multi"], "years": [2006, 2007, 2008, 2009, 2010],
+     "text": "Census flags race and Hispanic origin for caution in comparisons with 2006–10.",
+     "source": "Census, Comparing 2011-2015 ACS 5-year data"},
+    {"measures": ["pct_work_from_home", "pct_transit", "pct_drove_alone", "pct_walk_bike"], "years": [2020, 2021, 2022],
+     "text": "Periods that include 2020–2022 contain pandemic-era commuting; working from home and transit use shifted sharply.",
+     "source": "ACS commuting releases, 2021–2023"},
+    {"measures": ["pct_transit"], "years": [2019, 2020, 2021, 2022, 2023, 2024],
+     "text": "The 2019 questionnaire split rail categories; the public-transportation total remains comparable.",
+     "source": "ACS 2019 Subject Definitions, Means of Transportation"},
+    {"measures": ["*"], "years": [2020],
+     "text": "Census asks for caution comparing periods that include 2020: the pandemic disrupted collection and Census changed its nonresponse weighting.",
+     "source": "Census, Comparing 2016-2020 ACS 5-year data"}
+  ]
+}

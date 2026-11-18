@@ -1,0 +1,62 @@
+{
+  "about": "Areas for which Census withheld estimates, or told users to take care, because of a known data problem. The map shows these as withheld or cautioned, with the erratum, instead of as missing data. etl/build_geometry.py keeps their polygons although the cube has no row; the manifest carries this file to the app.",
+  "errata": [
+    {
+      "id": "148",
+      "title": "Data Collection Error in Wyandanch CDP, New York and Brentwood CDP, New York",
+      "url": "https://www.census.gov/programs-surveys/acs/technical-documentation/errata/148.html",
+      "reason": "after a 2020 data-collection error",
+      "summary": "A problem in 2020 data collection (a limited number of computer-assisted personal interviews) across multiple topics. Census suppresses the 2019-2023 and 2020-2024 5-year products for both places and their nested geographies, and advises caution comparing 2016-2020, 2017-2021 and 2018-2022 5-year estimates there.",
+      "checked": "2026-11-17",
+      "how_derived": "Tracts: the 14 Suffolk County 2020 tracts in the 2024 cartographic boundary file that are absent from Census's own 2020-2024 Geos file (Geos20245YR.txt); they do not overlap any other tract and together cover the two places.",
+      "withheld": {
+        "2020-2024": {
+          "tract": [
+            "36103122406",
+            "36103122501",
+            "36103145601",
+            "36103145602",
+            "36103145603",
+            "36103145604",
+            "36103145605",
+            "36103145702",
+            "36103146001",
+            "36103146105",
+            "36103146106",
+            "36103146201",
+            "36103146204",
+            "36103201200"
+          ],
+          "place": [
+            "3608026",
+            "3683294"
+          ]
+        }
+      },
+      "caution": {
+        "2016-2020": {
+          "tract": [
+            "36103122406",
+            "36103122501",
+            "36103145601",
+            "36103145602",
+            "36103145603",
+            "36103145604",
+            "36103145605",
+            "36103145702",
+            "36103146001",
+            "36103146105",
+            "36103146106",
+            "36103146201",
+            "36103146204",
+            "36103201200"
+          ],
+          "place": [
+            "3608026",
+            "3683294"
+          ]
+        }
+      }
+    }
+  ]
+}

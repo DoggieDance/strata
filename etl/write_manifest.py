@@ -19,8 +19,9 @@ from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
 
-from etl.common import load_states, REGISTRY_DIR, LevelUnavailable, level_cfg, load_measures, load_summary_files
+from etl.common import load_shares, load_states, REGISTRY_DIR, LevelUnavailable, level_cfg, load_measures, load_summary_files
 from etl.deflate import series, vintage_year
+from etl.harmonize import on_2010_tracts
 
 
 def _years(v: str) -> range:
@@ -78,7 +79,7 @@ def change_magnitudes(out: Path, new_files, base_files, measures, dollars, facto
     base = base.reindex(new.index)
     res = {}
     for m in measures:
-        f = factor if dollars[m] else 1.0
+        f = (factor.get(m, 1.0) if isinstance(factor, dict) else factor) if dollars[m] else 1.0
         x1, m1 = base[f"{m}_e"].to_numpy("float64"), base[f"{m}_m"].to_numpy("float64")
         x2, m2 = new[f"{m}_e"].to_numpy("float64"), new[f"{m}_m"].to_numpy("float64")
         ok = np.isfinite(x1) & np.isfinite(m1) & np.isfinite(x2) & np.isfinite(m2)
@@ -87,8 +88,32 @@ def change_magnitudes(out: Path, new_files, base_files, measures, dollars, facto
         with np.errstate(divide="ignore", invalid="ignore"):
             sig = np.where(se == 0, d != 0, np.abs(d) / se >= 1.645)
         v = np.sort(np.abs(d[ok & sig]))
-        res[m] = {"break": float(v[(len(v) - 1) // 2]) if len(v) else 0.0, "n": int(len(v))}
+        res[m] = {"break": float(v[(len(v) - 1) // 2]) if len(v) else 0.0, "n": int(len(v)),
+                  "tested": int(ok.sum())}
+        # Benjamini-Hochberg threshold over every valid test nationally (app/engine/change.js bhThreshold).
+        with np.errstate(divide="ignore", invalid="ignore"):
+            z = np.where(se == 0, np.where(d != 0, np.inf, 0.0), np.abs(d) / se)[ok]
+        res[m]["bh_z"] = bh_threshold(z, 0.10)
     return res
+
+
+def bh_threshold(z: np.ndarray, q: float) -> float | None:
+    """Smallest |Z| significant at false-discovery rate q (Benjamini-Hochberg 1995);
+    None if no test passes. Mirrors bhThreshold in app/engine/change.js."""
+    import math
+    p = np.sort(np.array([math.erfc(abs(x) / math.sqrt(2)) if np.isfinite(x) else 0.0 for x in z]))
+    m = len(p)
+    if not m:
+        return None
+    ok = np.nonzero(p <= (np.arange(1, m + 1) / m) * q)[0]
+    if not len(ok):
+        return None
+    pk = p[ok[-1]]
+    lo, hi = 0.0, 40.0
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if math.erfc(mid / math.sqrt(2)) > pk else (lo, mid)
+    return hi
 
 
 def build(out: Path) -> dict:
@@ -108,7 +133,18 @@ def build(out: Path) -> dict:
     def rows(rel: str) -> int:
         return pq.ParquetFile(out / rel).metadata.num_rows
 
+    all_v = sorted(load_summary_files()["vintages"])
+    for m in pres["measures"]:
+        m.setdefault("vintages", all_v)
+    for sh in load_shares():
+        pres["measures"].append({"id": sh["id"], "label": sh["label"], "fmt": "pct", "topic": sh["topic"],
+                                 "vintages": sorted(sh["sources"]), **({"note": sh["note"]} if sh.get("note") else {})})
+        kinds[sh["id"]] = {"kind": "percent", "dollars": False}
     measure_ids = [m["id"] for m in pres["measures"]]
+    by_id = {m["id"]: m for m in pres["measures"]}
+
+    def ids_for(v):
+        return [i for i in measure_ids if v in by_id[i]["vintages"]]
     levels = {}
     for lv, p in pres["levels"].items():
         entry = {**p, "vintages": {}}
@@ -133,42 +169,92 @@ def build(out: Path) -> dict:
             per_state = [st for st in states if st != "us"]
             if len(per_state) == len(pres["states"]) and lv != "county":
                 entry.setdefault("national_breaks", {})[v] = national_breaks(
-                    out, [states[st]["cube"] for st in per_state], measure_ids)
+                    out, [states[st]["cube"] for st in per_state], ids_for(v))
             if states:
                 entry["vintages"][v] = states
         harm = {}
-        for st in pres["states"]:
-            h = f"harmonized/2006-2010/{lv}-2020/{st}.parquet"
-            if (out / h).exists():
-                harm.setdefault("2006-2010", {"onto": "2016-2020", "states": {}})["states"][st] = {
-                    "cube": h, "geo": f"geo/2016-2020/{lv}/{st}.geojson",
-                    "names": f"geo/2016-2020/{lv}/{st}.names.json", "rows": rows(h)}
+        # Periods on 2010 tracts, plus any re-keyed copies (Connecticut 2020-2024).
+        for hv in sorted(set(on_2010_tracts()) | {d.name for d in (out / "harmonized").glob("*") if d.is_dir()}):
+            for st in pres["states"]:
+                h = f"harmonized/{hv}/{lv}-2020/{st}.parquet"
+                if (out / h).exists():
+                    harm.setdefault(hv, {"onto": "2016-2020", "states": {}})["states"][st] = {
+                        "cube": h, "geo": f"geo/2016-2020/{lv}/{st}.geojson",
+                        "names": f"geo/2016-2020/{lv}/{st}.names.json", "rows": rows(h)}
+            if hv in harm and len(harm[hv]["states"]) == len(pres["states"]):
+                harm[hv]["national_breaks"] = national_breaks(
+                    out, [x["cube"] for x in harm[hv]["states"].values()], ids_for(hv))
         if harm:
-            hs = harm["2006-2010"]["states"]
-            if len(hs) == len(pres["states"]):
-                harm["2006-2010"]["national_breaks"] = national_breaks(
-                    out, [x["cube"] for x in hs.values()], measure_ids)
             entry["harmonized"] = harm
         levels[lv] = entry
 
+    # Change maps (spec 05): every pair of non-overlapping periods, at the levels
+    # whose geography can be held fixed: tracts on 2020 lines (periods on 2010
+    # tracts via the harmonized cubes) and counties (boundary changes registered
+    # in county_changes.json). The shade split is computed nationally once every
+    # state is built, with the same Z test the app runs.
     s = series()
     changes = json.loads((REGISTRY_DIR / "county_changes.json").read_text())
-    factor = s[vintage_year("2016-2020")] / s[vintage_year("2006-2010")]
     dollars = {m["id"]: bool(kinds.get(m["id"], {}).get("dollars")) for m in pres["measures"]}
     n_states = len(pres["states"])
-    for lv, entry in levels.items():
-        new = {k: v for k, v in entry["vintages"].get("2016-2020", {}).items() if k != "us"}
-        base = (entry.get("harmonized", {}).get("2006-2010", {}).get("states", {}) if lv == "tract"
-                else {k: v for k, v in entry["vintages"].get("2006-2010", {}).items() if k != "us"} if lv == "county"
-                else {})
-        if len(new) == n_states and len(base) == n_states:
-            entry["national_change"] = change_magnitudes(
-                out, [new[k]["cube"] for k in sorted(new)], [base[k]["cube"] for k in sorted(base)],
-                measure_ids, dollars, factor, changes if lv == "county" else None)
+    tract_geo = {v: c.get("tract_geography") for v, c in load_summary_files()["vintages"].items()}
+
+    def side(lv, v):
+        e = levels[lv]
+        h = e.get("harmonized", {}).get(v, {}).get("states", {})
+        if lv == "tract" and tract_geo[v] == "2010":
+            return h
+        own = {k: x for k, x in e["vintages"].get(v, {}).items() if k != "us"}
+        # A state re-keyed onto 2020 tract codes (Connecticut 2020-2024) uses that copy.
+        return {**own, **h} if lv == "tract" else own
+
+    # Dollar basis per measure: None = end-year dollars in every period;
+    # an int N = pooled nominal values for vintages ending in year <= N.
+    dollar_bases = {}
+    for m in reg["measures"]:
+        if m.get("derives") and m.get("dollar_basis"):
+            dollar_bases[m["derives"]] = m["dollar_basis"]["nominal_pooled_through_endyear"]
+
+    def pooled(v, basis):
+        return basis is not None and vintage_year(v) <= basis
+
+    def price_level(v, basis):
+        if pooled(v, basis):
+            a0, b0 = (int(x) for x in v.split("-"))
+            return sum(s[y] for y in range(a0, b0 + 1)) / (b0 - a0 + 1)
+        return s[vintage_year(v)]
+
+    def basis_label(v, basis):
+        return f"average {v} prices (not inflation-adjusted by Census)" if pooled(v, basis) else f"{vintage_year(v)} dollars"
+
+    comparisons = []
+    for i, a in enumerate(vintages):
+        for b in vintages[i + 1:]:
+            c = {"from": a, "to": b, "valid": not overlaps(a, b),
+                 "why": "overlapping periods share sample years" if overlaps(a, b) else "non-overlapping periods"}
+            if c["valid"]:
+                c["factor"] = s[vintage_year(b)] / s[vintage_year(a)]
+                # Per-measure factors where a measure's dollars are not end-year
+                # dollars in every period (home value before 2018-22).
+                c["factors"] = {mid: price_level(b, basis) / price_level(a, basis)
+                                for mid, basis in dollar_bases.items() if basis}
+                c["price_basis"] = {mid: [basis_label(a, basis), basis_label(b, basis)] for mid, basis in dollar_bases.items() if basis}
+                c["measures"] = [i2 for i2 in ids_for(a) if b in by_id[i2]["vintages"]]
+                c["levels"] = {}
+                for lv in ("tract", "county"):
+                    sa, sb = side(lv, a), side(lv, b)
+                    both = sorted(set(sa) & set(sb))
+                    if not both:
+                        continue
+                    lc = {"states": both}
+                    if len(both) == n_states:
+                        lc["national"] = change_magnitudes(
+                            out, [sb[k]["cube"] for k in both], [sa[k]["cube"] for k in both],
+                            c["measures"], dollars, {mid: c["factors"].get(mid, c["factor"]) for mid in c["measures"]},
+                            changes if lv == "county" else None)
+                    c["levels"][lv] = lc
+            comparisons.append(c)
     years = sorted({vintage_year(v) for v in vintages})
-    comparisons = [{"from": a, "to": b, "valid": not overlaps(a, b),
-                    "why": "overlapping periods share sample years" if overlaps(a, b) else "non-overlapping periods"}
-                   for i, a in enumerate(vintages) for b in vintages[i + 1:]]
     return {
         "built": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "base": ".",
@@ -176,11 +262,18 @@ def build(out: Path) -> dict:
         "outlines": {"geo": "geo/states.geojson", "boxes": "geo/states.json"} if (out / "geo/states.json").exists() else None,
         "states": {k: v for k, v in pres["states"].items()
                    if any(k in e["vintages"].get(vv, {}) for e in levels.values() for vv in e["vintages"])},
-        "vintages": {v: {**pres["vintages"].get(v, {"label": v}), "dollars_year": vintage_year(v)} for v in vintages},
+        "vintages": {v: {**pres["vintages"].get(v, {"label": v}), "dollars_year": vintage_year(v),
+                         "tract_geography": tract_geo.get(v)} for v in vintages},
         "levels": levels,
-        "measures": [{**m, **kinds.get(m["id"], {})} for m in pres["measures"]],
-        "deflators": {"series": "R-CPI-U-RS", "annual": {str(y): s[y] for y in years}},
+        "measures": [{**m, **kinds.get(m["id"], {}),
+                      **({"nominal_pooled_through": dollar_bases[m["id"]]} if dollar_bases.get(m["id"]) else {})}
+                     for m in pres["measures"]],
+        "topic_order": pres.get("topic_order", []),
+        "deflators": {"series": "R-CPI-U-RS", "annual": {str(y): s[y] for y in sorted(s) if min(years) - 4 <= y <= max(years)}},
         "comparisons": comparisons,
+        "comparability_notes": json.loads((REGISTRY_DIR / "comparability_notes.json").read_text())["notes"],
+        # Census errata: areas withheld or cautioned (registry/suppressed_geographies.json).
+        "errata": json.loads((REGISTRY_DIR / "suppressed_geographies.json").read_text())["errata"],
         "county_changes": {"renamed": {g: r["was"] for g, r in changes["renamed"].items()},
                            "not_comparable": sorted(changes["not_comparable"])},
         "significance": {"z": 1.645, "confidence": 0.90, "source": "spec 05"},
@@ -194,7 +287,10 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     m = build(args.out)
     path = args.out / "manifest.json"
-    path.write_text(json.dumps(m, indent=2, ensure_ascii=False) + "\n")
+    # Atomic: builds run in parallel and the app may read it at any moment.
+    part = path.with_name(f"{path.name}.{__import__('os').getpid()}.part")
+    part.write_text(json.dumps(m, indent=2, ensure_ascii=False) + "\n")
+    part.replace(path)
     print(f"wrote {path} ({path.stat().st_size:,} bytes)")
     return 0
 

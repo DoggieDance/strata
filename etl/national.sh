@@ -9,12 +9,13 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 PY=.venv/bin/python
 STAGES=${STAGES:-"fetch10 cube geo xwalk"}
+OUT=${OUT:-build}   # build into a side folder, then swap, so the app never sees a half build
 STATES=${STATES:-$($PY -c 'from etl.common import parse_states; print(" ".join(parse_states("all")))')}
-mkdir -p build/logs
+mkdir -p "$OUT/logs"
 
 have() { [ -e "$1" ]; }
 for st in $STATES; do
-  log=build/logs/$st.log
+  log=$OUT/logs/$st.log
   for stage in $STAGES; do
     case $stage in
       fetch10)
@@ -23,26 +24,29 @@ for st in $STATES; do
       cube)
         for v in 2016-2020 2006-2010; do for lv in tract county place zcta; do
           [ "$v" = 2006-2010 ] && [ "$lv" = zcta ] && continue
-          have "build/acs/$v/$lv/$st.parquet" && continue
-          $PY -m etl.build_cube --states "$st" --vintages "$v" --levels "$lv" --out build >>"$log" 2>&1 \
+          have "$OUT/acs/$v/$lv/$st.parquet" && continue
+          $PY -m etl.build_cube --states "$st" --vintages "$v" --levels "$lv" --out "$OUT" >>"$log" 2>&1 \
             || echo "$st cube $v $lv FAILED"
         done; done ;;
       geo)
         for v in 2016-2020 2006-2010; do for lv in tract county place zcta; do
           [ "$v" = 2006-2010 ] && [ "$lv" = zcta ] && continue
-          have "build/geo/$v/$lv/$st.geojson" && continue
-          have "build/acs/$v/$lv/$st.parquet" || continue
-          $PY -m etl.build_geometry --states "$st" --vintages "$v" --levels "$lv" --out build >>"$log" 2>&1 \
+          have "$OUT/geo/$v/$lv/$st.geojson" && continue
+          have "$OUT/acs/$v/$lv/$st.parquet" || continue
+          $PY -m etl.build_geometry --states "$st" --vintages "$v" --levels "$lv" --out "$OUT" >>"$log" 2>&1 \
             || echo "$st geo $v $lv FAILED"
         done; done ;;
       xwalk)
-        if ! have "build/crosswalk/2010-2020/tract/$st.parquet"; then
-          $PY -m etl.crosswalk --states "$st" --out build >>"$log" 2>&1 || { echo "$st crosswalk FAILED"; continue 2; }
+        if ! have "$OUT/crosswalk/2010-2020/tract/$st.parquet"; then
+          $PY -m etl.crosswalk --states "$st" --out "$OUT" >>"$log" 2>&1 || { echo "$st crosswalk FAILED"; continue 2; }
         fi
-        if ! have "build/harmonized/2006-2010/tract-2020/$st.parquet"; then
-          $PY -m etl.harmonize --states "$st" --out build >>"$log" 2>&1 || echo "$st harmonize FAILED"
+        if ! have "$OUT/harmonized/2006-2010/tract-2020/$st.parquet"; then
+          $PY -m etl.harmonize --states "$st" --out "$OUT" >>"$log" 2>&1 || echo "$st harmonize FAILED"
         fi ;;
     esac
   done
+  # Refresh the manifest so the app shows this state now (owner, 2026-11-12:
+  # "im not seeing the other states yet"). The write is atomic.
+  $PY -m etl.write_manifest --out "$OUT" >/dev/null 2>&1 || echo "$st manifest FAILED"
   echo "$st done"
 done

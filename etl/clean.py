@@ -34,6 +34,7 @@ from etl.common import (
     jam_values,
     level_cfg,
     load_measures,
+    load_shares,
     load_summary_files,
     raw_dir,
     table_path,
@@ -108,7 +109,7 @@ def _state_geos(vintage: str, state: str, level: str) -> pd.DataFrame:
         return sequence_file.geos(vintage, state, level)
     cfg = load_summary_files()["vintages"][vintage]
     path = raw_dir(vintage) / cfg["geos"].rsplit("/", 1)[1]
-    geos = pd.read_csv(path, dtype=str, encoding="latin-1", usecols=[
+    geos = pd.read_csv(path, dtype=str, encoding="latin-1", sep=cfg.get("geos_sep", ","), usecols=[
         "SUMLEVEL", "COMPONENT", "STATE", "COUNTY", "PLACE", "TRACT", "ZCTA5", "NAME"])
     sel = geos[(geos.SUMLEVEL == lc["sumlevel"]) & (geos.COMPONENT == "00")]
     if level == "zcta":
@@ -146,13 +147,35 @@ def tract_names(vintage: str, state: str) -> pd.Series:
 # --------------------------------------------------------------------------
 # arithmetic (ACS Handbook, ch. 8 approximations)
 
+def sum_moe(E: np.ndarray, M: np.ndarray) -> np.ndarray:
+    """MOE of a row-wise sum of (already weighted) estimates E with MOEs M.
+
+    Root-sum-of-squares over the nonzero estimates, plus the largest MOE among
+    the zero estimates, once (Census: "When approximating a sum, use only the
+    largest zero estimate MOE, once" -- ACS MOE training, 2016, slide 26;
+    Worked Examples for Approximating Margins of Error). Zero-estimate MOEs are
+    model-based, not sampled, so adding every one of them overstates the error
+    (in 2006-10 tracts each is about +/-127; a 26-cell sum gained up to 20
+    points of spurious MOE before this rule). Any null estimate or MOE -> null.
+    """
+    E = np.asarray(E, dtype="float64")
+    M = np.abs(np.asarray(M, dtype="float64"))
+    bad = np.isnan(E).any(axis=1) | np.isnan(M).any(axis=1)
+    zero = E == 0
+    nz = np.where(zero, 0.0, M) ** 2
+    zmax = np.where(zero, M, 0.0).max(axis=1) if M.shape[1] else np.zeros(len(M))
+    out = np.sqrt(nz.sum(axis=1) + zmax ** 2)
+    return np.where(bad, np.nan, out)
+
+
 def sum_cells(tbl: pd.DataFrame, cells: list[str], weights=None):
-    """Weighted sum of cells; MOE = sqrt(sum((w*moe)^2)). Any null cell -> null."""
+    """Weighted sum of cells and its MOE (sum_moe: Census zero-estimate rule).
+    Any null cell -> null."""
     w = np.ones(len(cells)) if weights is None else np.asarray(weights, dtype="float64")
-    E = tbl[[f"E{c}" for c in cells]].to_numpy()
-    M = tbl[[f"M{c}" for c in cells]].to_numpy()
+    E = tbl[[f"E{c}" for c in cells]].to_numpy(dtype="float64")
+    M = tbl[[f"M{c}" for c in cells]].to_numpy(dtype="float64")
     est = E @ w  # NaN propagates
-    moe = np.sqrt(((M * w) ** 2).sum(axis=1))  # NaN propagates
+    moe = sum_moe(E * w, M * w)
     return pd.Series(est, index=tbl.index), pd.Series(moe, index=tbl.index)
 
 
@@ -168,6 +191,11 @@ def ratio(x, mx, y, my, *, proportion: bool, scale: float = 1.0):
     if proportion:
         minus = mx**2 - r**2 * my**2
         rad = minus.where(minus >= 0, plus)
+        # P = 1 is a special case: SE(P) = SE(X) / Y (Census, Instructions for
+        # Applying Statistical Testing to ACS Data, 2015 and 2025). The general
+        # formula's radicand is often negative there and would fall back to
+        # the ratio form, overstating the MOE by up to sqrt(2).
+        rad = rad.where(~np.isclose(r, 1.0), mx**2)
     else:
         rad = plus
     moe = np.sqrt(rad) / y_ok
@@ -192,8 +220,9 @@ def _shell_labels(vintage: str) -> dict:
         return sequence_file.labels(vintage)
     cfg = load_summary_files()["vintages"][vintage]
     path = raw_dir(vintage) / cfg["table_shells"].rsplit("/", 1)[1]
+    fmt = cfg.get("shells_format", {"sep": ",", "id": "Unique ID", "label": "Stub"})
     with open(path, encoding="latin-1", newline="") as f:
-        return {r["Unique ID"]: r["Stub"] for r in csv.DictReader(f) if r.get("Unique ID")}
+        return {r[fmt["id"]]: r[fmt["label"]].strip() for r in csv.DictReader(f, delimiter=fmt["sep"]) if r.get(fmt["id"])}
 
 
 def parse_bin(label: str) -> tuple[int, int | None]:
@@ -289,6 +318,15 @@ def build_measures(vintage: str, state: str, level: str = "tract"):
             e, mo = sum_cells(T(src["table"]), cells, [mids[c] for c in cells])
             notes[mid] = {"kind": "aggregate", "units": "dollars", "method": "bin_midpoint_sum",
                           "source": f"{src['table']}_{cells[0]}..{cells[-1]}", "midpoints": mids}
+            if pub := m.get("published_aggregate"):
+                # Census's own aggregate (estimate and replicate MOE) wherever it
+                # is published; the midpoint sum only where it is blank.
+                pe, pm = sum_cells(T(pub["table"]), [pub["cell"]])
+                have = pe.notna() & pm.notna()
+                e, mo = e.where(~have, pe), mo.where(~have, pm)
+                notes[mid].update(method="published aggregate (B25079) where published, else bin-midpoint sum",
+                                  published_share=round(float(have.mean()), 4),
+                                  source=f"{pub['table']}_{pub['cell']} | {src['table']}_{cells[0]}..{cells[-1]}")
         elif m["kind"] == "percent":
             sub = src.get("summary_file_substitute")
             if not sub:
@@ -326,6 +364,28 @@ def build_measures(vintage: str, state: str, level: str = "tract"):
             )
             notes[lid] = {"kind": "mean", "units": "dollars", "source": f"{mid} / {den}",
                           "legacy": True, "note": legacy["note"]}
+
+    # Shares (registry/shares.json): numerator and denominator counts, then the
+    # percent. Counts are what the harmonizer moves; the percent is recomputed
+    # from them. A share with no source for this vintage is left out.
+    for sh in load_shares():
+        src = sh["sources"].get(vintage)
+        if src is None:
+            continue
+        t = T(src["table"])
+        for cid, key in ((sh["count_numerator"], "numerator_cells"), (sh["count_denominator"], "denominator_cells")):
+            e, mo = sum_cells(t, expand_cells(src[key]))
+            prior = notes.get(cid)
+            source = f"{src['table']}_{'+'.join(src[key])}"
+            if prior and prior.get("source") != source:
+                raise ValueError(f"count {cid}: {source} conflicts with {prior['source']}")
+            cols[f"{cid}_e"], cols[f"{cid}_m"] = e, mo
+            notes[cid] = {"kind": "count", "units": "count", "source": source}
+        num, den = sh["count_numerator"], sh["count_denominator"]
+        cols[f"{sh['id']}_e"], cols[f"{sh['id']}_m"] = ratio(
+            cols[f"{num}_e"], cols[f"{num}_m"], cols[f"{den}_e"], cols[f"{den}_m"], proportion=True, scale=100.0)
+        notes[sh["id"]] = {"kind": "percent", "units": "percent (0-100)", "share": True,
+                           "source": f"{num} / {den}"}
 
     frame = pd.DataFrame(cols, index=universe)
     return frame, notes

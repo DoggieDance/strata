@@ -44,3 +44,33 @@ export function magnitudeBreak(changes) {
   const v = changes.filter((c) => c.state === "up" || c.state === "down").map((c) => Math.abs(c.d)).sort((a, b) => a - b);
   return v.length ? v[Math.floor((v.length - 1) / 2)] : 0;
 }
+
+// Two-sided p-value of a Z statistic, via the complementary error function
+// (Abramowitz & Stegun 7.1.26; |error| < 1.5e-7, ample for a threshold).
+export function pValue(z) {
+  if (!Number.isFinite(z)) return 0;
+  const x = Math.abs(z) / Math.SQRT2;
+  const t = 1 / (1 + 0.3275911 * x);
+  const erfc = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
+  return Math.min(1, erfc);
+}
+
+/**
+ * Benjamini–Hochberg (1995) false-discovery-rate control over many local tests.
+ * Returns the smallest |Z| that counts as significant at FDR q, or Infinity if
+ * none does. Under positive dependence (neighbouring tracts) BH remains valid
+ * (Benjamini & Yekutieli 2001); Caldas de Castro & Singer (2006) apply it to
+ * maps of local statistics.
+ * @param {number[]} zs |Z| for every tract with a valid test
+ */
+export function bhThreshold(zs, q = 0.10) {
+  const p = zs.filter((z) => z != null && !Number.isNaN(z)).map(pValue).sort((a, b) => a - b);
+  const m = p.length;
+  let k = -1;
+  for (let i = 0; i < m; i++) if (p[i] <= ((i + 1) / m) * q) k = i;
+  if (k < 0) return Infinity;
+  // The Z whose p-value equals p[k]: invert by bisection on pValue.
+  let lo = 0, hi = 40;
+  for (let it = 0; it < 80; it++) { const mid = (lo + hi) / 2; if (pValue(mid) > p[k]) lo = mid; else hi = mid; }
+  return hi;
+}

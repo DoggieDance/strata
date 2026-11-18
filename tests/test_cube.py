@@ -77,8 +77,14 @@ def test_cube_metadata_names_its_vintage_and_level(cube, vintage, level):
 def test_all_cubes_share_columns():
     from tests.conftest import built_combos, cube_path
     import pyarrow.parquet as pq
-    schemas = [pq.ParquetFile(cube_path(v, lv)).schema_arrow for v, lv in built_combos() if cube_path(v, lv).exists()]
-    assert all(s.names == schemas[0].names for s in schemas)
+    # Within a period every level shares one schema. Periods differ on purpose:
+    # internet, insurance and disability tables start later (registry/shares.json).
+    by_v = {}
+    for v, lv in built_combos():
+        if cube_path(v, lv).exists():
+            by_v.setdefault(v, []).append(pq.ParquetFile(cube_path(v, lv)).schema_arrow.names)
+    for v, names in by_v.items():
+        assert all(n == names[0] for n in names), v
 
 
 @pytest.mark.parametrize("v", ["2016-2020", "2006-2010"])

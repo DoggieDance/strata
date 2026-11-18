@@ -1,9 +1,10 @@
+import os
 from pathlib import Path
 
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-BUILD = ROOT / "build"
+BUILD = ROOT / os.environ.get("STRATA_BUILD", "build")  # test a side build before swapping it in
 VINTAGES = ["2016-2020", "2006-2010"]
 LEVELS = ["tract", "county", "place", "zcta"]
 

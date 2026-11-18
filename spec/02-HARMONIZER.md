@@ -247,3 +247,20 @@ neighborhood.
 
 Still owed for the gate: the 159-neighborhood z-score fixture (Figure 5 values)
 and STRATA-method results beside the study's.
+
+
+## Tract codes Census changed after 2010 (2026-11-17)
+
+The 2010→2020 crosswalk is keyed to the 2010 tract codes the 2006–10 ACS used.
+Later periods still on 2010 tracts (2011–15, 2015–19) carry Census's corrected
+codes. `registry/tract_code_changes.json` lists every difference found in the
+build, each paired by boundary rather than by code:
+
+| Kind | Rule |
+|---|---|
+| recode | Same tract, new code: re-key the crosswalk row. Nothing is estimated. |
+| merge | An empty tract (0 people, households, housing units in 2010) absorbed by a neighbor: pool rows and re-normalize; no weight moves. Refused if the absorbed tract had counts. |
+| boundary | Populated area changed tracts: the crosswalk cannot apportion the corrected tracts, so the 2020 tracts they touch get no value for those periods. |
+
+One boundary case exists (Los Angeles 1370.00). A target-density crosswalk
+from the corrected 2010 tracts would recover it; not built.

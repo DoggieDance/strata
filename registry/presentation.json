@@ -4,8 +4,17 @@
     "2006-2010": {
       "label": "2006–10"
     },
+    "2011-2015": {
+      "label": "2011–15"
+    },
+    "2015-2019": {
+      "label": "2015–19"
+    },
     "2016-2020": {
       "label": "2016–20"
+    },
+    "2020-2024": {
+      "label": "2020–24"
     }
   },
   "levels": {
@@ -36,37 +45,56 @@
     {
       "id": "mean_household_income",
       "label": "Mean household income",
-      "fmt": "usd"
+      "fmt": "usd",
+      "topic": "Income & housing costs"
     },
     {
       "id": "mean_gross_rent",
       "label": "Mean gross rent (cash renters)",
-      "fmt": "usd"
+      "fmt": "usd",
+      "topic": "Income & housing costs"
     },
     {
       "id": "mean_home_value",
       "label": "Mean home value",
-      "fmt": "usd"
+      "fmt": "usd",
+      "topic": "Income & housing costs"
     },
     {
       "id": "pct_bachelors_plus",
       "label": "Bachelor’s degree or higher, 25+",
-      "fmt": "pct"
+      "fmt": "pct",
+      "topic": "Economic"
     },
     {
       "id": "pct_nh_white",
       "label": "Non-Hispanic white",
-      "fmt": "pct"
+      "fmt": "pct",
+      "topic": "Race & ethnicity"
     },
     {
       "id": "total_population",
       "label": "Total population",
-      "fmt": "count"
+      "fmt": "count",
+      "topic": "Population"
     },
     {
       "id": "households",
       "label": "Households",
-      "fmt": "count"
+      "fmt": "count",
+      "topic": "Population"
     }
-  ]
+  ],
+  "topic_order": [
+    "Population",
+    "Race & ethnicity",
+    "Age & sex",
+    "Households",
+    "Income & housing costs",
+    "Economic",
+    "Housing",
+    "People & movement",
+    "Health & access"
+  ],
+  "shares_from": "registry/shares.json (label, topic; fmt pct)"
 }

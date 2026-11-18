@@ -28,7 +28,11 @@ def xw():
 def test_weights_sum_to_one(xw):
     s = xw.groupby("source").weight.sum()
     assert np.allclose(s, 1.0, atol=1e-9)
-    assert (xw.weight > 0).all()
+    # Per-base weights (registry v8): a row is kept if any base sends something
+    # there, so the population weight alone may be 0 (e.g. housing units, no people).
+    wcols = [c for c in xw.columns if c.startswith("weight_")] or ["weight"]
+    assert (xw[wcols] >= 0).all().all()
+    assert (xw[wcols].max(axis=1) > 0).all()
 
 
 def test_every_2010_tract_is_a_source_and_targets_are_2020_tracts(xw):
@@ -97,7 +101,7 @@ def test_percents_recomputed_not_apportioned(harmonized):
 
 # ---- synthetic cases: the formulas themselves ----
 
-NOTES = {"pop": {"kind": "count"}, "agg": {"kind": "aggregate"}}
+NOTES = {"pop": {"kind": "count", "source": "B01003_001"}, "agg": {"kind": "aggregate", "source": "B19025_001"}}
 
 
 def frame(**cols):
@@ -137,13 +141,16 @@ def test_single_source_targets_equal_their_source(harmonized, xw):
     2010 tract at weight 1 must equal that tract in every column."""
     src = pq.read_table(cube_path("2006-2010")).to_pandas().set_index("GEOID")
     one = xw[xw.groupby("target").source.transform("size") == 1]
-    one = one[np.isclose(one.weight, 1.0) & (one.groupby("source").target.transform("size") == 1)]
+    wcols = [c for c in xw.columns if c.startswith("weight_")] or ["weight"]
+    one = one[np.isclose(one[wcols], 1.0).all(axis=1) & (one.groupby("source").target.transform("size") == 1)]
     assert len(one) > 900  # 986 one-to-one tracts in Virginia
     a = harmonized.loc[one.target.values].reset_index(drop=True)
     b = src.loc[one.source.values].reset_index(drop=True)
     for c in src.columns:
         x, y = a[c].to_numpy(dtype="float64"), b[c].to_numpy(dtype="float64")
-        ok = np.isclose(x, y, rtol=1e-5, equal_nan=True) | (np.isnan(y) & (x == 0))
+        # atol: counts are stored as float32, and a percent's MOE subtracts two
+        # near-equal terms (radicand), so the 5th digit can move; shown to 0.1.
+        ok = np.isclose(x, y, rtol=1e-5, atol=1e-3, equal_nan=True) | (np.isnan(y) & (x == 0))
         assert ok.all(), c
 
 
@@ -161,3 +168,29 @@ def test_median_refused():
     xw = pd.DataFrame({"source": ["a"], "target": ["Y"], "weight": [1.0]})
     with pytest.raises(MedianApportionError):
         apportion(src, {"med": {"kind": "median"}}, xw, pd.Index(["Y"], name="GEOID"))
+
+
+def test_each_count_uses_its_universes_weight(monkeypatch):
+    """Methods audit 2026-11-17: households move by household weights, people by
+    population weights. A 2010 tract whose 2020 people sit mostly in a dorm block
+    (target X) but whose households sit mostly elsewhere (target Y)."""
+    monkeypatch.setattr("etl.harmonize.intensive_recipes", lambda: {})
+    monkeypatch.setattr("etl.harmonize.aggregate_universes", lambda: {})
+    src = frame(pop_e=[1000.0, 0.0], pop_m=[0.0, 0.0], agg_e=[100.0, 0.0], agg_m=[0.0, 0.0])
+    xw = pd.DataFrame({"source": ["a", "a"], "target": ["X", "Y"], "weight": [0.8, 0.2],
+                       "weight_pop": [0.8, 0.2], "weight_hh": [0.1, 0.9],
+                       "weight_hhpop": [0.2, 0.8], "weight_hu": [0.1, 0.9]})
+    out = apportion(src, NOTES, xw, pd.Index(["X", "Y"], name="GEOID"))
+    assert out.loc["X", "pop_e"] == 800 and out.loc["Y", "pop_e"] == 200      # B01003: population
+    assert out.loc["X", "agg_e"] == 10 and out.loc["Y", "agg_e"] == 90        # B19025: households
+
+
+def test_every_built_count_has_a_weighting_base():
+    """A new table without a base must fail the build, not default silently."""
+    import json
+    from etl.harmonize import basis_of_columns
+    path = cube_path("2006-2010")
+    if not path.exists():
+        pytest.skip("cube not built")
+    notes = json.loads(pq.ParquetFile(path).schema_arrow.metadata[b"strata"])["measures"]
+    assert set(basis_of_columns(notes).values()) <= {"pop", "hhpop", "hh", "hu"}

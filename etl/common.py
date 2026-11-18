@@ -43,12 +43,15 @@ def parse_states(arg: str) -> list[str]:
 
 
 PHASE_STATES = frozenset(json.loads((REGISTRY_DIR / "states.json").read_text())["states"])
-PHASE_VINTAGES = frozenset({"2006-2010", "2016-2020"})
+# Every vintage the Summary File registry describes (owner, 2026-11-17: "expand
+# to new year ranges"). A vintage is onboarded by etl/onboard.py, which resolves
+# its cells by label against already-verified vintages.
+PHASE_VINTAGES = frozenset(json.loads((REGISTRY_DIR / "summary_files.json").read_text())["vintages"])
 # Levels the owner asked for 2026-11-12: Census-published counties/cities,
 # places and ZCTAs, alongside tracts. Values are Census's own estimates for
 # those geographies, not sums of tracts.
 PHASE_LEVELS = frozenset({"tract", "county", "place", "zcta"})
-VINTAGE_ALIASES = {"2010": "2006-2010", "2020": "2016-2020"}
+VINTAGE_ALIASES = {"2010": "2006-2010", "2015": "2011-2015", "2019": "2015-2019", "2020": "2016-2020", "2024": "2020-2024"}
 
 SUMLEVEL_PREFIX = {"tract": "1400000US"}
 
@@ -62,6 +65,11 @@ class ScopeError(RuntimeError):
 
 def load_measures() -> dict:
     return json.loads((REGISTRY_DIR / "measures.seed.json").read_text())
+
+
+def load_shares() -> list[dict]:
+    """Share measures (registry/shares.json): a count over its universe, as a percent."""
+    return json.loads((REGISTRY_DIR / "shares.json").read_text())["shares"]
 
 
 def load_summary_files() -> dict:

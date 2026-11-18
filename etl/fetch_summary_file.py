@@ -18,7 +18,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
+import time
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -31,6 +34,7 @@ from etl.common import (
     check_scope,
     level_cfg,
     load_measures,
+    load_shares,
     load_summary_files,
     raw_dir,
     resolve_vintage,
@@ -66,8 +70,13 @@ def required_tables(vintage: str) -> list[str]:
         if src is None:
             raise ValueError(f"measure {m['id']} has no source for {vintage}")
         tables.add(_detailed_table(src, vintage, m["id"]))
+        if pub := m.get("published_aggregate"):
+            tables.add(pub["table"])
     for name, d in reg["denominators"].items():
         tables.add(_detailed_table(d, vintage, f"denominator {name}"))
+    for sh in load_shares():
+        if vintage in sh["sources"]:
+            tables.add(sh["sources"][vintage]["table"])
     return sorted(tables)
 
 
@@ -87,13 +96,50 @@ def _fresh(cached: dict, remote: dict) -> bool:
     if remote["last_modified"] and remote["content_length"] is not None:
         return (
             cached.get("last_modified") == remote["last_modified"]
-            and cached.get("content_length") == remote["content_length"]
+            and cached.get("content_length") in (remote["content_length"], None)
+            and cached.get("size", remote["content_length"]) == remote["content_length"]
         )
+    if remote["last_modified"]:
+        # www2.census.gov sometimes omits Content-Length on HEAD; an unchanged
+        # Last-Modified is then the only validator (the lookup file is also
+        # pinned by sha256).
+        return cached.get("last_modified") == remote["last_modified"]
     return False  # no usable validator: always refetch
 
 
-def fetch(url: str, dest: Path, session: requests.Session) -> str:
-    """Fetch url to dest unless the cache is current. Returns 'cached' or 'downloaded'."""
+class NotTheFile(IOError):
+    """The server answered 200 with something other than the file asked for."""
+
+
+def check_content(name: str, head: bytes, content_type: str | None = None) -> None:
+    """Refuse a download that is not what its name says. www2.census.gov's
+    firewall sometimes answers 200 with a 247-byte "Request Rejected" HTML page;
+    two of 6,760 files in the 2026-11-17 rebuild were that page saved as .zip."""
+    looks_html = head.lstrip()[:15].lower().startswith((b"<html", b"<!doctype", b"<head"))
+    if name.lower().endswith((".html", ".htm")):
+        return
+    if looks_html or (content_type or "").lower().startswith("text/html"):
+        raise NotTheFile(f"{name}: the server sent a web page, not the file (often a firewall rejection)")
+    if name.lower().endswith(".zip") and not head.startswith(b"PK\x03\x04"):
+        raise NotTheFile(f"{name}: not a zip archive (first bytes {head[:8]!r})")
+
+
+def fetch(url: str, dest: Path, session: requests.Session, tries: int = 4) -> str:
+    """Fetch url to dest unless the cache is current. Returns 'cached' or 'downloaded'.
+    A rejected or truncated download is retried with a growing pause, then the
+    error is raised: a file the server will not send stops the build."""
+    for k in range(tries):
+        try:
+            return _fetch_once(url, dest, session)
+        except (NotTheFile, IOError, requests.RequestException) as e:
+            missing = isinstance(e, requests.HTTPError) and e.response is not None and e.response.status_code == 404
+            if k == tries - 1 or missing:
+                raise
+            print(f"retrying {dest.name} in {15 * (k + 1)} s: {e}", file=sys.stderr)
+            time.sleep(15 * (k + 1))
+
+
+def _fetch_once(url: str, dest: Path, session: requests.Session) -> str:
     meta_path = dest.with_name(dest.name + ".meta.json")
     head = session.head(url, timeout=TIMEOUT, allow_redirects=True)
     head.raise_for_status()
@@ -102,23 +148,41 @@ def fetch(url: str, dest: Path, session: requests.Session) -> str:
     if dest.exists() and meta_path.exists():
         cached = json.loads(meta_path.read_text())
         if _fresh(cached, remote) and dest.stat().st_size == cached.get("size"):
-            return "cached"
+            with open(dest, "rb") as f:
+                try:
+                    check_content(dest.name, f.read(64))
+                    return "cached"
+                except NotTheFile:
+                    pass  # a bad page cached by an older fetcher: fetch again
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    part = dest.with_name(dest.name + ".part")
+    part = dest.with_name(f"{dest.name}.{os.getpid()}.part")  # unique: parallel fetches share files
     sha = hashlib.sha256()
     size = 0
+    first = b""
     with session.get(url, timeout=TIMEOUT, stream=True) as r:
         r.raise_for_status()
         got = _validators(r.headers)
+        ctype = r.headers.get("Content-Type")
         with open(part, "wb") as f:
             for chunk in r.iter_content(CHUNK):
+                if len(first) < 64:
+                    first += chunk[: 64 - len(first)]
                 f.write(chunk)
                 sha.update(chunk)
                 size += len(chunk)
     if got["content_length"] is not None and size != got["content_length"]:
         part.unlink()
         raise IOError(f"{url}: got {size} bytes, expected {got['content_length']}")
+    try:
+        check_content(dest.name, first, ctype)
+        if dest.name.lower().endswith(".zip"):
+            with zipfile.ZipFile(part) as z:
+                if z.testzip() is not None:
+                    raise NotTheFile(f"{dest.name}: zip archive fails its CRC check")
+    except (NotTheFile, zipfile.BadZipFile) as e:
+        part.unlink()
+        raise NotTheFile(str(e)) from e
     part.replace(dest)
     meta_path.write_text(
         json.dumps(

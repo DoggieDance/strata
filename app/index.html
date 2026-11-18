@@ -37,13 +37,60 @@
       <section>
         <label class="eyebrow" for="measure">Measure</label>
         <select id="measure"></select>
+        <p class="note" id="measure-note" hidden></p>
+        <p class="check">
+          <input type="checkbox" id="index-on">
+          <label for="index-on">Build an index from several measures</label>
+        </p>
+      </section>
+
+      <section id="builder" class="builder" hidden aria-labelledby="builder-title">
+        <h2 class="eyebrow" id="builder-title">Index</h2>
+        <label class="eyebrow sub" for="ix-preset">Start from</label>
+        <select id="ix-preset">
+          <option value="">Keep my measures</option>
+          <option value="philly">Philadelphia study, 2010 to 2020 change</option>
+          <option value="current">Only the measure above</option>
+        </select>
+        <label class="eyebrow sub" for="ix-name">Name</label>
+        <input id="ix-name" type="text" maxlength="120" autocomplete="off">
+        <ol id="ix-measures" class="ix-measures" aria-label="Measures in the index"></ol>
+        <div class="ix-add">
+          <label class="sr-only" for="ix-add">Measure to add</label>
+          <select id="ix-add"></select>
+          <button type="button" id="ix-add-btn">Add</button>
+        </div>
+        <label class="eyebrow sub" for="ix-aggregate">Combine by</label>
+        <select id="ix-aggregate">
+          <option value="mean">Weighted mean (fully compensatory)</option>
+          <option value="geometric">Geometric mean (penalizes imbalance)</option>
+          <option value="rank_sum">Sum of percentile ranks (CDC SVI)</option>
+        </select>
+        <p class="note error" id="ix-error" role="alert" hidden></p>
+        <p class="note" id="ix-sensitivity" role="status"></p>
+        <p><button type="button" id="ix-copy" class="link">Copy link to this index</button> <span class="note" id="ix-copied" role="status"></span></p>
       </section>
 
       <section>
-        <fieldset class="segmented" id="vintage">
-          <legend class="eyebrow">Period</legend>
-          <div class="seg-row" id="vintage-options"></div>
+        <fieldset class="segmented" id="mode">
+          <legend class="eyebrow">Show</legend>
+          <div class="seg-row">
+            <label><input type="radio" name="mode" value="level" checked><span>One period</span></label>
+            <label><input type="radio" name="mode" value="change"><span>Change</span></label>
+          </div>
         </fieldset>
+        <div id="one-period">
+          <label class="eyebrow sub" for="vintage">Period</label>
+          <select id="vintage"></select>
+        </div>
+        <div id="pair" class="pair" hidden>
+          <div><label class="eyebrow sub" for="from">From</label><select id="from"></select></div>
+          <div><label class="eyebrow sub" for="to">To</label><select id="to"></select></div>
+        </div>
+        <p class="check" id="fdr-row" hidden>
+          <input type="checkbox" id="fdr">
+          <label for="fdr">Control false discoveries (Benjamini–Hochberg, 10%)</label>
+        </p>
         <p class="check" id="on-new-row" hidden>
           <input type="checkbox" id="on-new">
           <label for="on-new">Show on 2020 tract lines</label>
@@ -55,8 +102,12 @@
       <section aria-labelledby="legend-title">
         <h2 class="eyebrow" id="legend-title">Legend</h2>
         <ul class="legend" id="legend"></ul>
+        <div id="cautions-wrap" class="cautions" hidden>
+          <h3 class="eyebrow">Comparability cautions</h3>
+          <ul id="cautions"></ul>
+        </div>
         <p class="note"><span class="swatch hatch" aria-hidden="true"></span> Low reliability: CV above 40%,
-          hatched, not colored. A field convention; Census publishes no cutoff.</p>
+          hatched, not colored. Tiers follow Esri's ACS convention (CV up to 12% high, 12–40% medium, over 40% low); Census publishes no cutoff.</p>
       </section>
 
       <section class="inspector" aria-labelledby="inspector-title">

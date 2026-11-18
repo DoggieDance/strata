@@ -1,0 +1,13 @@
+{
+  "note": "Which 2020 block count weights each table's counts when a 2010-tract period is moved onto 2020 tracts (etl/harmonize.py). Methods audit 2026-11-17: one total-population weight for everything lets dorm and prison blocks pull household and housing measures; NHGIS ships separate population, household and housing-unit weights for this reason. A share's numerator and denominator come from one table, so they always use the same weight. Bases come from the 2020 PL 94-171 file: pop = P1_001, hhpop = P1_001 - P5_001 (population outside group quarters), hh = H1_002 (occupied units = households), hu = H1_001.",
+  "bases": {
+    "pop": {"tables": ["B01001", "B01003", "B03002", "B05012", "B07003", "B08301", "B15002", "B15003", "B23001", "B23025"],
+            "why": "Universes include group-quarters residents (total population, population 25+, 16+, workers)."},
+    "hhpop": {"tables": ["B17001", "C17002", "B18101", "B27010"],
+              "why": "Poverty status excludes institutional group quarters and college dorms; disability and insurance cover the civilian noninstitutionalized population. Household population is the closest PL base."},
+    "hh": {"tables": ["B11001", "B16002", "C16002", "B19025", "B25003", "B25014", "B25044", "B25063", "B25065", "B25070", "B25075", "B25079", "B28002"],
+           "why": "Universes are households or occupied housing units (owner- or renter-occupied). B28002 (internet subscriptions) covers households."},
+    "hu": {"tables": ["B25002", "B25024", "B25034"],
+           "why": "Universes are all housing units, occupied or vacant."}
+  }
+}

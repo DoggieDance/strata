@@ -30,7 +30,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parent.parent
-BUILD = ROOT / "build"
+BUILD = ROOT / __import__("os").environ.get("STRATA_BUILD", "build")
 HOOD = ROOT / "data/raw/philly/philadelphia-neighborhoods.geojson"
 FIXTURE = ROOT / "tests/fixtures/philly_pct_change_top5.csv"
 STUDY_FACTOR = 1.187
@@ -44,7 +44,11 @@ INDICATORS = {
     # Park 60% vs 139%). A study error, kept here only to replicate it.
     "income": ("mean_household_income", "agg_household_income", "owner_households", 1, True),
     "rent": ("mean_gross_rent_philly_study", "agg_gross_rent", "renter_households", 1, True),
-    "home_value": ("mean_home_value", "agg_home_value", "owner_households", 1, True),
+    # The study summed B25075 bin midpoints. STRATA's cube now carries Census's
+    # published aggregate (B25079) where it exists (methods audit 2026-11-17),
+    # which runs up to ~6% lower in Philadelphia tracts in 2016-20; replicating
+    # the study needs the study's measure, recomputed here from the raw table.
+    "home_value": ("mean_home_value", "agg_home_value_bins", "owner_households", 1, True),
     # NOT reproduced. Our correct definition puts McGuire at 126%, the study at
     # 1,969%. Counting only men in 2010 (B15002_015:018) reproduces the study's
     # top-5 set and McGuire's value (male/male 25+ both years: 1,969.0%), but no
@@ -59,7 +63,21 @@ def tracts(vintage: str) -> gpd.GeoDataFrame:
     geo = geo[geo.GEOID.str.startswith("42101")].to_crs(CRS)
     cube = pq.read_table(BUILD / f"acs/{vintage}/tract/42.parquet").to_pandas().set_index("GEOID")
     cube = cube[[c for c in cube.columns if c.endswith("_e")]].rename(columns=lambda c: c[:-2])
+    cube["agg_home_value_bins"] = bin_midpoint_home_value(vintage)
     return geo.join(cube, on="GEOID")
+
+
+def bin_midpoint_home_value(vintage: str) -> pd.Series:
+    """Aggregate home value as the study computed it: B25075 bin counts times
+    midpoints, by the same registry recipe and code the cube builder uses."""
+    from etl.clean import bin_midpoints, expand_cells, load_table, sum_cells
+    from etl.common import load_measures
+    m = next(x for x in load_measures()["measures"] if x["id"] == "agg_home_value")
+    src = m["sources"][vintage]
+    cells = expand_cells(src["cells"])
+    mids = bin_midpoints(vintage, src["table"], src)
+    e, _ = sum_cells(load_table(vintage, src["table"], "42", "tract"), cells, [mids[c] for c in cells])
+    return e
 
 
 def overlay(tr: gpd.GeoDataFrame, hoods: gpd.GeoDataFrame) -> pd.DataFrame:

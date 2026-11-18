@@ -1,0 +1,38 @@
+{
+  "about": "Census 2010 tracts whose codes or boundaries Census changed after the 2006-2010 ACS. The 2010->2020 crosswalk is keyed to the original 2010 codes; later periods still on 2010 tracts (2011-15, 2015-19) carry the corrected ones. Every pairing below was derived from the boundaries (cb_2010 vs cb_2015 1:500k tract files): the old tract's interior point falls in the new tract, and the area ratio (new/old) is recorded. Population for 'boundary' rows is from the cubes. Used by etl/harmonize.py.",
+  "derived": "2026-11-17, build-v8; see worklog",
+  "applies_to": ["2011-2015", "2015-2019"],
+  "kinds": {
+    "recode": "Same tract, new code (county renamed or merged, or Census code correction). The crosswalk row is re-keyed; nothing is estimated.",
+    "merge": "The old tract was absorbed into an existing tract and had no people, households or housing units in 2010, so pooling its crosswalk rows into the absorbing tract changes no weight.",
+    "boundary": "The boundary moved and populated area changed tracts. The 2010->2020 crosswalk cannot apportion the corrected tracts, so every 2020 tract they touch is left without a value for these periods, rather than shown with a partial sum."
+  },
+  "changes": [
+    {"old": "02270000100", "new": "02158000100", "kind": "recode", "area_ratio": 1.000, "why": "Wade Hampton Census Area renamed Kusilvak Census Area (2015), county code 270 -> 158"},
+    {"old": "46113940500", "new": "46102940500", "kind": "recode", "area_ratio": 1.000, "why": "Shannon County renamed Oglala Lakota County (2015), county code 113 -> 102"},
+    {"old": "46113940800", "new": "46102940800", "kind": "recode", "area_ratio": 1.000, "why": "Shannon County renamed Oglala Lakota County (2015)"},
+    {"old": "46113940900", "new": "46102940900", "kind": "recode", "area_ratio": 1.000, "why": "Shannon County renamed Oglala Lakota County (2015)"},
+    {"old": "51515050100", "new": "51019050100", "kind": "recode", "area_ratio": 1.000, "why": "Bedford city became part of Bedford County, VA (2013)"},
+    {"old": "04019002701", "new": "04019002704", "kind": "recode", "area_ratio": 1.002, "why": "Pima County, AZ tract code correction"},
+    {"old": "04019002903", "new": "04019002906", "kind": "recode", "area_ratio": 0.993, "why": "Pima County, AZ tract code correction"},
+    {"old": "04019410501", "new": "04019004118", "kind": "recode", "area_ratio": 0.996, "why": "Pima County, AZ tract code correction"},
+    {"old": "04019410502", "new": "04019004121", "kind": "recode", "area_ratio": 0.999, "why": "Pima County, AZ tract code correction"},
+    {"old": "04019410503", "new": "04019004125", "kind": "recode", "area_ratio": 0.999, "why": "Pima County, AZ tract code correction"},
+    {"old": "04019470400", "new": "04019005200", "kind": "recode", "area_ratio": 1.000, "why": "Pima County, AZ tract code correction"},
+    {"old": "04019470500", "new": "04019005300", "kind": "recode", "area_ratio": 0.999, "why": "Pima County, AZ tract code correction"},
+    {"old": "36053940101", "new": "36053030101", "kind": "recode", "area_ratio": 1.003, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940102", "new": "36053030102", "kind": "recode", "area_ratio": 0.998, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940103", "new": "36053030103", "kind": "recode", "area_ratio": 1.001, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940200", "new": "36053030200", "kind": "recode", "area_ratio": 1.001, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940300", "new": "36053030300", "kind": "recode", "area_ratio": 0.998, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940401", "new": "36053030401", "kind": "recode", "area_ratio": 1.000, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940403", "new": "36053030403", "kind": "recode", "area_ratio": 1.000, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940600", "new": "36053030600", "kind": "recode", "area_ratio": 1.000, "why": "Madison County, NY tract code correction"},
+    {"old": "36053940700", "new": "36053030402", "kind": "recode", "area_ratio": 0.999, "why": "Madison County, NY tract code correction (not the next code in sequence: paired by boundary)"},
+    {"old": "36065940000", "new": "36065024800", "kind": "recode", "area_ratio": 1.000, "why": "Oneida County, NY tract code correction"},
+    {"old": "36065940100", "new": "36065024700", "kind": "recode", "area_ratio": 0.999, "why": "Oneida County, NY tract code correction"},
+    {"old": "36065940200", "new": "36065024900", "kind": "recode", "area_ratio": 1.031, "why": "Oneida County, NY tract code correction"},
+    {"old": "36085008900", "new": "36085009700", "kind": "merge", "why": "Richmond County, NY: tract 0089.00 (2010 population 0) absorbed into 0097.00, which kept 97.6% of its own area"},
+    {"old": "06037930401", "new": "06037137000", "kind": "boundary", "also": ["06037800204"], "area_ratio": 2.16, "why": "Los Angeles County, CA: new tract 1370.00 is all of old 9304.01 plus 17% of old 8002.04's area; population moved (9304.01: 2,520 in 2006-10 -> 1370.00: 4,797 in 2011-15; 8002.04: 6,837 -> 4,790)"}
+  ]
+}

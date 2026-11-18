@@ -1,0 +1,15 @@
+{
+  "note": "Label pairs etl/onboard.py treats as the same Census concept when resolving a vintage's cells. Each is a judgment, stated with its reason; anything not listed must match exactly (after case, punctuation and the '(in YYYY inflation-adjusted dollars)' suffix).",
+  "synonyms": [
+    {"a": "Worked at home", "b": "Worked from home", "tables": ["B08301"],
+     "why": "Census reworded the row in 2019; the question and universe (workers 16+) are unchanged."},
+    {"a": "Male householder, no wife present", "b": "Male householder, no spouse present", "tables": ["B11001"],
+     "why": "Rewording to include same-sex spouses (2019+); the row still counts families with a male householder and no spouse."},
+    {"a": "Female householder, no husband present", "b": "Female householder, no spouse present", "tables": ["B11001"],
+     "why": "As above."},
+    {"a": "No one 14 and over speaks English only or speaks English \"very well\"", "b": "Limited English speaking household", "tables": ["B16002", "C16002"],
+     "why": "Census replaced the term 'linguistically isolated household' with 'limited English speaking household' without changing the definition: no member 14 or older speaks only English or speaks English 'very well' (ACS subject definitions, Language Spoken at Home)."},
+    {"a": "Public transportation (excluding taxicab)", "b": "Public transportation", "tables": ["B08301"],
+     "why": "In 2020-2024 taxis became 'Taxi or ride-hailing services' and remain their own row (B08301_016), so the public-transportation row still excludes them."}
+  ]
+}

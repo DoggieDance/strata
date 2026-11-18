@@ -183,3 +183,37 @@ two MOEs may differ slightly; the spot-check compares estimates only.
 
 Next additions, in order of usefulness: vacancy rate, tenure, gross rent as a
 share of income, median year structure built, commute mode, limited English.
+
+## Share measures (v0.3.3, 2026-11-17)
+
+Owner, 2026-11-12: "an inventory of what other data we should pull from acs ...
+demographics like race, age groups, etc."
+
+**Inventory.** `analysis/acs_inventory.py` → `registry/acs_inventory.json`: all
+1,176 ACS 5-year detailed tables (771 without race-group iterations), each with
+topic, title, universe, cell counts per period, comparability (identical /
+labels reworded / restructured / one period only), and whether 2006–10 publishes
+it at tract level, checked against every Virginia tract row in all 118 tract
+sequence files. Headline: 427 distinct tables comparable as-is, 144
+restructured, 173 new since 2006–10 (health insurance, disability and internet
+among them; tract-level versions begin with 2008–12 or later).
+
+**40 shares** (`registry/shares.json`): each is a numerator count over a
+denominator count from one table, per period, published as a percent with the
+proportion MOE. Cell numbers are stored with the Census labels they resolve to;
+`tests/test_shares.py` re-reads both label files and fails on any drift. Counts
+(not percents) are what the harmonizer apportions, so every share with both
+periods gets a 2010→2020 change map. Per-period recipes where Census changed a
+table: education (B15002 → B15003), limited English (B16002 "linguistically
+isolated" → C16002, same definition), year built (B25034 gained a row).
+Unemployment uses B23001 in both periods because B23025 did not exist in
+2006–10. Four shares are 2016–20 only (uninsured, disability, broadband, no
+internet); the app disables them for 2006–10 and for change maps.
+
+**Gates.** Label test; exact partition identities on every built cube (race
+groups sum to B03002_001, age groups to B01001_001); 120 data.census.gov values
+from the new tables (VA, PA, CA tracts, both periods).
+
+Medians (median age, median rent, Gini) are deliberately not in this set: they
+can be mapped for one period but never apportioned onto 2020 tracts (hard rule),
+so they need the harmonizer to omit them explicitly first.
